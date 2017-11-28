@@ -28,7 +28,7 @@ export const getNavData = app => [
         ],
       },
       {
-        name: '异常',
+        name: 'Exception',
         path: 'exception',
         icon: 'warning',
         children: [
@@ -57,7 +57,7 @@ export const getNavData = app => [
     layout: 'UserLayout',
     children: [
       {
-        name: '帐户',
+        name: 'Quản lý user',
         icon: 'user',
         path: 'user',
         children: [
@@ -79,15 +79,5 @@ export const getNavData = app => [
         ],
       },
     ],
-  },
-  {
-    component: dynamicWrapper(app, [], () => import('../layouts/BlankLayout')),
-    layout: 'BlankLayout',
-    children: {
-      name: '使用文档',
-      path: 'http://pro.ant.design/docs/getting-started',
-      target: '_blank',
-      icon: 'book',
-    },
   },
 ];
