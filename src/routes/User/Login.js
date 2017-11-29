@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
-import { Form, Input, Button, Icon, Checkbox, Alert } from 'antd';
+import { Form, Input, Button, Icon, Alert } from 'antd';
 import styles from './Login.less';
 
 const FormItem = Form.Item;
@@ -11,27 +11,18 @@ const FormItem = Form.Item;
 }))
 @Form.create()
 export default class Login extends Component {
-  state = {
-    type: 'account',
-  }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.login.status === 'ok') {
       this.props.dispatch(routerRedux.push('/'));
     }
   }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
   handleSubmit = (e) => {
     e.preventDefault();
-    const { type } = this.state;
     this.props.form.validateFields({ force: true },
       (err, values) => {
         if (!err) {
           this.props.dispatch({
-            type: `login/${type}Submit`,
+            type: 'login/AccountSubmit',
             payload: values,
           });
         }
@@ -53,20 +44,18 @@ export default class Login extends Component {
   render() {
     const { form, login } = this.props;
     const { getFieldDecorator } = form;
-    const { type } = this.state;
     return (
       <div className={styles.main}>
         <Form onSubmit={this.handleSubmit}>
           {
             login.status === 'error' &&
-            login.type === 'account' &&
             login.submitting === false &&
-            this.renderMessage('账户或密码错误')
+            this.renderMessage('Tài khoản hoặc mật khẩu không đúng!')
           }
           <FormItem>
-            {getFieldDecorator('userName', {
+            {getFieldDecorator('username', {
               rules: [{
-                required: type === 'account', message: 'Vui lòng nhập tên đăng nhập!',
+                required: true, message: 'Vui lòng nhập tên đăng nhập!',
               }],
             })(
               <Input
@@ -79,7 +68,7 @@ export default class Login extends Component {
           <FormItem>
             {getFieldDecorator('password', {
               rules: [{
-                required: type === 'account', message: 'Vui lòng nhập mật khẩu!',
+                required: true, message: 'Vui lòng nhập mật khẩu!',
               }],
             })(
               <Input
@@ -91,12 +80,6 @@ export default class Login extends Component {
             )}
           </FormItem>
           <FormItem className={styles.additional}>
-            {getFieldDecorator('remember', {
-              valuePropName: 'checked',
-              initialValue: true,
-            })(
-              <Checkbox className={styles.autoLogin}>Lưu tài khoản</Checkbox>
-            )}
             <a className={styles.forgot} href="">Quên mật khẩu</a>
             <Button size="large" loading={login.submitting} className={styles.submit} type="primary" htmlType="submit">
               Xác nhận
