@@ -17,11 +17,13 @@ export const getNavData = app => [
     children: [
       {
         name: 'Shop',
+        showOnSideBar: true,
         icon: 'shop',
         path: 'shop',
         children: [
           {
             name: 'Danh sách',
+            showOnSideBar: true,
             path: 'list',
             component: dynamicWrapper(app, ['shop'], () => import('../routes/Shop/List')),
           },
@@ -29,21 +31,25 @@ export const getNavData = app => [
       },
       {
         name: 'Exception',
+        showOnSideBar: false,
         path: 'exception',
         icon: 'warning',
         children: [
           {
             name: '403',
+            showOnSideBar: false,
             path: '403',
             component: dynamicWrapper(app, [], () => import('../routes/Exception/403')),
           },
           {
             name: '404',
+            showOnSideBar: false,
             path: '404',
             component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
           },
           {
             name: '500',
+            showOnSideBar: false,
             path: '500',
             component: dynamicWrapper(app, [], () => import('../routes/Exception/500')),
           },
@@ -58,21 +64,25 @@ export const getNavData = app => [
     children: [
       {
         name: 'Quản lý user',
+        showOnSideBar: false,
         icon: 'user',
         path: 'user',
         children: [
           {
             name: '登录',
+            showOnSideBar: false,
             path: 'login',
             component: dynamicWrapper(app, ['login'], () => import('../routes/User/Login')),
           },
           {
             name: '注册',
+            showOnSideBar: false,
             path: 'register',
             component: dynamicWrapper(app, ['register'], () => import('../routes/User/Register')),
           },
           {
             name: '注册结果',
+            showOnSideBar: false,
             path: 'register-result',
             component: dynamicWrapper(app, [], () => import('../routes/User/RegisterResult')),
           },

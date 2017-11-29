@@ -1,5 +1,6 @@
 import fetch from 'dva/fetch';
 import { notification } from 'antd';
+import { API_URL } from '../constants/appConstants';
 
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -22,6 +23,8 @@ function checkStatus(response) {
  * @return {object}           An object containing either "data" or "err"
  */
 export default function request(url, options) {
+  const newUrl = API_URL + url;
+
   const defaultOptions = {
     credentials: 'include',
   };
@@ -35,7 +38,7 @@ export default function request(url, options) {
     newOptions.body = JSON.stringify(newOptions.body);
   }
 
-  return fetch(url, newOptions)
+  return fetch(newUrl, newOptions)
     .then(checkStatus)
     .then(response => response.json())
     .catch((error) => {
