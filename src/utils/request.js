@@ -6,6 +6,7 @@ function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response;
   }
+
   notification.error({
     message: `请求错误 ${response.status}: ${response.url}`,
     description: response.statusText,
@@ -37,7 +38,6 @@ export default function request(url, options) {
     };
     newOptions.body = JSON.stringify(newOptions.body);
   }
-
   return fetch(newUrl, newOptions)
     .then(checkStatus)
     .then(response => response.json())
@@ -49,6 +49,7 @@ export default function request(url, options) {
         });
       }
       if ('stack' in error && 'message' in error) {
+        console.log(error);
         notification.error({
           message: `请求错误: ${url}`,
           description: error.message,

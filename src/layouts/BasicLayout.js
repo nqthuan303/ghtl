@@ -65,9 +65,9 @@ class BasicLayout extends React.PureComponent {
     return { location, breadcrumbNameMap };
   }
   componentDidMount() {
-    // this.props.dispatch({
-    //   type: 'user/fetchCurrent',
-    // });
+    this.props.dispatch({
+      type: 'user/fetchCurrent',
+    });
   }
   componentWillUnmount() {
     this.triggerResizeEvent.cancel();
@@ -244,10 +244,10 @@ class BasicLayout extends React.PureComponent {
 
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
-        <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
-        <Menu.Item disabled><Icon type="setting" />设置</Menu.Item>
+        <Menu.Item><Icon type="user" />Thông tin user</Menu.Item>
+        <Menu.Item><Icon type="setting" />Cài đặt</Menu.Item>
         <Menu.Divider />
-        <Menu.Item key="logout"><Icon type="logout" />退出登录</Menu.Item>
+        <Menu.Item key="logout"><Icon type="logout" />Đăng xuất</Menu.Item>
       </Menu>
     );
     const noticeData = this.getNoticeData();
