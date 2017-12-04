@@ -1,16 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Layout, Menu, Icon, Avatar, Dropdown, Tag, message, Spin } from 'antd';
+import { Layout, Menu, Icon, Avatar, Dropdown, message } from 'antd';
 import DocumentTitle from 'react-document-title';
 import { connect } from 'dva';
-import { Link, Route, Redirect, Switch } from 'dva/router';
-import moment from 'moment';
-import groupBy from 'lodash/groupBy';
+import { Link, Route, Switch } from 'dva/router';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import Debounce from 'lodash-decorators/debounce';
 import HeaderSearch from '../components/HeaderSearch';
-import NoticeIcon from '../components/NoticeIcon';
 import GlobalFooter from '../components/GlobalFooter';
 import NotFound from '../routes/Exception/404';
 import styles from './BasicLayout.less';
@@ -52,6 +49,7 @@ class BasicLayout extends React.PureComponent {
       openKeys: this.getDefaultCollapsedSubMenus(props),
     };
   }
+
   getChildContext() {
     const { location, navData, getRouteData } = this.props;
     const routeData = getRouteData('BasicLayout');
@@ -64,11 +62,15 @@ class BasicLayout extends React.PureComponent {
     });
     return { location, breadcrumbNameMap };
   }
-  componentDidMount() {
-    this.props.dispatch({
-      type: 'user/fetchCurrent',
-    });
+
+  componentWillMount() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      const { history } = this.props;
+      history.push('/user/login');
+    }
   }
+
   componentWillUnmount() {
     this.triggerResizeEvent.cancel();
   }
@@ -80,9 +82,9 @@ class BasicLayout extends React.PureComponent {
   }
   onMenuClick = ({ key }) => {
     if (key === 'logout') {
-      this.props.dispatch({
-        type: 'login/logout',
-      });
+      const { history } = this.props;
+      localStorage.clear();
+      history.push('/user/login');
     }
   }
   getMenuData = (data, parentPath) => {
@@ -175,33 +177,6 @@ class BasicLayout extends React.PureComponent {
     });
     return title;
   }
-  getNoticeData() {
-    const { notices = [] } = this.props;
-    if (notices.length === 0) {
-      return {};
-    }
-    const newNotices = notices.map((notice) => {
-      const newNotice = { ...notice };
-      if (newNotice.datetime) {
-        newNotice.datetime = moment(notice.datetime).fromNow();
-      }
-      // transform id to item key
-      if (newNotice.id) {
-        newNotice.key = newNotice.id;
-      }
-      if (newNotice.extra && newNotice.status) {
-        const color = ({
-          todo: '',
-          processing: 'blue',
-          urgent: 'red',
-          doing: 'gold',
-        })[newNotice.status];
-        newNotice.extra = <Tag color={color} style={{ marginRight: 0 }}>{newNotice.extra}</Tag>;
-      }
-      return newNotice;
-    });
-    return groupBy(newNotices, 'type');
-  }
   handleOpenChange = (openKeys) => {
     const lastOpenKey = openKeys[openKeys.length - 1];
     const isMainMenu = this.menus.some(
@@ -240,8 +215,8 @@ class BasicLayout extends React.PureComponent {
     }
   }
   render() {
-    const { currentUser, collapsed, fetchingNotices, getRouteData } = this.props;
-
+    const { collapsed, getRouteData } = this.props;
+    const info = JSON.parse(localStorage.getItem('info'));
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
         <Menu.Item><Icon type="user" />Thông tin user</Menu.Item>
@@ -250,7 +225,6 @@ class BasicLayout extends React.PureComponent {
         <Menu.Item key="logout"><Icon type="logout" />Đăng xuất</Menu.Item>
       </Menu>
     );
-    const noticeData = this.getNoticeData();
 
     // Don't show popup menu when it is been collapsed
     const menuProps = collapsed ? {} : {
@@ -304,44 +278,12 @@ class BasicLayout extends React.PureComponent {
                   console.log('enter', value); // eslint-disable-line
                 }}
               />
-              <NoticeIcon
-                className={styles.action}
-                count={currentUser.notifyCount}
-                onItemClick={(item, tabProps) => {
-                  console.log(item, tabProps); // eslint-disable-line
-                }}
-                onClear={this.handleNoticeClear}
-                onPopupVisibleChange={this.handleNoticeVisibleChange}
-                loading={fetchingNotices}
-                popupAlign={{ offset: [20, -16] }}
-              >
-                <NoticeIcon.Tab
-                  list={noticeData['通知']}
-                  title="通知"
-                  emptyText="你已查看所有通知"
-                  emptyImage="https://gw.alipayobjects.com/zos/rmsportal/wAhyIChODzsoKIOBHcBk.svg"
-                />
-                <NoticeIcon.Tab
-                  list={noticeData['消息']}
-                  title="消息"
-                  emptyText="您已读完所有消息"
-                  emptyImage="https://gw.alipayobjects.com/zos/rmsportal/sAuJeJzSKbUmHfBQRzmZ.svg"
-                />
-                <NoticeIcon.Tab
-                  list={noticeData['待办']}
-                  title="待办"
-                  emptyText="你已完成所有待办"
-                  emptyImage="https://gw.alipayobjects.com/zos/rmsportal/HsIsxMZiWKrNUavQUXqx.svg"
-                />
-              </NoticeIcon>
-              {currentUser.name ? (
-                <Dropdown overlay={menu}>
-                  <span className={`${styles.action} ${styles.account}`}>
-                    <Avatar size="small" className={styles.avatar} src={currentUser.avatar} />
-                    {currentUser.name}
-                  </span>
-                </Dropdown>
-              ) : <Spin size="small" style={{ marginLeft: 8 }} />}
+              <Dropdown overlay={menu}>
+                <span className={`${styles.action} ${styles.account}`}>
+                  <Avatar size="small" className={styles.avatar} />
+                  {info ? info.name : ''}
+                </span>
+              </Dropdown>
             </div>
           </Header>
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
@@ -359,7 +301,6 @@ class BasicLayout extends React.PureComponent {
                     )
                   )
                 }
-                <Redirect exact from="/" to="/dashboard/analysis" />
                 <Route component={NotFound} />
               </Switch>
             </div>
@@ -386,7 +327,6 @@ class BasicLayout extends React.PureComponent {
 }
 
 export default connect(state => ({
-  currentUser: state.user.currentUser,
   collapsed: state.global.collapsed,
   fetchingNotices: state.global.fetchingNotices,
   notices: state.global.notices,

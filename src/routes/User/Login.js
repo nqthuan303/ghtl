@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { routerRedux } from 'dva/router';
-import { Form, Input, Button, Icon, Alert } from 'antd';
+import { Form, Input, Button, Icon, notification } from 'antd';
 import styles from './Login.less';
+import request from '../../utils/request';
 
 const FormItem = Form.Item;
 
@@ -11,33 +11,43 @@ const FormItem = Form.Item;
 }))
 @Form.create()
 export default class Login extends Component {
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.login.status === 'ok') {
-      this.props.dispatch(routerRedux.push('/'));
+  componentWillMount() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const { history } = this.props;
+      history.push('');
     }
   }
+  async onLogin(data) {
+    const opt = {
+      method: 'POST',
+      body: data,
+    };
+    const { history } = this.props;
+    const result = await request('/user/login', opt);
+    const { data: resData } = result;
+    if (result.status === 'success') {
+      const { token } = resData;
+      const { info } = resData;
+      localStorage.setItem('info', JSON.stringify(info));
+      localStorage.setItem('token', token);
+      history.push('');
+    } else {
+      notification.error({
+        message: 'Đăng nhập không thành công!',
+        description: resData.msg,
+      });
+    }
+  }
+
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields({ force: true },
       (err, values) => {
         if (!err) {
-          this.props.dispatch({
-            type: 'login/AccountSubmit',
-            payload: values,
-          });
+          this.onLogin(values);
         }
       }
-    );
-  }
-
-  renderMessage = (message) => {
-    return (
-      <Alert
-        style={{ marginBottom: 24 }}
-        message={message}
-        type="error"
-        showIcon
-      />
     );
   }
 
@@ -47,11 +57,6 @@ export default class Login extends Component {
     return (
       <div className={styles.main}>
         <Form onSubmit={this.handleSubmit}>
-          {
-            login.status === 'error' &&
-            login.submitting === false &&
-            this.renderMessage('Tài khoản hoặc mật khẩu không đúng!')
-          }
           <FormItem>
             {getFieldDecorator('username', {
               rules: [{

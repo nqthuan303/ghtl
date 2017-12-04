@@ -1,4 +1,3 @@
-import { routerRedux } from 'dva/router';
 import { fakeAccountLogin, fakeMobileLogin } from '../services/api';
 
 export default {
@@ -39,25 +38,9 @@ export default {
         payload: false,
       });
     },
-    *logout(_, { put }) {
-      yield put({
-        type: 'changeLoginStatus',
-        payload: {
-          status: false,
-        },
-      });
-      yield put(routerRedux.push('/user/login'));
-    },
   },
 
   reducers: {
-    changeLoginStatus(state, { payload }) {
-      return {
-        ...state,
-        status: payload.status,
-        type: payload.type,
-      };
-    },
     changeSubmitting(state, { payload }) {
       return {
         ...state,

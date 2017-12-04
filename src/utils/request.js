@@ -26,9 +26,7 @@ function checkStatus(response) {
 export default function request(url, options) {
   const newUrl = API_URL + url;
 
-  const defaultOptions = {
-    credentials: 'include',
-  };
+  const defaultOptions = {};
   const newOptions = { ...defaultOptions, ...options };
   if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
     newOptions.headers = {
@@ -37,6 +35,14 @@ export default function request(url, options) {
       ...newOptions.headers,
     };
     newOptions.body = JSON.stringify(newOptions.body);
+  }
+  const token = localStorage.getItem('token');
+  if (token) {
+    const { headers } = newOptions;
+
+    newOptions.headers = {
+      ...headers, Authorization: token,
+    };
   }
   return fetch(newUrl, newOptions)
     .then(checkStatus)
@@ -49,7 +55,6 @@ export default function request(url, options) {
         });
       }
       if ('stack' in error && 'message' in error) {
-        console.log(error);
         notification.error({
           message: `请求错误: ${url}`,
           description: error.message,
