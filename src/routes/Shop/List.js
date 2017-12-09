@@ -42,6 +42,7 @@ class ShopList extends React.Component {
     if (result.status === 'success') {
       const { items } = this.state;
       delete items[index];
+      items.splice(index, 1);
       this.setState({
         items,
         notice: {
@@ -58,6 +59,13 @@ class ShopList extends React.Component {
       });
     }
   }
+  onClickShopName = (e) => {
+    e.preventDefault();
+    const { history } = this.props;
+    const { target } = e;
+    const shopId = target.getAttribute('shopid');
+    history.push(`/shop/info/${shopId}`);
+  }
 
   async getList() {
     const result = await request('/client/list');
@@ -69,6 +77,7 @@ class ShopList extends React.Component {
 
   render() {
     const { items, notice } = this.state;
+
     const columns = [
       {
         title: 'No',
@@ -79,6 +88,9 @@ class ShopList extends React.Component {
         title: 'shop',
         sorter: (a, b) => a.name.length - b.name.length,
         dataIndex: 'name',
+        render: (text, record) => (
+          <a shopid={record._id} onClick={this.onClickShopName} href={`shop/info/${record._id}`}>{record.name}</a>
+        ),
       },
       {
         title: 'SĐT',
@@ -106,7 +118,6 @@ class ShopList extends React.Component {
           <div>
             <a onClick={() => this.onClickDelete(record, index)}>Xóa</a>
             <Divider type="vertical" />
-            <a href="">Sửa</a>
           </div>
         ),
       },
@@ -116,10 +127,10 @@ class ShopList extends React.Component {
         <Card bordered={false}>
           <div className={styles.tableList}>
             {notice.message !== '' ?
-              <Alert style={{ marginBottom: 10 }} message={notice.message} type={notice.type} /> : ''}
+              <Alert closable style={{ marginBottom: 10 }} message={notice.message} type={notice.type} /> : ''}
 
             <Table
-              rowKey={record => record.id}
+              rowKey={record => record._id}
               dataSource={items}
               columns={columns}
               pagination={{ showSizeChanger: true }}

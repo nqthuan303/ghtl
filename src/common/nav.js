@@ -27,6 +27,12 @@ export const getNavData = app => [
             path: 'list',
             component: dynamicWrapper(app, ['shop'], () => import('../routes/Shop/List')),
           },
+          {
+            name: 'Thông tin Shop',
+            showOnSideBar: false,
+            path: 'info/:id',
+            component: dynamicWrapper(app, ['shop'], () => import('../routes/Shop/Info')),
+          },
         ],
       },
       {
