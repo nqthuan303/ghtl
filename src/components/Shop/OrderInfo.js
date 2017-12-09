@@ -10,9 +10,9 @@ class OrderInfo extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.getOrders();
-  }
+  // componentDidMount() {
+  //   this.getOrders();
+  // }
 
   // async getOrders() {
   //   const { id } = this.props.match.params;
