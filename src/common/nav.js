@@ -36,6 +36,26 @@ export const getNavData = app => [
         ],
       },
       {
+        name: 'Chuyến Đi Giao',
+        showOnSideBar: true,
+        icon: 'car',
+        path: 'delivery',
+        children: [
+          {
+            name: 'Danh sách',
+            showOnSideBar: true,
+            path: 'list',
+            component: dynamicWrapper(app, ['delivery'], () => import('../routes/Delivery/List')),
+          },
+          {
+            name: 'Thêm Chuyến Đi Giao',
+            showOnSideBar: false,
+            path: 'add',
+            component: dynamicWrapper(app, ['delivery'], () => import('../routes/Delivery/Add')),
+          },
+        ],
+      },
+      {
         name: 'Exception',
         showOnSideBar: false,
         path: 'exception',
