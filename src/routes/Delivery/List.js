@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-// import { withRouter } from 'react-router';
-import { Tabs, Card } from 'antd';
+import { withRouter } from 'react-router';
+import { Tabs, Card, Button } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DeliveryUnComplete from '../../components/Delivery/DeliveryUnComplete';
 
@@ -8,22 +8,14 @@ const { TabPane } = Tabs;
 
 // import DeliveryComplete from './DeliveryComplete';
 
-// const panes = [
-//   { menuItem: 'Chưa kết thúc', render: () => <Tab.Pane><DeliveryUnComplete /></Tab.Pane> },
-//   { menuItem: 'Đã kết thúc', render: () => <Tab.Pane><DeliveryComplete /></Tab.Pane> },
-// ];
-
-// const AddDelivery = withRouter(({ history }) => (
-//   <Button
-//     onClick={() => { history.push('/delivery/add'); }}
-//     floated="left"
-//     icon
-//     labelPosition="left"
-//     size="small"
-//   >
-//     <Icon name="add" /> Tạo chuyến đi giao
-//   </Button>
-// ));
+const AddDelivery = withRouter(({ history }) => (
+  <Button
+    onClick={() => { history.push('/delivery/add'); }}
+    icon="plus"
+  >
+    Tạo chuyến đi giao
+  </Button>
+));
 
 // const AutoAddDelivery = withRouter(({ history }) => (
 //   <Button
@@ -48,6 +40,10 @@ class DeliveryList extends Component {
     return (
       <PageHeaderLayout title="Danh sách ">
         <Card bordered={false}>
+          <div style={{ marginBottom: '20px', display: 'inline-block', width: '100%' }}>
+            <AddDelivery />
+            {/* <AutoAddDelivery/> */}
+          </div>
           <Tabs type="card">
             <TabPane tab="Chưa Kết Thúc" key="1">
               <DeliveryUnComplete />
@@ -56,8 +52,7 @@ class DeliveryList extends Component {
               {/* <DeliveryComplete /> */}
             </TabPane>
           </Tabs>
-          {/* <AddDelivery />
-          <AutoAddDelivery /> */}
+
         </Card>
       </PageHeaderLayout>
     );

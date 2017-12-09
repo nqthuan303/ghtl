@@ -41,6 +41,12 @@ export const getNavData = app => [
             path: 'list',
             component: dynamicWrapper(app, ['delivery'], () => import('../routes/Delivery/List')),
           },
+          {
+            name: 'Thêm Chuyến Đi Giao',
+            showOnSideBar: false,
+            path: 'add',
+            component: dynamicWrapper(app, ['delivery'], () => import('../routes/Delivery/Add')),
+          },
         ],
       },
       {
