@@ -41,7 +41,6 @@ class ShopList extends React.Component {
     const result = await request(delUrl, { method: 'DELETE' });
     if (result.status === 'success') {
       const { items } = this.state;
-      delete items[index];
       items.splice(index, 1);
       this.setState({
         items,

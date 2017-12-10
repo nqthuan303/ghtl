@@ -85,7 +85,7 @@ class FormShop extends React.Component {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={1}>
+                <Col span={2}>
                   <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }} />
                 </Col>
                 <Col span={11}>
@@ -99,13 +99,11 @@ class FormShop extends React.Component {
                 </Col>
               </FormItem>
               <FormItem>
-                <Col span={23}>
-                  {getFieldDecorator('phone', {
-                    rules: [{ required: true }],
-                  })(
-                    <Input placeholder="Số điện thoại" />
-                  )}
-                </Col>
+                {getFieldDecorator('phone', {
+                  rules: [{ required: true }],
+                })(
+                  <Input placeholder="Số điện thoại" />
+                )}
               </FormItem>
               <FormItem>
                 <Col span={11}>
@@ -117,7 +115,7 @@ class FormShop extends React.Component {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={1}>
+                <Col span={2}>
                   <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }} />
                 </Col>
                 <Col span={11}>
@@ -138,13 +136,11 @@ class FormShop extends React.Component {
                 </Col>
               </FormItem>
               <FormItem>
-                <Col span={23}>
-                  {getFieldDecorator('descriptionOfGoods', {
-                    rules: [{ required: false }],
-                  })(
-                    <Input placeholder="Mô tả hàng" />
-                  )}
-                </Col>
+                {getFieldDecorator('descriptionOfGoods', {
+                  rules: [{ required: false }],
+                })(
+                  <Input placeholder="Mô tả hàng" />
+                )}
               </FormItem>
             </Card>
           </Col>
@@ -160,7 +156,7 @@ class FormShop extends React.Component {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={1}>
+                <Col span={2}>
                   <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }} />
                 </Col>
                 <Col span={11}>
@@ -175,16 +171,14 @@ class FormShop extends React.Component {
               </FormItem>
 
               <FormItem>
-                <Col span={23}>
-                  {getFieldDecorator('status', {
-                    rules: [{ required: true }],
-                  })(
-                    <Select>
-                      <Option value="active">Hoạt động</Option>
-                      <Option value="inactive">Không hoạt động</Option>
-                    </Select>
-                  )}
-                </Col>
+                {getFieldDecorator('status', {
+                  rules: [{ required: true }],
+                })(
+                  <Select>
+                    <Option value="active">Hoạt động</Option>
+                    <Option value="inactive">Không hoạt động</Option>
+                  </Select>
+                )}
               </FormItem>
               <FormItem>
                 <Col span={11}>
@@ -199,7 +193,7 @@ class FormShop extends React.Component {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={1}>
+                <Col span={2}>
                   <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }} />
                 </Col>
                 <Col span={11}>
@@ -228,7 +222,7 @@ class FormShop extends React.Component {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={1}>
+                <Col span={2}>
                   <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }} />
                 </Col>
                 <Col span={11}>
@@ -252,7 +246,7 @@ class FormShop extends React.Component {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={1}>
+                <Col span={2}>
                   <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }} />
                 </Col>
                 <Col span={11}>
