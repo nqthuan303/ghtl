@@ -12,3 +12,9 @@ body {
   width: 100%;
   margin: 40px 0 !important;
 }
+.tableList .tableListOperator {
+  margin-bottom: 16px;
+}
+.tableList .tableListOperator button {
+  margin-right: 8px;
+}
