@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Menu, Table, Divider, Modal, notification } from 'antd';
+import { Card, Menu, Table, Divider, Modal, notification, Button } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import globalStyles from '../../index.less';
 import request from '../../utils/request';
@@ -41,6 +41,11 @@ class OrderList extends React.Component {
         // console.log('Cancel');
       },
     });
+  }
+
+  onClickAddOrder = () => {
+    const { history } = this.props;
+    history.push('/order/add');
   }
   async onConfirmDelete(id, index) {
     const result = await request(`/order/delete/${id}`, {
@@ -92,7 +97,6 @@ class OrderList extends React.Component {
 
   renderMenu() {
     const { ordersInStatus } = this.state;
-
     return ordersInStatus.map((item) => {
       return (
         <Menu.Item key={item._id}>
@@ -154,6 +158,7 @@ class OrderList extends React.Component {
     return (
       <PageHeaderLayout title="Danh sách đơn hàng">
         <Card bordered={false}>
+          <Button onClick={this.onClickAddOrder}>Thêm đơn hàng</Button>
           <div className={globalStyles.tableList}>
             <Menu
               style={{ marginBottom: 20 }}
