@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Divider, Table, Alert, Modal } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import styles from './List.less';
+import globalStyles from '../../index.less';
 import request from '../../utils/request';
 
 const { confirm } = Modal;
@@ -41,7 +41,6 @@ class ShopList extends React.Component {
     const result = await request(delUrl, { method: 'DELETE' });
     if (result.status === 'success') {
       const { items } = this.state;
-      delete items[index];
       items.splice(index, 1);
       this.setState({
         items,
@@ -125,7 +124,7 @@ class ShopList extends React.Component {
     return (
       <PageHeaderLayout title="Danh sách shop">
         <Card bordered={false}>
-          <div className={styles.tableList}>
+          <div className={globalStyles.tableList}>
             {notice.message !== '' ?
               <Alert closable style={{ marginBottom: 10 }} message={notice.message} type={notice.type} /> : ''}
 

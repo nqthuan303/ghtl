@@ -46,7 +46,7 @@ class ShopInfo extends React.Component {
               <Alert closable style={{ marginBottom: 10 }} message={notice.message} type={notice.type} /> : ''}
             <div>
               <Tabs>
-                <TabPane tab="Thông tin shop" key="1">
+                <TabPane tab="Thông tin chung" key="1">
                   <FormShop data={shop} onDataSaved={this.onDataSaved} />
                 </TabPane>
                 <TabPane tab="Đơn hàng" key="2">
