@@ -3,10 +3,9 @@ import { withRouter } from 'react-router';
 import { Tabs, Card, Button } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DeliveryUnComplete from '../../components/Delivery/DeliveryUnComplete';
+import DeliveryComplete from '../../components/Delivery/DeliveryComplete';
 
 const { TabPane } = Tabs;
-
-// import DeliveryComplete from './DeliveryComplete';
 
 const AddDelivery = withRouter(({ history }) => (
   <Button
@@ -49,7 +48,7 @@ class DeliveryList extends Component {
               <DeliveryUnComplete />
             </TabPane>
             <TabPane tab="Kết Thúc" key="2">
-              {/* <DeliveryComplete /> */}
+              <DeliveryComplete />
             </TabPane>
           </Tabs>
 

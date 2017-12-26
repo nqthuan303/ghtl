@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { Table, Icon } from 'antd';
-import { withRouter } from 'react-router';
+import { Table } from 'antd';
 // import EachDelivery from './EachDelivery';
 import request from '../../utils/request';
 
-class DeliveryUnComplete extends Component {
+class DeliveryComplete extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,10 +15,12 @@ class DeliveryUnComplete extends Component {
   componentDidMount() {
     this.getDelivery();
   }
-  onClickEditDelivery(delivery) {
-    const { history } = this.props;
-    history.push(`/delivery/update/${delivery._id}`);
-  }
+  //   onClickEditDelivery(delivery) {
+  //     this.setState({
+  //       delivery,
+  //       showModal: true,
+  //     });
+  //   }
   async getDelivery() {
     const data = await request('/delivery/list');
     if (data && data.data) {
@@ -27,15 +28,13 @@ class DeliveryUnComplete extends Component {
       const listDelivery = [];
       for (let i = 0; i < deliverys.length; i += 1) {
         const delivery = deliverys[i];
-        if (delivery.status === 'unCompleted') {
+        if (delivery.status === 'completed') {
           const createdAt = new Date(delivery.createdAt);
           const deliveryCreatedAt = `${createdAt.getDate()}/${
             createdAt.getMonth()} ${
             createdAt.getHours()}:${
             createdAt.getMinutes()}`;
           listDelivery.push({
-            _id: delivery._id,
-            key: i,
             id: delivery.id,
             name: delivery.user.name,
             countOrders: delivery.orders.length,
@@ -75,28 +74,16 @@ class DeliveryUnComplete extends Component {
     }, {
       title: 'Chỉnh Sửa',
       key: 'edit',
-      render: (text, record) => (
-        <a
-          onClick={() => this.onClickEditDelivery(record)}
-          // href={`delivery/update/${record._id}`}
-        >
-          <Icon type="edit" />
-        </a>
-      ),
     }, {
       title: 'Trạng Thái',
       key: 'status',
-      render: () => (
-        <span>
-          Chưa Kết Thúc
-        </span>
-      ),
+      dataIndex: 'status',
     }, {
-      title: 'Print',
+      title: '',
       key: 'print',
       render: () => (
         <span >
-          <Icon type="printer" />
+          Chưa Kết Thúc
         </span>
       ),
     }];
@@ -122,4 +109,4 @@ class DeliveryUnComplete extends Component {
   }
 }
 
-export default withRouter(DeliveryUnComplete);
+export default DeliveryComplete;

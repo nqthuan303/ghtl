@@ -1,50 +1,46 @@
 import React, { Component } from 'react';
-import { Input, Button, Select, Tag } from 'antd';
+import { Input, Button, Select, Tag, Modal, notification } from 'antd';
 import StorageOrderCard from '../../components/Delivery/StorageOrderCard';
 import SelectOrderList from '../../components/Delivery/SelectOrderList';
-// import EachDeliveryTable from './EachDeliveryTable';
+import EachDeliveryTable from '../../components/Delivery/EachDeliveryTable';
+import OrderConvertStatus from '../../components/Delivery/OrderConvertStatus';
 import request from '../../utils/request';
-import style from './Add.less';
+import style from './AddDelivery.less';
 
 const { Search } = Input;
 const { Option } = Select;
 const { CheckableTag } = Tag;
 
 let orderEachDistrict = {};
+const deliveryOrders = {};
+let delivery = {};
 
-class AddDelivery extends Component {
+class UpdateDelivery extends Component {
   constructor(props) {
     super(props);
+    this.deliveryId = this.props.match.params.id;
     this.state = {
       shippers: [],
-      // selectedShipper: '',
+      selectedShipper: '',
       selectedTags: [],
-      // districts: [],
       selectList: [],
       stateOrderEachDistrict: [],
-      // showModal: false,
-      // confirmSave: false,
+      showModal: false,
+      showModalConvert: false,
+      orderConvert: {},
     };
   }
 
   componentDidMount() {
+    this.getDelivery();
     this.getOrderList();
     this.getShipperList();
   }
-  // onSelectShipper = (value) => {
-  //   this.setState({
-  //     selectedShipper: value,
-  //   });
-  // }
-
-  // onConfirmDelivery=() => {
-  //   this.setState({
-  //     confirmSave: true,
-  //   });
-  // }
-  onSaveData =() => {
-    this.setState({ selectList: [] });
-    this.getOrderList();
+  onSaveData = () => {
+    // e.preventDefault();
+    // this.setState({ selectList: [] });
+    // this.getOrderList();
+    this.props.history.replace('/delivery/list');
   }
   onClickCard(order) {
     const { selectList, stateOrderEachDistrict } = this.state;
@@ -60,19 +56,67 @@ class AddDelivery extends Component {
       stateOrderEachDistrict,
     });
   }
-  onClickDeleteSelectList(order) {
-    const { selectList, stateOrderEachDistrict } = this.state;
-    for (let i = 0; i < selectList.length; i += 1) {
-      if (order._id === selectList[i]._id) {
-        selectList.splice(i, 1);
+  onCompleteConvert(order) {
+    delete deliveryOrders[order._id];
+    let index = -1;
+    for (let i = 0; i < delivery.orders.length; i += 1) {
+      if (order._id === delivery.orders[i]._id) {
+        index = i;
         break;
       }
     }
-    stateOrderEachDistrict.push(order);
-    this.setState({
-      selectList,
-      stateOrderEachDistrict,
+    delivery.orders.splice(index, 1);
+    this.getOrderList();
+    request(`/delivery/update/${this.deliveryId}`, { method: 'PUT', body: delivery }).then((result) => {
+      if (result.status === 'success') {
+        notification.success({
+          message: 'Thành Công',
+          description: 'Xóa và chuyển trạng thái thành công',
+        });
+      } else {
+        notification.error(
+          {
+            message: 'Đã xãy ra lỗi',
+            description: result.data.msg,
+          });
+      }
     });
+  }
+  onClickDeleteSelectList(order) {
+    const { selectList, stateOrderEachDistrict } = this.state;
+    if (deliveryOrders[order._id] && deliveryOrders[order._id] === 1) {
+      this.setState({
+        showModalConvert: true,
+        orderConvert: order,
+      });
+    } else {
+      for (let i = 0; i < selectList.length; i += 1) {
+        if (order._id === selectList[i]._id) {
+          selectList.splice(i, 1);
+          break;
+        }
+      }
+      stateOrderEachDistrict.push(order);
+      this.setState({
+        selectList,
+        stateOrderEachDistrict,
+      });
+    }
+  }
+  async getDelivery() {
+    const result = await request(`/delivery/findOne/${this.deliveryId}`);
+    if (result.status === 'success') {
+      const { orders } = result.data;
+      for (let i = 0; i < orders.length; i += 1) {
+        const orrder = orders[i];
+        deliveryOrders[orrder._id] = 1;
+      }
+      delivery = result.data;
+      this.setState({
+        selectList: orders,
+        selectedShipper: result.data.user,
+      });
+    }
   }
   getShipperList() {
     request('/user/getShipper').then((result) => {
@@ -90,7 +134,7 @@ class AddDelivery extends Component {
         orderEachDistrict = {};
         for (let i = 0; i < orders.length; i += 1) {
           const order = orders[i];
-          const districId = order.reciever.district._id;
+          const districId = order.receiver.district._id;
           if (!orderEachDistrict[districId]) {
             orderEachDistrict[districId] = [];
           }
@@ -103,26 +147,35 @@ class AddDelivery extends Component {
       }
     });
   }
-  // closeShowModal =() => {
-  //   this.setState({
-  //     showModal: false,
-  //     confirmSave: false,
-  //   });
-  // }
-  // openShowModal =() => {
-  //   const { selectedShipper, selectList } = this.state;
+  closeShowModal =() => {
+    this.setState({
+      showModal: false,
+    });
+  }
+  closeModalConvert = () => {
+    this.setState({
+      showModalConvert: false,
+    });
+  }
+  openShowModal =() => {
+    const { selectedShipper, selectList } = this.state;
 
-  //   if (selectedShipper !== '' && selectedShipper !== -1 && selectList.length > 0) {
-  //     this.setState({
-  //       showModal: true,
-  //     });
-  //   }
-  // }
-  // handleSelectShipper = (value) => {
-  //   this.setState({
-  //     selectedShipper: value,
-  //   });
-  // }
+    if (selectedShipper && selectList.length > 0) {
+      this.setState({
+        showModal: true,
+      });
+    } else {
+      notification.warning({
+        message: 'Chú ý',
+        description: 'Bạn phải chọn người giao hàng và đơn hàng.',
+      });
+    }
+  }
+  handleSelectShipper = (value) => {
+    this.setState({
+      selectedShipper: value,
+    });
+  }
   handleChangeTag(tag, checked) {
     const { selectedTags } = this.state;
     if (tag === 'all') {
@@ -185,7 +238,7 @@ class AddDelivery extends Component {
             checked={selectedTags.indexOf(districtId) > -1}
             onChange={checked => this.handleChangeTag(districtId, checked)}
           >
-            {orderEachDistrict[districtId][0].reciever.district.name}
+            {orderEachDistrict[districtId][0].receiver.district.name}
             ({orderEachDistrict[districtId].length})
           </CheckableTag>
         );
@@ -197,11 +250,11 @@ class AddDelivery extends Component {
     const {
       // shippers,
       // districts,
-      // selectedShipper,
+      selectedShipper,
       selectList,
-      // orderInDistrict,
-      // showModal,
-      // confirmSave,
+      orderConvert,
+      showModal,
+      showModalConvert,
       stateOrderEachDistrict } = this.state;
     return (
       <div>
@@ -211,6 +264,7 @@ class AddDelivery extends Component {
             style={{ width: 200 }}
             placeholder="Select a person"
             optionFilterProp="children"
+            value={selectedShipper}
             onChange={this.handleSelectShipper}
             filterOption={
               (input, option) =>
@@ -218,7 +272,7 @@ class AddDelivery extends Component {
           >
             {this.renderShippers()}
           </Select>
-          <Button style={{ float: 'right' }} type="primary" onClick={this.openShowModal}>Tạo</Button>
+          <Button style={{ float: 'right' }} type="primary" onClick={this.openShowModal}>Cập Nhật</Button>
           <Search
             placeholder="Mã Vận Đơn"
             style={{ width: 200, float: 'right', marginRight: '10px' }}
@@ -239,32 +293,37 @@ class AddDelivery extends Component {
             onClickDeleteOrder={order => this.onClickDeleteSelectList(order)}
           />
         </div>
-        {/* <Modal
-          size="large"
-          open={showModal}
-          onClose={this.closeShowModal}
+        <Modal
+          title="Chuyển Trạng Thái Đơn Hàng"
+          visible={showModalConvert}
+          onCancel={this.closeModalConvert}
+          footer={null}
+          width={500}
         >
-          <Modal.Header>Chuyến Đi Giao</Modal.Header>
-          <Modal.Content>
-            <EachDeliveryTable
-              selectList={selectList}
-              selectedShipper={selectedShipper.toString()}
-              confirmSave={confirmSave}
-              closeShowModal={this.closeShowModal}
-              onSaveData={this.onSaveData}
-            />
-          </Modal.Content>
-          <Modal.Actions>
-            <Button onClick={this.closeShowModal} color="red">
-                  Hủy
-            </Button>
-            <Button onClick={this.onConfirmDelivery} color="green">
-                  Xác nhận
-            </Button>
-          </Modal.Actions>
-        </Modal> */}
+          <OrderConvertStatus
+            orderConvert={orderConvert}
+            closeShowModal={this.closeModalConvert}
+            onSaveData={order => this.onCompleteConvert(order)}
+          />
+        </Modal>
+
+        <Modal
+          title="Cập Nhật Chuyến Đi Giao"
+          visible={showModal}
+          onCancel={this.closeShowModal}
+          width={1100}
+          footer={null}
+        >
+          <EachDeliveryTable
+            selectList={selectList}
+            deliveryId={this.deliveryId}
+            selectedShipper={selectedShipper}
+            closeShowModal={this.closeShowModal}
+            onSaveData={this.onSaveData}
+          />
+        </Modal>
       </div>
     );
   }
 }
-export default AddDelivery;
+export default UpdateDelivery;

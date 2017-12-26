@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Card } from 'antd';
+import { Card, List } from 'antd';
 
 
 export default class StorageOrderCard extends Component {
@@ -17,44 +17,32 @@ constructor(props) {
 onClickCard(order) {
   this.props.onClickCardOrder(order);
 }
-renderOrder() {
-  const { orderEachDistrict } = this.props;
-  const result = [];
-  for (let i = 0; i < orderEachDistrict.length; i += 1) {
-    const order = orderEachDistrict[i];
+renderOrder(order) {
+  const createdAt = new Date(order.createdAt);
+  const orderCreatedAt = `${createdAt.getDate()}/${
+    createdAt.getMonth()} ${
+    createdAt.getHours()}:${
+    createdAt.getMinutes()}`;
 
-    const createdAt = new Date(order.createdAt);
-    const orderCreatedAt = `${createdAt.getDate()}/${
-      createdAt.getMonth()} ${
-      createdAt.getHours()}:${
-      createdAt.getMinutes()}`;
-
-    result.push(
-      <Card
-        key={i}
-        title={orderCreatedAt}
-        onClick={() => this.onClickCard(order)}
-        bordered={false}
-        style={{ width: 180, float: 'left', margin: '0 10px 10px 0' }}
-      >
-        <p>{order.id}</p>
-        <p>{order.reciever.address}</p>
+  return (
+    <List.Item>
+      <Card title={orderCreatedAt} onClick={() => this.onClickCard(order)}>
+        <div> ID: {order.id}</div>
+        <p>{order.receiver.address}</p>
       </Card>
-    );
-  }
-  return result;
+    </List.Item>);
 }
 render() {
+  const { orderEachDistrict } = this.props;
   return (
     <div>
-      {this.renderOrder()}
-      {/* <ConfirmModal
-          onModalClose={this.onModalClose}
-          loading={confirmLoading}
-          onConfirm={() => this.confirmCancelOrder()}
-          title="Hủy vận đơn"
-          content={confirmContent}
-          show={cancelOrderModal} /> */}
+      <List
+        grid={{ gutter: 16, column: 4 }}
+        dataSource={orderEachDistrict}
+        renderItem={order => (
+          this.renderOrder(order)
+        )}
+      />
     </div>
 
   );
