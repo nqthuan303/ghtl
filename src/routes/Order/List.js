@@ -133,8 +133,8 @@ class OrderList extends React.Component {
       },
       {
         title: 'Số ĐT',
-        render: (text, record) => {
-          return record.receiver ? record.receiver.phoneNumbers[0] : '';
+        render: () => {
+          return '';
         },
       },
       {
