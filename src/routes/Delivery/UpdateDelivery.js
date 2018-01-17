@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Input, Button, Select, Tag, Modal, notification } from 'antd';
 import StorageOrderCard from '../../components/Delivery/StorageOrderCard';
 import SelectOrderList from '../../components/Delivery/SelectOrderList';
-import EachDeliveryTable from '../../components/Delivery/EachDeliveryTable';
 import OrderConvertStatus from '../../components/Delivery/OrderConvertStatus';
 import request from '../../utils/request';
 import style from './AddDelivery.less';
@@ -25,7 +24,6 @@ class UpdateDelivery extends Component {
       selectedTags: [],
       selectList: [],
       stateOrderEachDistrict: [],
-      showModal: false,
       showModalConvert: false,
       orderConvert: {},
     };
@@ -103,6 +101,43 @@ class UpdateDelivery extends Component {
       });
     }
   }
+  onUpdateDelivery = () => {
+    const { selectedShipper, selectList } = this.state;
+    const arrOrderId = [];
+    const objDelivery = {};
+    for (let i = 0; i < selectList.length; i += 1) {
+      arrOrderId.push(selectList[i]._id);
+    }
+    if (selectedShipper) {
+      objDelivery.user = selectedShipper;
+    }
+    objDelivery.orders = arrOrderId;
+    const url = `/delivery/update/${this.deliveryId}`;
+    const method = 'PUT';
+    request(url, { method, body: objDelivery }).then((result) => {
+      if (result.status === 'success') {
+        this.onSaveData();
+        notification.success({
+          message: 'Thành Công',
+          description: 'Bạn đã cập nhật Chuyến Đi Giao thành công.',
+        });
+      } else {
+        notification.error({
+          message: 'Xãy ra lỗi',
+          description: result.data.msg,
+        });
+      }
+    });
+  }
+  getShipperList() {
+    request('/user/getShipper').then((result) => {
+      if (result) {
+        this.setState({
+          shippers: result,
+        });
+      }
+    });
+  }
   async getDelivery() {
     const result = await request(`/delivery/findOne/${this.deliveryId}`);
     if (result.status === 'success') {
@@ -117,15 +152,6 @@ class UpdateDelivery extends Component {
         selectedShipper: result.data.user,
       });
     }
-  }
-  getShipperList() {
-    request('/user/getShipper').then((result) => {
-      if (result) {
-        this.setState({
-          shippers: result,
-        });
-      }
-    });
   }
   getOrderList() {
     request('/order/order-with-status?status=storage').then((result) => {
@@ -147,29 +173,10 @@ class UpdateDelivery extends Component {
       }
     });
   }
-  closeShowModal =() => {
-    this.setState({
-      showModal: false,
-    });
-  }
   closeModalConvert = () => {
     this.setState({
       showModalConvert: false,
     });
-  }
-  openShowModal =() => {
-    const { selectedShipper, selectList } = this.state;
-
-    if (selectedShipper && selectList.length > 0) {
-      this.setState({
-        showModal: true,
-      });
-    } else {
-      notification.warning({
-        message: 'Chú ý',
-        description: 'Bạn phải chọn người giao hàng và đơn hàng.',
-      });
-    }
   }
   handleSelectShipper = (value) => {
     this.setState({
@@ -253,7 +260,6 @@ class UpdateDelivery extends Component {
       selectedShipper,
       selectList,
       orderConvert,
-      showModal,
       showModalConvert,
       stateOrderEachDistrict } = this.state;
     return (
@@ -272,7 +278,7 @@ class UpdateDelivery extends Component {
           >
             {this.renderShippers()}
           </Select>
-          <Button style={{ float: 'right' }} type="primary" onClick={this.openShowModal}>Cập Nhật</Button>
+          <Button style={{ float: 'right' }} type="primary" onClick={this.onUpdateDelivery}>Cập Nhật</Button>
           <Search
             placeholder="Mã Vận Đơn"
             style={{ width: 200, float: 'right', marginRight: '10px' }}
@@ -304,22 +310,6 @@ class UpdateDelivery extends Component {
             orderConvert={orderConvert}
             closeShowModal={this.closeModalConvert}
             onSaveData={order => this.onCompleteConvert(order)}
-          />
-        </Modal>
-
-        <Modal
-          title="Cập Nhật Chuyến Đi Giao"
-          visible={showModal}
-          onCancel={this.closeShowModal}
-          width={1100}
-          footer={null}
-        >
-          <EachDeliveryTable
-            selectList={selectList}
-            deliveryId={this.deliveryId}
-            selectedShipper={selectedShipper}
-            closeShowModal={this.closeShowModal}
-            onSaveData={this.onSaveData}
           />
         </Modal>
       </div>

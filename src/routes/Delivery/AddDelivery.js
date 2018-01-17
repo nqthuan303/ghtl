@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Input, Button, Select, Tag, Modal, notification } from 'antd';
+import { Input, Button, Select, Tag, notification } from 'antd';
 import StorageOrderCard from '../../components/Delivery/StorageOrderCard';
 import SelectOrderList from '../../components/Delivery/SelectOrderList';
-import EachDeliveryTable from '../../components/Delivery/EachDeliveryTable';
 import request from '../../utils/request';
 import style from './AddDelivery.less';
 
@@ -22,7 +21,6 @@ class AddDelivery extends Component {
       // districts: [],
       selectList: [],
       stateOrderEachDistrict: [],
-      showModal: false,
       // confirmSave: false,
     };
   }
@@ -31,7 +29,7 @@ class AddDelivery extends Component {
     this.getOrderList();
     this.getShipperList();
   }
-  onSaveData =() => {
+  onSaveData() {
     this.setState({ selectList: [] });
     this.getOrderList();
   }
@@ -92,28 +90,37 @@ class AddDelivery extends Component {
       }
     });
   }
-  closeShowModal =() => {
-    this.setState({
-      showModal: false,
-    });
-  }
-  openShowModal =() => {
-    const { selectedShipper, selectList } = this.state;
-
-    if (selectedShipper && selectList.length > 0) {
-      this.setState({
-        showModal: true,
-      });
-    } else {
-      notification.warning({
-        message: 'Chú ý',
-        description: 'Bạn phải chọn người giao hàng và đơn hàng.',
-      });
-    }
-  }
   handleSelectShipper = (value) => {
     this.setState({
       selectedShipper: value,
+    });
+  }
+  createDelivery= () => {
+    const { selectedShipper, selectList } = this.state;
+    const arrOrderId = [];
+    const delivery = {};
+    for (let i = 0; i < selectList.length; i += 1) {
+      arrOrderId.push(selectList[i]._id);
+    }
+    if (selectedShipper) {
+      delivery.user = selectedShipper;
+    }
+    delivery.orders = arrOrderId;
+    const url = '/delivery/add';
+    const method = 'POST';
+    request(url, { method, body: delivery }).then((result) => {
+      if (result.status === 'success') {
+        this.onSaveData();
+        notification.success({
+          message: 'Thành Công',
+          description: 'Bạn đã lưu Chuyến Đi Giao thành công.',
+        });
+      } else {
+        notification.error({
+          message: 'Xãy ra lỗi',
+          description: result.data.msg,
+        });
+      }
     });
   }
   handleChangeTag(tag, checked) {
@@ -188,13 +195,7 @@ class AddDelivery extends Component {
   }
   render() {
     const {
-      // shippers,
-      // districts,
-      selectedShipper,
       selectList,
-      // orderInDistrict,
-      // showModal,
-      // confirmSave,
       stateOrderEachDistrict } = this.state;
     return (
       <div>
@@ -211,7 +212,7 @@ class AddDelivery extends Component {
           >
             {this.renderShippers()}
           </Select>
-          <Button style={{ float: 'right' }} type="primary" onClick={this.openShowModal}>Tạo</Button>
+          <Button style={{ float: 'right' }} type="primary" onClick={this.createDelivery}>Tạo</Button>
           <Search
             placeholder="Mã Vận Đơn"
             style={{ width: 200, float: 'right', marginRight: '10px' }}
@@ -232,20 +233,6 @@ class AddDelivery extends Component {
             onClickDeleteOrder={order => this.onClickDeleteSelectList(order)}
           />
         </div>
-        <Modal
-          title="Chuyện Đi Giao"
-          visible={this.state.showModal}
-          onCancel={this.closeShowModal}
-          width={1100}
-          footer={null}
-        >
-          <EachDeliveryTable
-            selectList={selectList}
-            selectedShipper={selectedShipper}
-            closeShowModal={this.closeShowModal}
-            onSaveData={this.onSaveData}
-          />
-        </Modal>
       </div>
     );
   }

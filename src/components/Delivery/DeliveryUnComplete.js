@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Table, Icon } from 'antd';
+import { Table, Icon, notification, Modal } from 'antd';
 import { withRouter } from 'react-router';
-// import EachDelivery from './EachDelivery';
+import Delivery from './Delivery';
 import request from '../../utils/request';
 
 class DeliveryUnComplete extends Component {
@@ -9,8 +9,8 @@ class DeliveryUnComplete extends Component {
     super(props);
     this.state = {
       listDelivery: [],
-    //   showModal: false,
-    //   delivery: {},
+      showModal: false,
+      selectDelivery: '',
     };
   }
   componentDidMount() {
@@ -20,14 +20,66 @@ class DeliveryUnComplete extends Component {
     const { history } = this.props;
     history.push(`/delivery/update/${delivery._id}`);
   }
+  onSaveData =() => {
+    this.getDelivery();
+    this.setState({
+      showModal: false,
+    });
+  }
+  onClickDeleteDelivery(delivery) {
+    request(`/delivery/delete/${delivery._id}`, { method: 'DELETE' }).then((result) => {
+      if (result.status === 'success') {
+        notification.success({
+          message: 'Thành Công',
+          description: 'Bạn đã xóa chuyến đi giao',
+        });
+        this.getDelivery();
+      } else {
+        notification.error({
+          message: 'Xãy ra lỗi',
+          description: result.data.msg,
+        });
+      }
+    });
+  }
+  onClickChangeStatus(record) {
+    const { countOrders, name } = record;
+    if (countOrders <= 0 || !name || name === '') {
+      notification.error({
+        message: 'Xãy ra lỗi',
+        description: 'Chuyến đi giao cần chọn shiper và đơn hàng!!!!',
+      });
+      return;
+    }
+    request(`/delivery/changeStatusDelivery/${record._id}`, { method: 'PUT' }).then((result) => {
+      if (result.status === 'success') {
+        this.getDelivery();
+        notification.success({
+          message: 'Thành Công',
+          description: 'Bạn đã lưu Chuyến Đi Giao thành công.',
+        });
+      } else {
+        notification.error({
+          message: 'Xãy ra lỗi',
+          description: result.data.msg,
+        });
+      }
+    });
+  }
+  onClickChangeDelivery(record) {
+    this.setState({
+      showModal: true,
+      selectDelivery: record._id,
+    });
+  }
   async getDelivery() {
     const data = await request('/delivery/list');
     if (data && data.data) {
-      const deliverys = data.data;
+      const deliveries = data.data;
       const listDelivery = [];
-      for (let i = 0; i < deliverys.length; i += 1) {
-        const delivery = deliverys[i];
-        if (delivery.status === 'unCompleted') {
+      for (let i = 0; i < deliveries.length; i += 1) {
+        const delivery = deliveries[i];
+        if (delivery.status === 'unCompleted' || delivery.status === 'delivery') {
           const createdAt = new Date(delivery.createdAt);
           const deliveryCreatedAt = `${createdAt.getDate()}/${
             createdAt.getMonth()} ${
@@ -37,89 +89,102 @@ class DeliveryUnComplete extends Component {
             _id: delivery._id,
             key: i,
             id: delivery.id,
-            name: delivery.user.name,
+            name: delivery.user ? delivery.user.name : '',
             countOrders: delivery.orders.length,
             createdAt: deliveryCreatedAt,
+            status: delivery.status,
           });
         }
       }
       this.setState({ listDelivery });
     }
   }
-  //   closeShowModal =() => {
-  //     this.setState({
-  //       showModal: false,
-  //     });
-  //   }
-  render() {
-    const { listDelivery } = this.state;
-    const columns = [{
-      title: 'Chuyến Giao',
-      dataIndex: 'id',
-      key: 'id',
-    }, {
-      title: 'Bắt Đầu',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-    }, {
-      title: 'Nhân Viên Giao',
-      dataIndex: 'name',
-      key: 'name',
-    }, {
-      title: 'Số Đơn',
-      dataIndex: 'countOrders',
-      key: 'countOrders',
-    }, {
-      title: 'Tổng Thu',
-      key: 'monney',
-    }, {
-      title: 'Chỉnh Sửa',
-      key: 'edit',
-      render: (text, record) => (
-        <a
-          onClick={() => this.onClickEditDelivery(record)}
-          // href={`delivery/update/${record._id}`}
-        >
-          <Icon type="edit" />
-        </a>
-      ),
-    }, {
-      title: 'Trạng Thái',
-      key: 'status',
-      render: () => (
-        <span>
-          Chưa Kết Thúc
-        </span>
-      ),
-    }, {
-      title: 'Print',
-      key: 'print',
-      render: () => (
-        <span >
-          <Icon type="printer" />
-        </span>
-      ),
-    }];
-    return (
-      <div>
-        <Table dataSource={listDelivery} columns={columns} />
-        {/* <Modal
-          size="large"
-          open={showModal}
-          onClose={this.closeShowModal}
-        >
-          <Modal.Header>Chuyến Đi Giao  {delivery.id}</Modal.Header>
-          <Modal.Content>
-            <EachDelivery
-              delivery={delivery}
+    closeShowModal =() => {
+      this.setState({
+        showModal: false,
+      });
+    }
+    render() {
+      const { listDelivery, selectDelivery, showModal } = this.state;
+      const columns = [{
+        title: 'Chuyến Giao',
+        dataIndex: 'id',
+        key: 'id',
+      }, {
+        title: 'Bắt Đầu',
+        dataIndex: 'createdAt',
+        key: 'createdAt',
+      }, {
+        title: 'Nhân Viên Giao',
+        dataIndex: 'name',
+        key: 'name',
+      }, {
+        title: 'Số Đơn',
+        dataIndex: 'countOrders',
+        key: 'countOrders',
+      }, {
+        title: 'Tổng Thu',
+        key: 'monney',
+      }, {
+        title: 'Chỉnh Sửa',
+        key: 'edit',
+        render: (text, record) => (
+          record.status === 'unCompleted' ?
+            <div style={{ fontSize: '16px' }} >
+              <a onClick={() => this.onClickEditDelivery(record)}>
+                <Icon type="edit" />
+              </a>
+              <a style={{ marginLeft: '10px' }} onClick={() => this.onClickDeleteDelivery(record)}>
+                <Icon type="delete" />
+              </a>
+            </div>
+            : ''
+        ),
+      }, {
+        title: 'Trạng Thái',
+        key: 'status',
+        render: record => (
+          <div>
+            {record.status === 'unCompleted' ?
+              <a onClick={() => this.onClickChangeStatus(record)}>
+                {record.status}
+              </a>
+          :
+              <a onClick={() => this.onClickChangeDelivery(record)}>
+                {record.status}
+              </a>
+          }
+          </div>
+
+        ),
+      }, {
+        title: 'In',
+        key: 'print',
+        render: () => (
+          <span >
+            <Icon type="printer" />
+          </span>
+        ),
+      }];
+      return (
+        <div>
+          <Table dataSource={listDelivery} columns={columns} />
+          <Modal
+            title="Delivery"
+            visible={showModal}
+            onCancel={this.closeShowModal}
+            width={900}
+            footer={null}
+          >
+            <Delivery
+              deliveryId={selectDelivery}
               closeShowModal={this.closeShowModal}
-    onClickDeleteOrder={(deliveryId, orderId) => this.onClickDeleteOrder(deliveryId, orderId)}
+              onSaveData={this.onSaveData}
             />
-          </Modal.Content>
-        </Modal> */}
-      </div>
-    );
-  }
+          </Modal>
+        </div>
+      );
+    }
 }
 
 export default withRouter(DeliveryUnComplete);
