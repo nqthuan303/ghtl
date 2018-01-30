@@ -16,39 +16,33 @@ const AddDelivery = withRouter(({ history }) => (
   </Button>
 ));
 
-// const AutoAddDelivery = withRouter(({ history }) => (
-//   <Button
-//     onClick={() => { history.push('/delivery/add'); }}
-//     floated="left"
-//     icon
-//     labelPosition="left"
-//     size="small"
-//   >
-//     <Icon name="add" /> Tạo tự động
-//   </Button>
-// ));
-
 class DeliveryList extends Component {
-  componentDidMount() {
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
   }
 
-  onClickAddOrder = () => {
+  onSaveData = () => {
+    this.deliveryComplete.getDelivery();
   }
-
   render() {
     return (
       <PageHeaderLayout title="Danh sách ">
         <Card bordered={false}>
           <div style={{ marginBottom: '20px', display: 'inline-block', width: '100%' }}>
             <AddDelivery />
-            {/* <AutoAddDelivery/> */}
           </div>
           <Tabs type="card">
             <TabPane tab="Chưa Kết Thúc" key="1">
-              <DeliveryUnComplete />
+              <DeliveryUnComplete
+                onSaveData={this.onSaveData}
+              />
             </TabPane>
             <TabPane tab="Kết Thúc" key="2">
-              <DeliveryComplete />
+              <DeliveryComplete
+                ref={(instance) => { this.deliveryComplete = instance; }}
+              />
             </TabPane>
           </Tabs>
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Icon, notification, Modal } from 'antd';
 import { withRouter } from 'react-router';
+import moment from 'moment';
 import Delivery from './Delivery';
 import request from '../../utils/request';
 
@@ -22,6 +23,7 @@ class DeliveryUnComplete extends Component {
   }
   onSaveData =() => {
     this.getDelivery();
+    this.props.onSaveData();
     this.setState({
       showModal: false,
     });
@@ -80,18 +82,13 @@ class DeliveryUnComplete extends Component {
       for (let i = 0; i < deliveries.length; i += 1) {
         const delivery = deliveries[i];
         if (delivery.status === 'unCompleted' || delivery.status === 'delivery') {
-          const createdAt = new Date(delivery.createdAt);
-          const deliveryCreatedAt = `${createdAt.getDate()}/${
-            createdAt.getMonth()} ${
-            createdAt.getHours()}:${
-            createdAt.getMinutes()}`;
           listDelivery.push({
             _id: delivery._id,
             key: i,
             id: delivery.id,
             name: delivery.user ? delivery.user.name : '',
             countOrders: delivery.orders.length,
-            createdAt: deliveryCreatedAt,
+            startTime: delivery.startTime ? moment(delivery.startTime).format('DD-MM HH:mm') : '',
             status: delivery.status,
           });
         }
@@ -112,8 +109,8 @@ class DeliveryUnComplete extends Component {
         key: 'id',
       }, {
         title: 'Bắt Đầu',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
+        dataIndex: 'startTime',
+        key: 'startTime',
       }, {
         title: 'Nhân Viên Giao',
         dataIndex: 'name',
@@ -162,7 +159,7 @@ class DeliveryUnComplete extends Component {
         key: 'print',
         render: () => (
           <span >
-            <Icon type="printer" />
+            <Icon style={{ cursor: 'pointer' }} type="printer" />
           </span>
         ),
       }];
@@ -173,13 +170,13 @@ class DeliveryUnComplete extends Component {
             title="Delivery"
             visible={showModal}
             onCancel={this.closeShowModal}
-            width={900}
+            width={1000}
             footer={null}
           >
             <Delivery
               deliveryId={selectDelivery}
               closeShowModal={this.closeShowModal}
-              onSaveData={this.onSaveData}
+              onSaveDataDelivery={this.onSaveData}
             />
           </Modal>
         </div>

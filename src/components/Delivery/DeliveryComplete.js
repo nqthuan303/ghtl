@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Table } from 'antd';
-// import EachDelivery from './EachDelivery';
+import { Table, Icon } from 'antd';
+import moment from 'moment';
 import request from '../../utils/request';
 
 class DeliveryComplete extends Component {
@@ -8,19 +8,12 @@ class DeliveryComplete extends Component {
     super(props);
     this.state = {
       listDelivery: [],
-    //   showModal: false,
-    //   delivery: {},
     };
   }
   componentDidMount() {
     this.getDelivery();
   }
-  //   onClickEditDelivery(delivery) {
-  //     this.setState({
-  //       delivery,
-  //       showModal: true,
-  //     });
-  //   }
+
   async getDelivery() {
     const data = await request('/delivery/list');
     if (data && data.data) {
@@ -29,81 +22,100 @@ class DeliveryComplete extends Component {
       for (let i = 0; i < deliverys.length; i += 1) {
         const delivery = deliverys[i];
         if (delivery.status === 'completed') {
-          const createdAt = new Date(delivery.createdAt);
-          const deliveryCreatedAt = `${createdAt.getDate()}/${
-            createdAt.getMonth()} ${
-            createdAt.getHours()}:${
-            createdAt.getMinutes()}`;
-          listDelivery.push({
-            id: delivery.id,
-            name: delivery.user.name,
-            countOrders: delivery.orders.length,
-            createdAt: deliveryCreatedAt,
-          });
+          delivery.key = i;
+          listDelivery.push(delivery);
         }
       }
       this.setState({ listDelivery });
     }
   }
-  //   closeShowModal =() => {
-  //     this.setState({
-  //       showModal: false,
-  //     });
-  //   }
+  expandedRowRender = (record) => {
+    const columns = [
+      { title: 'Id', dataIndex: 'id', key: 'id' },
+      { title: 'Địa Chỉ', dataIndex: 'address', key: 'address' },
+      { title: 'Quận', dataIndex: 'district', key: 'district' },
+    ];
+
+    const data = [];
+    for (let i = 0; i < record.orders.length; i += 1) {
+      const order = record.orders[i];
+      data.push({
+        key: i,
+        id: order.id,
+        address: order.receiver.address,
+        district: order.receiver.district.name,
+      });
+    }
+    return (
+      <Table
+        showHeader={false}
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+      />
+    );
+  };
   render() {
     const { listDelivery } = this.state;
     const columns = [{
       title: 'Chuyến Giao',
-      dataIndex: 'id',
       key: 'id',
+      render: record => (
+        <div>
+          {record.id}
+        </div>
+      ),
     }, {
-      title: 'Bắt Đầu',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: 'Kết Thúc',
+      key: 'endTime',
+      render: record => (
+        <div>
+          {moment(record.endTime).format('DD-MM HH:mm')}
+        </div>
+      ),
     }, {
       title: 'Nhân Viên Giao',
-      dataIndex: 'name',
       key: 'name',
+      render: record => (
+        <div>
+          {record.user.name}
+        </div>
+      ),
     }, {
       title: 'Số Đơn',
-      dataIndex: 'countOrders',
       key: 'countOrders',
+      render: record => (
+        <div>
+          {record.orders.length}
+        </div>
+      ),
     }, {
       title: 'Tổng Thu',
       key: 'monney',
     }, {
-      title: 'Chỉnh Sửa',
-      key: 'edit',
-    }, {
       title: 'Trạng Thái',
       key: 'status',
-      dataIndex: 'status',
+      render: record => (
+        <div>
+          {record.status}
+        </div>
+      ),
     }, {
-      title: '',
+      title: 'In',
       key: 'print',
       render: () => (
-        <span >
-          Chưa Kết Thúc
-        </span>
+        <div>
+          <Icon style={{ cursor: 'pointer' }} type="printer" />
+        </div>
       ),
     }];
     return (
       <div>
-        <Table dataSource={listDelivery} columns={columns} />
-        {/* <Modal
-          size="large"
-          open={showModal}
-          onClose={this.closeShowModal}
-        >
-          <Modal.Header>Chuyến Đi Giao  {delivery.id}</Modal.Header>
-          <Modal.Content>
-            <EachDelivery
-              delivery={delivery}
-              closeShowModal={this.closeShowModal}
-    onClickDeleteOrder={(deliveryId, orderId) => this.onClickDeleteOrder(deliveryId, orderId)}
-            />
-          </Modal.Content>
-        </Modal> */}
+        <Table
+          dataSource={listDelivery}
+          columns={columns}
+          expandedRowRender={this.expandedRowRender}
+        />
       </div>
     );
   }

@@ -18,10 +18,8 @@ class AddDelivery extends Component {
       shippers: [],
       selectedShipper: '',
       selectedTags: [],
-      // districts: [],
       selectList: [],
       stateOrderEachDistrict: [],
-      // confirmSave: false,
     };
   }
 
@@ -124,12 +122,26 @@ class AddDelivery extends Component {
     });
   }
   handleChangeTag(tag, checked) {
-    const { selectedTags } = this.state;
+    const { selectedTags, selectList } = this.state;
+    const staticOrders = JSON.parse(JSON.stringify(orderEachDistrict));
+    for (let i = 0; i < selectList.length; i += 1) {
+      const districtId = selectList[i].receiver.district._id;
+      if (staticOrders[districtId]) {
+        const arrOrder = staticOrders[districtId];
+        for (let k = 0; k < arrOrder.length; k += 1) {
+          if (selectList[i]._id === arrOrder[k]._id) {
+            arrOrder.splice(k, 1);
+            break;
+          }
+        }
+        staticOrders[districtId] = arrOrder;
+      }
+    }
     if (tag === 'all') {
       let orders = [];
-      for (const districtId in orderEachDistrict) {
-        if (Object.prototype.hasOwnProperty.call(orderEachDistrict, districtId)) {
-          orders = orders.concat(orderEachDistrict[districtId]);
+      for (const districtId in staticOrders) {
+        if (Object.prototype.hasOwnProperty.call(staticOrders, districtId)) {
+          orders = orders.concat(staticOrders[districtId]);
         }
       }
 
@@ -147,13 +159,17 @@ class AddDelivery extends Component {
       let orders = [];
       for (let i = 0; i < nextSelectedTags.length; i += 1) {
         const district = nextSelectedTags[i];
-        orders = orders.concat(orderEachDistrict[district]);
+        orders = orders.concat(staticOrders[district]);
       }
       this.setState({
         selectedTags: nextSelectedTags,
         stateOrderEachDistrict: orders,
       });
     }
+    // let stateOrders = [];
+    // for(let i=0; i < orders.length; i+=1){
+
+    // }
   }
   renderShippers() {
     const { shippers } = this.state;

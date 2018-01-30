@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Table, notification, Button, Select } from 'antd';
+import moment from 'moment';
 import request from '../../utils/request';
 import orderStatusConstants from '../../constants/orderStatus';
 
@@ -10,7 +11,7 @@ class Delivery extends Component {
     static propTypes = {
       deliveryId: PropTypes.string.isRequired,
       closeShowModal: PropTypes.func.isRequired,
-      onSaveData: PropTypes.func.isRequired,
+      onSaveDataDelivery: PropTypes.func.isRequired,
     }
     constructor(props) {
       super(props);
@@ -43,7 +44,7 @@ class Delivery extends Component {
       request('/order/changeMulti', { method: 'PUT', body: postData }).then((result) => {
         if (result.status === 'success') {
           this.props.closeShowModal();
-          this.props.onSaveData();
+          this.props.onSaveDataDelivery();
           notification.success({
             message: 'Thành Công',
             description: 'Bạn đã cập nhật chuyến đi giao thành công.',
@@ -84,8 +85,31 @@ class Delivery extends Component {
         orders: stateOrders,
       });
     }
-    onClickEndDelivery = () => {
-
+    onClickEndDelivery = async () => {
+      const { orders } = this.state;
+      const postData = {};
+      for (let i = 0; i < orders.length; i++) {
+        const order = orders[i];
+        if (!postData[order.orderstatus]) {
+          postData[order.orderstatus] = [];
+        }
+        postData[order.orderstatus].push(order._id);
+      }
+      const result = await request(`/delivery/completeDelivery/${this.props.deliveryId}`, { method: 'PUT', body: postData });
+      if (result.status === 'success') {
+        this.props.closeShowModal();
+        this.props.onSaveDataDelivery();
+        notification.success({
+          message: 'Thành Công',
+          description: 'Hoàn Thành chuyến đi giao thành công.',
+        });
+      } else {
+        this.props.closeShowModal();
+        notification.error({
+          message: 'Xãy ra lỗi',
+          description: result.data.msg,
+        });
+      }
     }
     async getDelivery(deliveryId) {
       const result = await request(`/delivery/findOne/${deliveryId}`);
@@ -108,11 +132,6 @@ class Delivery extends Component {
       const result = [];
       for (let i = 0; i < orders.length; i += 1) {
         const order = orders[i];
-        const createdAt = new Date(order.createdAt);
-        const orderCreatedAt = `${createdAt.getDate()}/${
-          createdAt.getMonth()} ${
-          createdAt.getHours()}:${
-          createdAt.getMinutes()}`;
         const { phoneNumbers } = order.receiver;
         let textPhoneNUmbers = '';
         for (let k = 0; k < phoneNumbers.length; k += 1) {
@@ -123,7 +142,7 @@ class Delivery extends Component {
           _id: order._id,
           count: i + 1,
           id: order.id,
-          createAt: orderCreatedAt,
+          createAt: moment(order.createdAt).format('DD-MM HH:mm'),
           name: order.receiver.name,
           address: order.receiver.address,
           district: order.receiver.district.name,
