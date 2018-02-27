@@ -82,6 +82,26 @@ export const getNavData = app => [
         ],
       },
       {
+        name: 'Chuyến Đi Trả',
+        showOnSideBar: true,
+        icon: 'car',
+        path: 'refund',
+        children: [
+          {
+            name: 'Danh sách',
+            showOnSideBar: true,
+            path: 'list',
+            component: dynamicWrapper(app, ['refund'], () => import('../routes/Refund/ListRefund')),
+          },
+          {
+            name: 'Thêm Chuyến Đi Trả',
+            showOnSideBar: false,
+            path: 'add',
+            component: dynamicWrapper(app, ['refund'], () => import('../routes/Refund/AddRefund')),
+          },
+        ],
+      },
+      {
         name: 'Exception',
         showOnSideBar: false,
         path: 'exception',
