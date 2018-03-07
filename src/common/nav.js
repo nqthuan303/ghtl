@@ -56,6 +56,26 @@ export const getNavData = app => [
         ],
       },
       {
+        name: 'Chuyến đi lấy',
+        showOnSideBar: true,
+        icon: 'shop',
+        path: 'pickup',
+        children: [
+          {
+            name: 'Danh sách',
+            showOnSideBar: true,
+            path: 'list',
+            component: dynamicWrapper(app, ['order'], () => import('../routes/Pickup/List')),
+          },
+          {
+            name: 'Thêm đơn hàng',
+            showOnSideBar: true,
+            path: 'add',
+            component: dynamicWrapper(app, ['order'], () => import('../routes/Order/Add')),
+          },
+        ],
+      },
+      {
         name: 'Chuyến Đi Giao',
         showOnSideBar: true,
         icon: 'car',
