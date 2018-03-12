@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Table, notification, Button, Select } from 'antd';
 import moment from 'moment';
 import request from '../../utils/request';
-import orderStatusConstants from '../../constants/orderStatus';
+import orderStatusConstants from '../../constants/status';
 
 const { Option } = Select;
 
@@ -71,7 +71,7 @@ class Delivery extends Component {
       let statusDelivery = '';
       for (let i = 0; i < listOrderStatus.length; i += 1) {
         const orderStatus = listOrderStatus[i];
-        if (orderStatus.name === orderStatusConstants.DONE) {
+        if (orderStatus.name === orderStatusConstants.order.DONE) {
           statusDelivery = orderStatus.value;
         }
       }

@@ -1,44 +1,35 @@
 import React, { Component } from 'react';
-import { Input, Button, Select, Tag, Modal, notification } from 'antd';
-import StorageOrderCard from '../../components/Delivery/StorageOrderCard';
-import SelectOrderList from '../../components/Delivery/SelectOrderList';
-import OrderConvertStatus from '../../components/Delivery/OrderConvertStatus';
+import { Input, Button, Select, Tag, notification } from 'antd';
+import OrderCard from '../../components/Refund/OrderCard';
+import SelectOrderList from '../../components/Refund/SelectOrderList';
 import request from '../../utils/request';
-import style from './AddDelivery.less';
+import style from './AddRefund.less';
 
 const { Search } = Input;
 const { Option } = Select;
 const { CheckableTag } = Tag;
 
 let orderEachDistrict = {};
-const deliveryOrders = {};
-let delivery = {};
 
-class UpdateDelivery extends Component {
+class AddRefund extends Component {
   constructor(props) {
     super(props);
-    this.deliveryId = this.props.match.params.id;
     this.state = {
       shippers: [],
       selectedShipper: '',
       selectedTags: [],
       selectList: [],
       stateOrderEachDistrict: [],
-      showModalConvert: false,
-      orderConvert: {},
     };
   }
 
   componentDidMount() {
-    this.getDelivery();
     this.getOrderList();
     this.getShipperList();
   }
-  onSaveData = () => {
-    // e.preventDefault();
-    // this.setState({ selectList: [] });
-    // this.getOrderList();
-    this.props.history.replace('/delivery/list');
+  onSaveData() {
+    this.setState({ selectList: [] });
+    this.getOrderList();
   }
   onClickCard(order) {
     const { selectList, stateOrderEachDistrict } = this.state;
@@ -54,79 +45,18 @@ class UpdateDelivery extends Component {
       stateOrderEachDistrict,
     });
   }
-  onCompleteConvert(order) {
-    delete deliveryOrders[order._id];
-    let index = -1;
-    for (let i = 0; i < delivery.orders.length; i += 1) {
-      if (order._id === delivery.orders[i]._id) {
-        index = i;
+  onClickDeleteSelectList(order) {
+    const { selectList, stateOrderEachDistrict } = this.state;
+    for (let i = 0; i < selectList.length; i += 1) {
+      if (order._id === selectList[i]._id) {
+        selectList.splice(i, 1);
         break;
       }
     }
-    delivery.orders.splice(index, 1);
-    this.getOrderList();
-    request(`/delivery/update/${this.deliveryId}`, { method: 'PUT', body: delivery }).then((result) => {
-      if (result.status === 'success') {
-        notification.success({
-          message: 'Thành Công',
-          description: 'Xóa và chuyển trạng thái thành công',
-        });
-      } else {
-        notification.error(
-          {
-            message: 'Đã xãy ra lỗi',
-            description: result.data.msg,
-          });
-      }
-    });
-  }
-  onClickDeleteSelectList(order) {
-    const { selectList, stateOrderEachDistrict } = this.state;
-    if (deliveryOrders[order._id] && deliveryOrders[order._id] === 1) {
-      this.setState({
-        showModalConvert: true,
-        orderConvert: order,
-      });
-    } else {
-      for (let i = 0; i < selectList.length; i += 1) {
-        if (order._id === selectList[i]._id) {
-          selectList.splice(i, 1);
-          break;
-        }
-      }
-      stateOrderEachDistrict.push(order);
-      this.setState({
-        selectList,
-        stateOrderEachDistrict,
-      });
-    }
-  }
-  onUpdateDelivery = () => {
-    const { selectedShipper, selectList } = this.state;
-    const arrOrderId = [];
-    const objDelivery = {};
-    for (let i = 0; i < selectList.length; i += 1) {
-      arrOrderId.push(selectList[i]._id);
-    }
-    if (selectedShipper) {
-      objDelivery.user = selectedShipper;
-    }
-    objDelivery.orders = arrOrderId;
-    const url = `/delivery/update/${this.deliveryId}`;
-    const method = 'PUT';
-    request(url, { method, body: objDelivery }).then((result) => {
-      if (result.status === 'success') {
-        this.onSaveData();
-        notification.success({
-          message: 'Thành Công',
-          description: 'Bạn đã cập nhật Chuyến Đi Giao thành công.',
-        });
-      } else {
-        notification.error({
-          message: 'Xãy ra lỗi',
-          description: result.data.msg,
-        });
-      }
+    stateOrderEachDistrict.push(order);
+    this.setState({
+      selectList,
+      stateOrderEachDistrict,
     });
   }
   getShipperList() {
@@ -138,29 +68,14 @@ class UpdateDelivery extends Component {
       }
     });
   }
-  async getDelivery() {
-    const result = await request(`/delivery/findOne/${this.deliveryId}`);
-    if (result.status === 'success') {
-      const { orders } = result.data;
-      for (let i = 0; i < orders.length; i += 1) {
-        const orrder = orders[i];
-        deliveryOrders[orrder._id] = 1;
-      }
-      delivery = result.data;
-      this.setState({
-        selectList: orders,
-        selectedShipper: result.data.user,
-      });
-    }
-  }
   getOrderList() {
-    request('/order/order-for-delivery').then((result) => {
+    request('/order/order-for-refund').then((result) => {
       if (result && result.data) {
         const orders = result.data;
         orderEachDistrict = {};
         for (let i = 0; i < orders.length; i += 1) {
           const order = orders[i];
-          const districId = order.receiver.district._id;
+          const districId = order.sender.district._id;
           if (!orderEachDistrict[districId]) {
             orderEachDistrict[districId] = [];
           }
@@ -173,23 +88,64 @@ class UpdateDelivery extends Component {
       }
     });
   }
-  closeModalConvert = () => {
-    this.setState({
-      showModalConvert: false,
-    });
-  }
   handleSelectShipper = (value) => {
     this.setState({
       selectedShipper: value,
     });
   }
+  createRefund= () => {
+    const { selectedShipper, selectList } = this.state;
+    const objOrderId = {};
+    const refund = {};
+    for (let i = 0; i < selectList.length; i += 1) {
+      const order = selectList[i];
+      if (!objOrderId[order.orderstatus]) {
+        objOrderId[order.orderstatus] = [];
+      }
+      objOrderId[order.orderstatus].push(order._id);
+    }
+    if (selectedShipper) {
+      refund.user = selectedShipper;
+    }
+    refund.order = objOrderId;
+    const url = '/refund/add';
+    const method = 'POST';
+    request(url, { method, body: refund }).then((result) => {
+      if (result.status === 'success') {
+        this.onSaveData();
+        notification.success({
+          message: 'Thành Công',
+          description: 'Bạn đã lưu Chuyến Đi trả thành công.',
+        });
+      } else {
+        notification.error({
+          message: 'Xãy ra lỗi',
+          description: result.data.msg,
+        });
+      }
+    });
+  }
   handleChangeTag(tag, checked) {
-    const { selectedTags } = this.state;
+    const { selectedTags, selectList } = this.state;
+    const staticOrders = JSON.parse(JSON.stringify(orderEachDistrict));
+    for (let i = 0; i < selectList.length; i += 1) {
+      const districtId = selectList[i].sender.district._id;
+      if (staticOrders[districtId]) {
+        const arrOrder = staticOrders[districtId];
+        for (let k = 0; k < arrOrder.length; k += 1) {
+          if (selectList[i]._id === arrOrder[k]._id) {
+            arrOrder.splice(k, 1);
+            break;
+          }
+        }
+        staticOrders[districtId] = arrOrder;
+      }
+    }
     if (tag === 'all') {
       let orders = [];
-      for (const districtId in orderEachDistrict) {
-        if (Object.prototype.hasOwnProperty.call(orderEachDistrict, districtId)) {
-          orders = orders.concat(orderEachDistrict[districtId]);
+      for (const districtId in staticOrders) {
+        if (Object.prototype.hasOwnProperty.call(staticOrders, districtId)) {
+          orders = orders.concat(staticOrders[districtId]);
         }
       }
 
@@ -207,7 +163,7 @@ class UpdateDelivery extends Component {
       let orders = [];
       for (let i = 0; i < nextSelectedTags.length; i += 1) {
         const district = nextSelectedTags[i];
-        orders = orders.concat(orderEachDistrict[district]);
+        orders = orders.concat(staticOrders[district]);
       }
       this.setState({
         selectedTags: nextSelectedTags,
@@ -245,7 +201,7 @@ class UpdateDelivery extends Component {
             checked={selectedTags.indexOf(districtId) > -1}
             onChange={checked => this.handleChangeTag(districtId, checked)}
           >
-            {orderEachDistrict[districtId][0].receiver.district.name}
+            {orderEachDistrict[districtId][0].sender.district.name}
             ({orderEachDistrict[districtId].length})
           </CheckableTag>
         );
@@ -255,12 +211,7 @@ class UpdateDelivery extends Component {
   }
   render() {
     const {
-      // shippers,
-      // districts,
-      selectedShipper,
       selectList,
-      orderConvert,
-      showModalConvert,
       stateOrderEachDistrict } = this.state;
     return (
       <div>
@@ -270,7 +221,6 @@ class UpdateDelivery extends Component {
             style={{ width: 200 }}
             placeholder="Select a person"
             optionFilterProp="children"
-            value={selectedShipper}
             onChange={this.handleSelectShipper}
             filterOption={
               (input, option) =>
@@ -278,7 +228,7 @@ class UpdateDelivery extends Component {
           >
             {this.renderShippers()}
           </Select>
-          <Button style={{ float: 'right' }} type="primary" onClick={this.onUpdateDelivery}>Cập Nhật</Button>
+          <Button style={{ float: 'right' }} type="primary" onClick={this.createRefund}>Tạo</Button>
           <Search
             placeholder="Mã Vận Đơn"
             style={{ width: 200, float: 'right', marginRight: '10px' }}
@@ -288,7 +238,7 @@ class UpdateDelivery extends Component {
           {this.renderCheckableTag()}
         </div>
         <div style={{ background: '#ECECEC', padding: '20px', overflow: 'hidden' }}>
-          <StorageOrderCard
+          <OrderCard
             onClickCardOrder={order => this.onClickCard(order)}
             orderEachDistrict={stateOrderEachDistrict}
           />
@@ -299,21 +249,8 @@ class UpdateDelivery extends Component {
             onClickDeleteOrder={order => this.onClickDeleteSelectList(order)}
           />
         </div>
-        <Modal
-          title="Chuyển Trạng Thái Đơn Hàng"
-          visible={showModalConvert}
-          onCancel={this.closeModalConvert}
-          footer={null}
-          width={500}
-        >
-          <OrderConvertStatus
-            orderConvert={orderConvert}
-            closeShowModal={this.closeModalConvert}
-            onSaveData={order => this.onCompleteConvert(order)}
-          />
-        </Modal>
       </div>
     );
   }
 }
-export default UpdateDelivery;
+export default AddRefund;

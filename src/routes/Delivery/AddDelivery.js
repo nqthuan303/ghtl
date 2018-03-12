@@ -69,7 +69,7 @@ class AddDelivery extends Component {
     });
   }
   getOrderList() {
-    request('/order/order-with-status?status=storage').then((result) => {
+    request('/order/order-for-delivery').then((result) => {
       if (result && result.data) {
         const orders = result.data;
         orderEachDistrict = {};
