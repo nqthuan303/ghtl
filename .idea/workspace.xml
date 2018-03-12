@@ -6,7 +6,7 @@
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/components/Pickup/PickupTable.js" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/routes/Pickup/List.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/common/nav.js" afterPath="$PROJECT_DIR$/src/common/nav.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/index.js" afterPath="$PROJECT_DIR$/src/index.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -36,25 +36,28 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="List.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="List.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/routes/Pickup/List.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="419">
-              <caret line="133" column="29" lean-forward="true" selection-start-line="133" selection-start-column="29" selection-end-line="133" selection-end-column="29" />
+            <state relative-caret-position="1035">
+              <caret line="69" column="3" lean-forward="false" selection-start-line="69" selection-start-column="3" selection-end-line="69" selection-end-column="3" />
               <folding>
-                <element signature="e#0#39#0" expanded="true" />
+                <element signature="e#0#41#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ClientOrderTable.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ClientOrderTable.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/components/Pickup/ClientOrderTable.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="870">
-              <caret line="61" column="50" lean-forward="false" selection-start-line="61" selection-start-column="40" selection-end-line="61" selection-end-column="50" />
+            <state relative-caret-position="1530">
+              <caret line="102" column="7" lean-forward="false" selection-start-line="102" selection-start-column="7" selection-end-line="102" selection-end-column="7" />
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
+                <marker date="1520859798847" expanded="true" signature="3106:3222" ph="..." />
+                <marker date="1520859798847" expanded="true" signature="3523:3727" ph="..." />
+                <marker date="1520859798847" expanded="true" signature="3539:3714" ph="..." />
               </folding>
             </state>
           </provider>
@@ -63,10 +66,12 @@
       <file leaf-file-name="PickupTable.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/Pickup/PickupTable.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1860">
-              <caret line="127" column="21" lean-forward="false" selection-start-line="127" selection-start-column="21" selection-end-line="127" selection-end-column="21" />
+            <state relative-caret-position="150">
+              <caret line="10" column="6" lean-forward="false" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
               <folding>
-                <element signature="e#0#39#0" expanded="true" />
+                <element signature="e#0#41#0" expanded="true" />
+                <marker date="1520859316217" expanded="true" signature="2048:2204" ph="..." />
+                <marker date="1520859316217" expanded="true" signature="2064:2191" ph="..." />
               </folding>
             </state>
           </provider>
@@ -160,13 +165,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>removeOrder</find>
-      <find>ClientOrderTable</find>
-      <find>conso</find>
-      <find>getShipperList</find>
-      <find>client</find>
-      <find>address</find>
-      <find>shipper</find>
       <find>onSelectShipper</find>
       <find>renderShipers</find>
       <find>notification.success</find>
@@ -190,6 +188,13 @@
       <find>shiper</find>
       <find>pershiper</find>
       <find>pickUpsOfShipper</find>
+      <find>pickUpId</find>
+      <find>shipperId</find>
+      <find>confirmModal</find>
+      <find>pickupDetailModal</find>
+      <find>onDeletePickupSuccess</find>
+      <find>ordersPerShiper</find>
+      <find>countPickup</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -242,9 +247,9 @@
         <option value="$PROJECT_DIR$/src/components/Order/FormOrder.js" />
         <option value="$PROJECT_DIR$/src/common/nav.js" />
         <option value="$PROJECT_DIR$/src/components/Pickup/index.js" />
-        <option value="$PROJECT_DIR$/src/components/Pickup/ClientOrderTable.js" />
-        <option value="$PROJECT_DIR$/src/components/Pickup/PickupTable.js" />
         <option value="$PROJECT_DIR$/src/routes/Pickup/List.js" />
+        <option value="$PROJECT_DIR$/src/components/Pickup/PickupTable.js" />
+        <option value="$PROJECT_DIR$/src/components/Pickup/ClientOrderTable.js" />
       </list>
     </option>
   </component>
@@ -280,7 +285,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -337,6 +341,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -403,11 +408,12 @@
       <workItem from="1517320787043" duration="4479000" />
       <workItem from="1517406202890" duration="3327000" />
       <workItem from="1517835789068" duration="1492000" />
+      <workItem from="1520857640950" duration="2033000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="151679000" />
+    <option name="totallyTimeSpent" value="153712000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1399" height="877" extended-state="0" />
@@ -773,10 +779,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/components/Pickup/ClientOrderTable.js">
+    <entry file="file://$PROJECT_DIR$/src/routes/Pickup/List.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="870">
-          <caret line="61" column="50" lean-forward="false" selection-start-line="61" selection-start-column="40" selection-end-line="61" selection-end-column="50" />
+        <state relative-caret-position="1035">
+          <caret line="69" column="3" lean-forward="false" selection-start-line="69" selection-start-column="3" selection-end-line="69" selection-end-column="3" />
           <folding>
             <element signature="e#0#41#0" expanded="true" />
           </folding>
@@ -785,20 +791,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/components/Pickup/PickupTable.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1860">
-          <caret line="127" column="21" lean-forward="false" selection-start-line="127" selection-start-column="21" selection-end-line="127" selection-end-column="21" />
+        <state relative-caret-position="150">
+          <caret line="10" column="6" lean-forward="false" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
           <folding>
-            <element signature="e#0#39#0" expanded="true" />
+            <element signature="e#0#41#0" expanded="true" />
+            <marker date="1520859316217" expanded="true" signature="2048:2204" ph="..." />
+            <marker date="1520859316217" expanded="true" signature="2064:2191" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/routes/Pickup/List.js">
+    <entry file="file://$PROJECT_DIR$/src/components/Pickup/ClientOrderTable.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="133" column="29" lean-forward="true" selection-start-line="133" selection-start-column="29" selection-end-line="133" selection-end-column="29" />
+        <state relative-caret-position="1530">
+          <caret line="102" column="7" lean-forward="false" selection-start-line="102" selection-start-column="7" selection-end-line="102" selection-end-column="7" />
           <folding>
-            <element signature="e#0#39#0" expanded="true" />
+            <element signature="e#0#41#0" expanded="true" />
+            <marker date="1520859798847" expanded="true" signature="3106:3222" ph="..." />
+            <marker date="1520859798847" expanded="true" signature="3523:3727" ph="..." />
+            <marker date="1520859798847" expanded="true" signature="3539:3714" ph="..." />
           </folding>
         </state>
       </provider>
