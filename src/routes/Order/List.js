@@ -99,7 +99,7 @@ class OrderList extends React.Component {
     const { ordersInStatus } = this.state;
     return ordersInStatus.map((item) => {
       return (
-        <Menu.Item key={item._id}>
+        <Menu.Item key={item.value}>
           {item.name}
         </Menu.Item>
       );
@@ -139,9 +139,8 @@ class OrderList extends React.Component {
       },
       {
         title: 'Trạng thái',
-        render: (text, record) => {
-          return record.orderstatus ? record.orderstatus.name : '';
-        },
+        dataIndex: 'orderstatus',
+
       },
       {
         title: 'Hoạt động',

@@ -8,7 +8,9 @@ import request from '../../utils/request';
 class AddOrder extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      tempOrders: [],
+    };
   }
 
   componentDidMount() {

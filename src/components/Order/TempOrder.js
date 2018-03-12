@@ -61,9 +61,8 @@ class TempOrder extends Component {
       },
       {
         title: 'Trạng thái',
-        render: (text, record) => {
-          return record.orderstatus ? record.orderstatus.name : '';
-        },
+        dataIndex: 'orderstatus',
+
       },
       {
         title: 'Hoạt động',
