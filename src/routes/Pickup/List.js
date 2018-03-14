@@ -4,7 +4,7 @@ import { Menu, Card } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import globalStyles from '../../index.less';
 import ClientOrderTable from '../../components/Pickup/ClientOrderTable';
-// import PickupTable from '../../components/Pickup/PickupTable';
+import PickupTable from '../../components/Pickup/PickupTable';
 import request from '../../utils/request';
 
 class PickupList extends Component {
@@ -29,19 +29,10 @@ class PickupList extends Component {
     this.setState({ districtId: name });
   }
 
-  onDeletePickupSuccess = () => {
-    this.clientOrderTableRef.getOrdersEachClient();
-    this.getDistrictList();
-  }
-
   onChangeDistrict = (e) => {
-    const { key } = e;
     this.setState({
       districtId: e.key,
     });
-    if (key !== 'all') {
-      console.log(key);
-    }
   }
   async getDistrictList() {
     const result = await request('/order/count-order-in-district?status=pending');
@@ -88,6 +79,9 @@ class PickupList extends Component {
               ref={(instance) => { this.clientOrderTableRef = instance; }}
               onOrderChange={this.onOrderChange}
               districtId={districtId}
+            />
+            <PickupTable
+              ref={(instance) => { this.pickupTableRef = instance; }}
             />
           </div>
         </Card>

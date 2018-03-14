@@ -38,12 +38,11 @@ export default class ClientOrderTable extends Component {
         description: 'Tạo chuyến đi giao thành công!!!',
       });
       this.getOrdersEachClient();
-      // this.props.onOrderChange();
+      this.props.onOrderChange();
     }
   }
 
   onCancel = () => {
-    console.log(123123);
   }
 
   onSelectShipper(value, orders, client) {
@@ -53,7 +52,7 @@ export default class ClientOrderTable extends Component {
       orderIds.push(order._id);
     }
     this.selectedData = {
-      user: value,
+      shipperId: value,
       orders: orderIds,
       client,
     };

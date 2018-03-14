@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { Table } from 'antd';
+import { Table, notification } from 'antd';
 import request from '../../utils/request';
 
 export default class PickupTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ordersPerShiper: {},
       pickups: [],
     };
     this.shiperId = '';
@@ -18,72 +17,56 @@ export default class PickupTable extends Component {
     const result = await request('/pickup/list');
     if (result.status === 'success') {
       const { data } = result;
-      const ordersPerShiper = {};
-      for (let i = 0; i < data.length; i++) {
-        const item = data[i];
-        const { user } = item;
-        const shipperId = user._id;
-        if (ordersPerShiper[shipperId]) {
-          ordersPerShiper[shipperId]++;
-        } else {
-          ordersPerShiper[shipperId] = 1;
-        }
-      }
       this.setState({
-        ordersPerShiper,
         pickups: data,
+      });
+    } else {
+      notification.error({
+        message: 'Lỗi',
+        description: result.data.msg,
       });
     }
   }
 
   renderShiperName = (value, row) => {
-    // console.log(row);
-    const { ordersPerShiper } = this.state;
-    const shipper = row.user;
-    let rowSpan = 0;
-    if (this.shiperId !== shipper._id) {
-      this.shiperId = shipper._id;
-      rowSpan = ordersPerShiper[this.shiperId];
-    }
-    const obj = {
-      children: value,
-      props: {
-        rowSpan,
-      },
-    };
-    return obj;
+    const { shipper } = row;
+    return (
+      <p>{shipper.name} - {shipper.id}/{shipper.phone}</p>
+    );
   }
 
-  renderPickupId = (value, row) => {
-    const { ordersPerShiper } = this.state;
-    const shipper = row.user;
-    let rowSpan = 0;
-    if (this.shiperId !== shipper._id) {
-      this.shiperId = shipper._id;
-      rowSpan = ordersPerShiper[this.shiperId];
-    }
-    const obj = {
-      children: value,
-      props: {
-        rowSpan,
-      },
-    };
-    return obj;
+  renderData = (record) => {
+    const { data } = record;
+    const columns = [
+      { key: 'id', dataIndex: 'id' },
+      { render: () => '123 abc' },
+      { render: () => '625.000' },
+      { render: () => 'Sửa' },
+      { render: () => 'xxx' },
+    ];
+    return (
+      <Table
+        showHeader={false}
+        dataSource={data}
+        columns={columns}
+        pagination={false}
+      />
+    );
   }
 
   render() {
     const { pickups } = this.state;
 
     const columns = [
-      { key: 'pickupId', dataIndex: 'id', render: this.renderPickupId },
-      { key: 'shipperName', dataIndex: 'user.name', render: this.renderShiperName },
-      { key: 'createdAtPickup', render: () => 123 },
+      { key: 'pickupId', dataIndex: 'id' },
+      { key: 'shipperName', render: this.renderShiperName },
     ];
 
     return (
-      <div style={{ marginTop: 20 }}>
+      <div style={{ marginTop: 50 }}>
         <Table
           showHeader={false}
+          expandedRowRender={this.renderData}
           dataSource={pickups}
           columns={columns}
           pagination={false}
