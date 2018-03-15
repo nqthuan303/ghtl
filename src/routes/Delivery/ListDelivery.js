@@ -17,14 +17,10 @@ const AddDelivery = withRouter(({ history }) => (
 ));
 
 class DeliveryList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
   onSaveData = () => {
-    this.deliveryComplete.getDelivery();
+    if (this.deliveryComplete) {
+      this.deliveryComplete.getDelivery();
+    }
   }
   render() {
     return (
