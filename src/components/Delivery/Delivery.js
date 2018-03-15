@@ -1,12 +1,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Table, notification, Button, Select } from 'antd';
+import { Table, notification, Button, Select, Input } from 'antd';
 import moment from 'moment';
 import request from '../../utils/request';
-import orderStatusConstants from '../../constants/status';
+import { order as objOrderStatus } from '../../constants/status';
 
+const { TextArea } = Input;
 const { Option } = Select;
+const listOrderStatus = [];
 
+for (const key in objOrderStatus) {
+  if (key === 'STORAGE' || key === 'DELIVERY' ||
+    key === 'DELIVERED' || key === 'RETURNFEESTORAGE' || key === 'RETURNSTORAGE') {
+    const status = objOrderStatus[key];
+    listOrderStatus.push(status);
+  }
+}
 class Delivery extends Component {
     static propTypes = {
       deliveryId: PropTypes.string.isRequired,
@@ -17,47 +26,43 @@ class Delivery extends Component {
       super(props);
       this.state = {
         orders: [],
-        listOrderStatus: [],
       };
     }
-
-
     componentDidMount() {
       this.getDelivery(this.props.deliveryId);
-      this.getOrderStatus();
     }
     componentWillReceiveProps(nextProps) {
       if (this.props.deliveryId !== nextProps.deliveryId) {
         this.getDelivery(nextProps.deliveryId);
       }
     }
-    onClickSave() {
-      const { orders } = this.state;
-      const postData = {};
-      for (let i = 0; i < orders.length; i++) {
-        const order = orders[i];
-        if (!postData[order.orderstatus]) {
-          postData[order.orderstatus] = [];
-        }
-        postData[order.orderstatus].push(order._id);
-      }
-      request('/order/changeMulti', { method: 'PUT', body: postData }).then((result) => {
-        if (result.status === 'success') {
-          this.props.closeShowModal();
-          this.props.onSaveDataDelivery();
-          notification.success({
-            message: 'Thành Công',
-            description: 'Bạn đã cập nhật chuyến đi giao thành công.',
-          });
-        } else {
-          this.props.closeShowModal();
-          notification.error({
-            message: 'Xãy ra lỗi',
-            description: result.data.msg,
-          });
-        }
-      });
-    }
+    // onClickSave() {
+    //   const { orders } = this.state;
+    //   const postData = {};
+    //   for (let i = 0; i < orders.length; i++) {
+    //     const order = orders[i];
+    //     if (!postData[order.orderstatus]) {
+    //       postData[order.orderstatus] = [];
+    //     }
+    //     postData[order.orderstatus].push(order._id);
+    //   }
+    //   request('/order/changeMulti', { method: 'PUT', body: postData }).then((result) => {
+    //     if (result.status === 'success') {
+    //       this.props.closeShowModal();
+    //       this.props.onSaveDataDelivery();
+    //       notification.success({
+    //         message: 'Thành Công',
+    //         description: 'Bạn đã cập nhật chuyến đi giao thành công.',
+    //       });
+    //     } else {
+    //       this.props.closeShowModal();
+    //       notification.error({
+    //         message: 'Xãy ra lỗi',
+    //         description: result.data.msg,
+    //       });
+    //     }
+    //   });
+    // }
     onChangeOrderStatus(value, index) {
       const stateOrders = Object.assign([], this.state.orders);
       stateOrders[index].orderstatus = value;
@@ -65,21 +70,10 @@ class Delivery extends Component {
         orders: stateOrders,
       });
     }
-    onClickChangeStatusDone = () => {
-      const { listOrderStatus } = this.state;
+    onClickChangeDelivered = () => {
       const stateOrders = Object.assign([], this.state.orders);
-      let statusDelivery = '';
-      for (let i = 0; i < listOrderStatus.length; i += 1) {
-        const orderStatus = listOrderStatus[i];
-        if (orderStatus.name === orderStatusConstants.order.DONE) {
-          statusDelivery = orderStatus.value;
-        }
-      }
-      if (!statusDelivery || statusDelivery === '') {
-        return;
-      }
       for (let i = 0; i < stateOrders.length; i += 1) {
-        stateOrders[i].orderstatus = statusDelivery;
+        stateOrders[i].orderstatus = objOrderStatus.DELIVERED.value;
       }
       this.setState({
         orders: stateOrders,
@@ -95,7 +89,7 @@ class Delivery extends Component {
         }
         postData[order.orderstatus].push(order._id);
       }
-      const result = await request(`/delivery/completeDelivery/${this.props.deliveryId}`, { method: 'PUT', body: postData });
+      const result = await request(`/delivery/delivery-done/${this.props.deliveryId}`, { method: 'PUT', body: postData });
       if (result.status === 'success') {
         this.props.closeShowModal();
         this.props.onSaveDataDelivery();
@@ -119,14 +113,6 @@ class Delivery extends Component {
         });
       }
     }
-    async getOrderStatus() {
-      const result = await request('/orderStatus/listForSelect');
-      if (result && result.length > 0) {
-        this.setState({
-          listOrderStatus: result,
-        });
-      }
-    }
     renderOrder() {
       const { orders } = this.state;
       const result = [];
@@ -134,8 +120,10 @@ class Delivery extends Component {
         const order = orders[i];
         const { phoneNumbers } = order.receiver;
         let textPhoneNUmbers = '';
-        for (let k = 0; k < phoneNumbers.length; k += 1) {
-          textPhoneNUmbers = `${textPhoneNUmbers}    ${phoneNumbers[k]}`;
+        if (phoneNumbers) {
+          for (let k = 0; k < phoneNumbers.length; k += 1) {
+            textPhoneNUmbers = `${textPhoneNUmbers}    ${phoneNumbers[k]}`;
+          }
         }
         result.push({
           key: i,
@@ -186,7 +174,7 @@ class Delivery extends Component {
   <div style={{ textAlign: 'center' }}>
     <div> Trạng Thái </div>
     <br />
-    <div> <Button type="primary" onClick={this.onClickChangeStatusDone}>Đã Giao</Button> </div>
+    <div> <Button type="primary" onClick={this.onClickChangeDelivered}>Đã Giao</Button> </div>
   </div>,
           key: 'orderStatus',
           render: record => (
@@ -205,39 +193,55 @@ class Delivery extends Component {
             </Select>),
         },
       ];
-      return <Table columns={columns} dataSource={result} />;
+      return (<Table
+        columns={columns}
+        dataSource={result}
+        expandedRowRender={() => <p style={{ margin: 0 }}>Lý Do: <TextArea rows={2} /></p>}
+      />);
     }
     renderOrderStatus = () => {
-      const { listOrderStatus } = this.state;
       const result = [];
-      for (let i = 0; i < listOrderStatus.length; i += 1) {
+      for (let i = 0; i < listOrderStatus.length; i++) {
         const status = listOrderStatus[i];
         result.push(
-          <Option key={i} value={status.value}>{status.text}</Option>
+          <Option key={i} value={status.value}>{status.name}</Option>
         );
       }
       return result;
     }
     render() {
+      const { orders } = this.state;
+      let disableButton = true;
+      const ordersLength = orders.length;
+      let count = 0;
+      for (let i = 0; i < ordersLength; i += 1) {
+        if (orders[i].orderstatus === objOrderStatus.DELIVERY.value) {
+          break;
+        }
+        count += 1;
+      }
+      if (count === ordersLength) {
+        disableButton = false;
+      }
       return (
         <div>
           {this.renderOrder()}
           <div style={{ textAlign: 'center' }}>
-            <Button
+            {/* <Button
               type="primary"
               onClick={() => this.onClickSave()}
-            > Xác Nhận
+            > Lưu
+            </Button> */}
+            <Button
+              disabled={disableButton}
+              type="primary"
+              onClick={() => this.onClickEndDelivery()}
+            > Kết Thúc Chuyến Đi
             </Button>
             <Button
               style={{ marginLeft: '20px' }}
               onClick={() => this.props.closeShowModal()}
             > Hủy
-            </Button>
-            <Button
-              style={{ float: 'right' }}
-              type="primary"
-              onClick={() => this.onClickEndDelivery()}
-            > Kết Thúc Chuyến Đi
             </Button>
           </div>
         </div>

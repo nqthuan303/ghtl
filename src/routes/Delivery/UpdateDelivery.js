@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Input, Button, Select, Tag, Modal, notification } from 'antd';
+import { Input, Button, Select, Tag, notification } from 'antd';
 import StorageOrderCard from '../../components/Delivery/StorageOrderCard';
 import SelectOrderList from '../../components/Delivery/SelectOrderList';
-import OrderConvertStatus from '../../components/Delivery/OrderConvertStatus';
 import request from '../../utils/request';
 import style from './AddDelivery.less';
+import { order as objOrderStatus } from '../../constants/status';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -24,8 +24,6 @@ class UpdateDelivery extends Component {
       selectedTags: [],
       selectList: [],
       stateOrderEachDistrict: [],
-      showModalConvert: false,
-      orderConvert: {},
     };
   }
 
@@ -35,9 +33,6 @@ class UpdateDelivery extends Component {
     this.getShipperList();
   }
   onSaveData = () => {
-    // e.preventDefault();
-    // this.setState({ selectList: [] });
-    // this.getOrderList();
     this.props.history.replace('/delivery/list');
   }
   onClickCard(order) {
@@ -54,39 +49,10 @@ class UpdateDelivery extends Component {
       stateOrderEachDistrict,
     });
   }
-  onCompleteConvert(order) {
-    delete deliveryOrders[order._id];
-    let index = -1;
-    for (let i = 0; i < delivery.orders.length; i += 1) {
-      if (order._id === delivery.orders[i]._id) {
-        index = i;
-        break;
-      }
-    }
-    delivery.orders.splice(index, 1);
-    this.getOrderList();
-    request(`/delivery/update/${this.deliveryId}`, { method: 'PUT', body: delivery }).then((result) => {
-      if (result.status === 'success') {
-        notification.success({
-          message: 'Thành Công',
-          description: 'Xóa và chuyển trạng thái thành công',
-        });
-      } else {
-        notification.error(
-          {
-            message: 'Đã xãy ra lỗi',
-            description: result.data.msg,
-          });
-      }
-    });
-  }
   onClickDeleteSelectList(order) {
     const { selectList, stateOrderEachDistrict } = this.state;
     if (deliveryOrders[order._id] && deliveryOrders[order._id] === 1) {
-      this.setState({
-        showModalConvert: true,
-        orderConvert: order,
-      });
+      this.convertOrderStorage(order);
     } else {
       for (let i = 0; i < selectList.length; i += 1) {
         if (order._id === selectList[i]._id) {
@@ -143,8 +109,8 @@ class UpdateDelivery extends Component {
     if (result.status === 'success') {
       const { orders } = result.data;
       for (let i = 0; i < orders.length; i += 1) {
-        const orrder = orders[i];
-        deliveryOrders[orrder._id] = 1;
+        const order = orders[i];
+        deliveryOrders[order._id] = 1;
       }
       delivery = result.data;
       this.setState({
@@ -173,10 +139,42 @@ class UpdateDelivery extends Component {
       }
     });
   }
-  closeModalConvert = () => {
-    this.setState({
-      showModalConvert: false,
-    });
+  async convertOrderStorage(order) {
+    const postData = Object.assign({}, order);
+    postData.orderstatus = objOrderStatus.STORAGE.value;
+    const updateOrder = await request(`/order/update/${postData._id}`, { method: 'PUT', body: postData });
+    if (updateOrder.message === 'Success') {
+      delete deliveryOrders[postData._id];
+      let index = -1;
+      for (let i = 0; i < delivery.orders.length; i += 1) {
+        if (postData._id === delivery.orders[i]._id) {
+          index = i;
+          break;
+        }
+      }
+      delivery.orders.splice(index, 1);
+      const body = Object.assign({}, delivery);
+      body.orders = [];
+      for (const orderId in deliveryOrders) {
+        if (Object.prototype.hasOwnProperty.call(deliveryOrders, orderId)) {
+          body.orders.push(orderId);
+        }
+      }
+      this.getOrderList();
+      const result = await request(`/delivery/update/${this.deliveryId}`, { method: 'PUT', body });
+      if (result.status === 'success') {
+        notification.success({
+          message: 'Thành Công',
+          description: 'Xóa và chuyển trạng thái thành công',
+        });
+      } else {
+        notification.error(
+          {
+            message: 'Đã xãy ra lỗi',
+            description: result.data.msg,
+          });
+      }
+    }
   }
   handleSelectShipper = (value) => {
     this.setState({
@@ -259,8 +257,6 @@ class UpdateDelivery extends Component {
       // districts,
       selectedShipper,
       selectList,
-      orderConvert,
-      showModalConvert,
       stateOrderEachDistrict } = this.state;
     return (
       <div>
@@ -299,19 +295,6 @@ class UpdateDelivery extends Component {
             onClickDeleteOrder={order => this.onClickDeleteSelectList(order)}
           />
         </div>
-        <Modal
-          title="Chuyển Trạng Thái Đơn Hàng"
-          visible={showModalConvert}
-          onCancel={this.closeModalConvert}
-          footer={null}
-          width={500}
-        >
-          <OrderConvertStatus
-            orderConvert={orderConvert}
-            closeShowModal={this.closeModalConvert}
-            onSaveData={order => this.onCompleteConvert(order)}
-          />
-        </Modal>
       </div>
     );
   }

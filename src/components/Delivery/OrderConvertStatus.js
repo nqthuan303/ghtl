@@ -2,8 +2,17 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { notification, Button, Row, Col, Select } from 'antd';
 import request from '../../utils/request';
+import { order as objOrderStatus } from '../../constants/status';
 
 const { Option } = Select;
+const listOrderStatus = [];
+
+for (const key in objOrderStatus) {
+  if (key === 'STORAGE' || key === 'DELIVERYPREPARE' || key === 'DELIVERY' || key === 'RETURNFEESTORAGE') {
+    const status = objOrderStatus[key];
+    listOrderStatus.push(status);
+  }
+}
 
 class OrderConvertStatus extends Component {
     static propTypes = {
@@ -14,13 +23,8 @@ class OrderConvertStatus extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        listOrderStatus: [],
         selectStatus: this.props.orderConvert.orderstatus,
       };
-    }
-
-    componentDidMount() {
-      this.getOrderStatus();
     }
     componentWillReceiveProps(nextProps) {
       if (this.props.orderConvert &&
@@ -52,14 +56,6 @@ class OrderConvertStatus extends Component {
         });
       }
       this.props.closeShowModal();
-    }
-    async getOrderStatus() {
-      const result = await request('/orderStatus/listForSelect');
-      if (result && result.length > 0) {
-        this.setState({
-          listOrderStatus: result,
-        });
-      }
     }
     handleSelectOrderStatus = (value) => {
       this.setState({
@@ -112,11 +108,10 @@ class OrderConvertStatus extends Component {
         </div>);
     }
     renderOrderStatus() {
-      const { listOrderStatus } = this.state;
       const result = [];
       for (let i = 0; i < listOrderStatus.length; i += 1) {
         result.push(
-          <Option key={i} value={listOrderStatus[i].value}>{listOrderStatus[i].text}</Option>
+          <Option key={i} value={listOrderStatus[i].value}>{listOrderStatus[i].name}</Option>
         );
       }
       return result;

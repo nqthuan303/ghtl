@@ -4,6 +4,7 @@ import { withRouter } from 'react-router';
 import moment from 'moment';
 import Delivery from './Delivery';
 import request from '../../utils/request';
+import { delivery as deliveryStatus } from '../../constants/status';
 
 class DeliveryUnComplete extends Component {
   constructor(props) {
@@ -53,7 +54,7 @@ class DeliveryUnComplete extends Component {
       });
       return;
     }
-    request(`/delivery/changeStatusDelivery/${record._id}`, { method: 'PUT' }).then((result) => {
+    request(`/delivery/change-status-doing/${record._id}`, { method: 'PUT' }).then((result) => {
       if (result.status === 'success') {
         this.getDelivery();
         notification.success({
@@ -81,7 +82,8 @@ class DeliveryUnComplete extends Component {
       const listDelivery = [];
       for (let i = 0; i < deliveries.length; i += 1) {
         const delivery = deliveries[i];
-        if (delivery.status === 'unCompleted' || delivery.status === 'delivery') {
+        if (delivery.status === deliveryStatus.PENDING ||
+            delivery.status === deliveryStatus.DOING) {
           listDelivery.push({
             _id: delivery._id,
             key: i,
@@ -126,7 +128,7 @@ class DeliveryUnComplete extends Component {
         title: 'Chỉnh Sửa',
         key: 'edit',
         render: (text, record) => (
-          record.status === 'unCompleted' ?
+          record.status === deliveryStatus.PENDING ?
             <div style={{ fontSize: '16px' }} >
               <a onClick={() => this.onClickEditDelivery(record)}>
                 <Icon type="edit" />
@@ -138,17 +140,17 @@ class DeliveryUnComplete extends Component {
             : ''
         ),
       }, {
-        title: 'Trạng Thái',
+        title: 'Hành Động',
         key: 'status',
         render: record => (
           <div>
-            {record.status === 'unCompleted' ?
+            {record.status === deliveryStatus.PENDING ?
               <a onClick={() => this.onClickChangeStatus(record)}>
-                {record.status}
+                Bắt Đầu
               </a>
           :
               <a onClick={() => this.onClickChangeDelivery(record)}>
-                {record.status}
+                Cập Nhật
               </a>
           }
           </div>

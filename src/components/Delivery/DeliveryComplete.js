@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Table, Icon } from 'antd';
 import moment from 'moment';
 import request from '../../utils/request';
+import { delivery as deliveryStatus } from '../../constants/status';
 
 class DeliveryComplete extends Component {
   constructor(props) {
@@ -21,7 +22,7 @@ class DeliveryComplete extends Component {
       const listDelivery = [];
       for (let i = 0; i < deliverys.length; i += 1) {
         const delivery = deliverys[i];
-        if (delivery.status === 'completed') {
+        if (delivery.status === deliveryStatus.DONE) {
           delivery.key = i;
           listDelivery.push(delivery);
         }
