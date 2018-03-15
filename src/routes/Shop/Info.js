@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Alert, Tabs } from 'antd';
+import { Alert, Tabs } from 'antd';
 import { withRouter } from 'react-router';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import FormShop from '../../components/Shop/FormShop';
@@ -40,28 +40,26 @@ class ShopInfo extends React.Component {
     const { notice, shop } = this.state;
     return (
       <PageHeaderLayout title="Thông tin shop">
-        <Card bordered={false}>
+        <div>
+          {notice.message !== '' ?
+            <Alert closable style={{ marginBottom: 10 }} message={notice.message} type={notice.type} /> : ''}
           <div>
-            {notice.message !== '' ?
-              <Alert closable style={{ marginBottom: 10 }} message={notice.message} type={notice.type} /> : ''}
-            <div>
-              <Tabs>
-                <TabPane tab="Thông tin chung" key="1">
-                  <FormShop data={shop} onDataSaved={this.onDataSaved} />
-                </TabPane>
-                <TabPane tab="Đơn hàng" key="2">
-                  <OrderInfo />
-                </TabPane>
-                <TabPane tab="Gói cước" key="3">
-                  <PriceInfo />
-                </TabPane>
-                <TabPane tab="Bảng kê" key="4">
-                  <p>Content of Tab Pane 4</p>
-                </TabPane>
-              </Tabs>
-            </div>
+            <Tabs>
+              <TabPane tab="Thông tin chung" key="1">
+                <FormShop data={shop} onDataSaved={this.onDataSaved} />
+              </TabPane>
+              <TabPane tab="Đơn hàng" key="2">
+                <OrderInfo />
+              </TabPane>
+              <TabPane tab="Gói cước" key="3">
+                <PriceInfo />
+              </TabPane>
+              <TabPane tab="Bảng kê" key="4">
+                <p>Content of Tab Pane 4</p>
+              </TabPane>
+            </Tabs>
           </div>
-        </Card>
+        </div>
       </PageHeaderLayout>
     );
   }

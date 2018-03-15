@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Divider, Table, Alert, Modal } from 'antd';
+import { Divider, Table, Alert, Modal } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import globalStyles from '../../index.less';
 import request from '../../utils/request';
@@ -123,21 +123,16 @@ class ShopList extends React.Component {
     ];
     return (
       <PageHeaderLayout title="Danh sách shop">
-        <Card bordered={false}>
-          <div className={globalStyles.tableList}>
-            {notice.message !== '' ?
-              <Alert closable style={{ marginBottom: 10 }} message={notice.message} type={notice.type} /> : ''}
-
-            <Table
-              rowKey={record => record._id}
-              dataSource={items}
-              columns={columns}
-              pagination={{ showSizeChanger: true }}
-            />
-          </div>
-        </Card>
-
-
+        <div className={globalStyles.tableList}>
+          {notice.message !== '' ?
+            <Alert closable style={{ marginBottom: 10 }} message={notice.message} type={notice.type} /> : ''}
+          <Table
+            rowKey={record => record._id}
+            dataSource={items}
+            columns={columns}
+            pagination={{ showSizeChanger: true }}
+          />
+        </div>
       </PageHeaderLayout>
 
     );

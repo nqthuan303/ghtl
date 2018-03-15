@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, notification } from 'antd';
+import { notification } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import FormOrder from '../../components/Order/FormOrder';
 import TempOrder from '../../components/Order/TempOrder';
@@ -77,10 +77,8 @@ class AddOrder extends React.Component {
     const { tempOrders } = this.state;
     return (
       <PageHeaderLayout title="Thêm đơn hàng">
-        <Card bordered={false}>
-          <FormOrder saveOrder={this.saveOrder} onSave={this.onSaveTempOrder} />
-          <TempOrder removeOrder={this.removeOrder} data={tempOrders} />
-        </Card>
+        <FormOrder saveOrder={this.saveOrder} onSave={this.onSaveTempOrder} />
+        <TempOrder removeOrder={this.removeOrder} data={tempOrders} />
       </PageHeaderLayout>
     );
   }

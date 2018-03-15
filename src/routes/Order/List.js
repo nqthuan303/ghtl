@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Menu, Table, Divider, Modal, notification, Button } from 'antd';
+import { Menu, Table, Divider, Modal, notification, Button } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import globalStyles from '../../index.less';
 import request from '../../utils/request';
@@ -156,28 +156,26 @@ class OrderList extends React.Component {
 
     return (
       <PageHeaderLayout title="Danh sách đơn hàng">
-        <Card bordered={false}>
-          <Button onClick={this.onClickAddOrder}>Thêm đơn hàng</Button>
-          <div className={globalStyles.tableList}>
-            <Menu
-              style={{ marginBottom: 20 }}
-              onClick={this.onClickMenu}
-              selectedKeys={[currentMenu]}
-              mode="horizontal"
-            >
-              <Menu.Item key="all">
-                Tất cả
-              </Menu.Item>
-              {this.renderMenu()}
-            </Menu>
-            <Table
-              rowKey={record => record._id}
-              dataSource={items}
-              columns={columns}
-              pagination={{ showSizeChanger: true }}
-            />
-          </div>
-        </Card>
+        <Button onClick={this.onClickAddOrder}>Thêm đơn hàng</Button>
+        <div className={globalStyles.tableList}>
+          <Menu
+            style={{ marginBottom: 20 }}
+            onClick={this.onClickMenu}
+            selectedKeys={[currentMenu]}
+            mode="horizontal"
+          >
+            <Menu.Item key="all">
+              Tất cả
+            </Menu.Item>
+            {this.renderMenu()}
+          </Menu>
+          <Table
+            rowKey={record => record._id}
+            dataSource={items}
+            columns={columns}
+            pagination={{ showSizeChanger: true }}
+          />
+        </div>
       </PageHeaderLayout>
     );
   }

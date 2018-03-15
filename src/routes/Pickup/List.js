@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Menu, Card } from 'antd';
+import { Menu } from 'antd';
 
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import globalStyles from '../../index.less';
 import ClientOrderTable from '../../components/Pickup/ClientOrderTable';
 import PickupTable from '../../components/Pickup/PickupTable';
 import request from '../../utils/request';
@@ -63,28 +62,28 @@ class PickupList extends Component {
     const { districtId } = this.state;
     return (
       <PageHeaderLayout title="Danh sách shop">
-        <Card bordered={false}>
-          <div className={globalStyles.tableList}>
-            <Menu
-              onClick={this.onChangeDistrict}
-              selectedKeys={[districtId]}
-              mode="horizontal"
-            >
-              <Menu.Item key="all">
-                All
-              </Menu.Item>
-              {this.renderDistrict()}
-            </Menu>
-            <ClientOrderTable
-              ref={(instance) => { this.clientOrderTableRef = instance; }}
-              onOrderChange={this.onOrderChange}
-              districtId={districtId}
-            />
-            <PickupTable
-              ref={(instance) => { this.pickupTableRef = instance; }}
-            />
-          </div>
-        </Card>
+        <div>
+          <Menu
+            onClick={this.onChangeDistrict}
+            selectedKeys={[districtId]}
+            mode="horizontal"
+          >
+            <Menu.Item key="all">
+              All
+            </Menu.Item>
+            {this.renderDistrict()}
+          </Menu>
+          <ClientOrderTable
+            ref={(instance) => { this.clientOrderTableRef = instance; }}
+            onOrderChange={this.onOrderChange}
+            districtId={districtId}
+          />
+        </div>
+        <div>
+          <PickupTable
+            ref={(instance) => { this.pickupTableRef = instance; }}
+          />
+        </div>
       </PageHeaderLayout>
     );
   }
