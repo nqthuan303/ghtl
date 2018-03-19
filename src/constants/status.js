@@ -1,4 +1,38 @@
 const status = {
+  getOrderStatus: () => {
+    const result = [];
+    for (const key in status.order) {
+      if (key) {
+        const item = status.order[key];
+        result.push(item.value);
+      }
+    }
+    return result;
+  },
+  paymentStatus: {
+    PENDING: {
+      name: 'Chưa đối soát', // đơn hàng chưa được xử lý thanh toán
+      value: 'pending',
+    },
+    UNPAID: {
+      name: 'Chưa thanh toán', // đơn hàng chưa thanh toán cho shop
+      value: 'unPaid',
+    },
+    PAID: {
+      name: 'Đã thanh toán', // đơn hàng đã thanh toán cho shop
+      value: 'paid',
+    },
+  },
+  orderPayBy: {
+    SENDER: {
+      name: 'Người gửi',
+      value: 'sender',
+    },
+    RECEIVER: {
+      name: 'Người nhận',
+      value: 'receiver',
+    },
+  },
   order: {
     TEMP: { // trạng thái khi khách hàng tạo đơn hàng nhưng chưa xác nhận
       name: 'Tạm',

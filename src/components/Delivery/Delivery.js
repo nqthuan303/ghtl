@@ -82,12 +82,17 @@ class Delivery extends Component {
     onClickEndDelivery = async () => {
       const { orders } = this.state;
       const postData = {};
+      // let colectedMoney = 0;
       for (let i = 0; i < orders.length; i++) {
         const order = orders[i];
         if (!postData[order.orderstatus]) {
           postData[order.orderstatus] = [];
         }
         postData[order.orderstatus].push(order._id);
+
+        // if (order.orderstatus === objOrderStatus.DELIVERED.value) {
+
+        // }
       }
       const result = await request(`/delivery/delivery-done/${this.props.deliveryId}`, { method: 'PUT', body: postData });
       if (result.status === 'success') {
