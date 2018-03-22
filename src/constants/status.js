@@ -107,7 +107,8 @@ const status = {
   delivery: {
     PENDING: 'pending',
     DOING: 'doing',
-    DONE: 'done',
+    COMPLETED: 'completed', // chuyến đi đã kết thúc nhưng chưa thu tiền của shipper
+    DONE: 'done', // chuyến đi đã được thu tiền
   },
   refund: {
     PENDING: 'pending',

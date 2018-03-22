@@ -22,7 +22,7 @@ class DeliveryComplete extends Component {
       const listDelivery = [];
       for (let i = 0; i < deliverys.length; i += 1) {
         const delivery = deliverys[i];
-        if (delivery.status === deliveryStatus.DONE) {
+        if (delivery.status === deliveryStatus.COMPLETED) {
           delivery.key = i;
           listDelivery.push(delivery);
         }
@@ -97,9 +97,9 @@ class DeliveryComplete extends Component {
     }, {
       title: 'Trạng Thái',
       key: 'status',
-      render: record => (
+      render: () => (
         <div>
-          {record.status}
+          Hoàn Thành
         </div>
       ),
     }, {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Table, notification, Button, Select, Input } from 'antd';
 import moment from 'moment';
 import request from '../../utils/request';
-import { order as objOrderStatus } from '../../constants/status';
+import { order as objOrderStatus, orderPayBy } from '../../constants/status';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -64,12 +64,16 @@ class Delivery extends Component {
         }
         deliveryOrder[order.orderstatus].push(order._id);
         if (order.orderstatus === objOrderStatus.DELIVERED.value) {
-          collectedMoney = collectedMoney + order.goodMoney + order.shipFee;
+          let money = order.goodMoney + order.shipFee;
+          if (order.payBy === orderPayBy.SENDER.value) {
+            money = order.goodMoney;
+          }
+          collectedMoney += money;
         }
       }
       postData.orders = deliveryOrder;
       postData.collectedMoney = collectedMoney;
-      const result = await request(`/delivery/delivery-done/${this.props.deliveryId}`, { method: 'PUT', body: postData });
+      const result = await request(`/delivery/delivery-completed/${this.props.deliveryId}`, { method: 'PUT', body: postData });
       if (result.status === 'success') {
         this.props.closeShowModal();
         this.props.onSaveDataDelivery();
@@ -99,15 +103,15 @@ class Delivery extends Component {
       for (let i = 0; i < orders.length; i += 1) {
         const order = orders[i];
         const { phoneNumbers } = order.receiver;
-        let textPhoneNUmbers = '';
+        let textPhoneNumbers = '';
         if (phoneNumbers) {
           for (let k = 0; k < phoneNumbers.length; k += 1) {
-            textPhoneNUmbers = `${textPhoneNUmbers}    ${phoneNumbers[k]}`;
+            textPhoneNumbers = `${textPhoneNumbers}    ${phoneNumbers[k]}`;
           }
         }
-        let money = 0;
-        if (order.orderstatus === objOrderStatus.DELIVERED.value) {
-          money = order.goodMoney + order.shipFee;
+        let money = order.goodMoney + order.shipFee;
+        if (order.payBy === orderPayBy.SENDER.value) {
+          money = order.goodMoney;
         }
         result.push({
           key: i,
@@ -118,8 +122,9 @@ class Delivery extends Component {
           name: order.receiver.name,
           address: order.receiver.address,
           district: order.receiver.district.name,
-          phoneNumbers: textPhoneNUmbers,
+          phoneNumbers: textPhoneNumbers,
           orderstatus: order.orderstatus,
+          payBy: order.payBy,
           money,
         });
       }
