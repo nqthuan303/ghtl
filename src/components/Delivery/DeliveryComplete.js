@@ -92,7 +92,8 @@ class DeliveryComplete extends Component {
       ),
     }, {
       title: 'Tổng Thu',
-      key: 'monney',
+      dataIndex: 'collectedMoney',
+      key: 'collectedMoney',
     }, {
       title: 'Trạng Thái',
       key: 'status',

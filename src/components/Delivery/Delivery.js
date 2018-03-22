@@ -36,33 +36,6 @@ class Delivery extends Component {
         this.getDelivery(nextProps.deliveryId);
       }
     }
-    // onClickSave() {
-    //   const { orders } = this.state;
-    //   const postData = {};
-    //   for (let i = 0; i < orders.length; i++) {
-    //     const order = orders[i];
-    //     if (!postData[order.orderstatus]) {
-    //       postData[order.orderstatus] = [];
-    //     }
-    //     postData[order.orderstatus].push(order._id);
-    //   }
-    //   request('/order/changeMulti', { method: 'PUT', body: postData }).then((result) => {
-    //     if (result.status === 'success') {
-    //       this.props.closeShowModal();
-    //       this.props.onSaveDataDelivery();
-    //       notification.success({
-    //         message: 'Thành Công',
-    //         description: 'Bạn đã cập nhật chuyến đi giao thành công.',
-    //       });
-    //     } else {
-    //       this.props.closeShowModal();
-    //       notification.error({
-    //         message: 'Xãy ra lỗi',
-    //         description: result.data.msg,
-    //       });
-    //     }
-    //   });
-    // }
     onChangeOrderStatus(value, index) {
       const stateOrders = Object.assign([], this.state.orders);
       stateOrders[index].orderstatus = value;
@@ -82,18 +55,20 @@ class Delivery extends Component {
     onClickEndDelivery = async () => {
       const { orders } = this.state;
       const postData = {};
-      // let colectedMoney = 0;
+      const deliveryOrder = {};
+      let collectedMoney = 0;
       for (let i = 0; i < orders.length; i++) {
         const order = orders[i];
-        if (!postData[order.orderstatus]) {
-          postData[order.orderstatus] = [];
+        if (!deliveryOrder[order.orderstatus]) {
+          deliveryOrder[order.orderstatus] = [];
         }
-        postData[order.orderstatus].push(order._id);
-
-        // if (order.orderstatus === objOrderStatus.DELIVERED.value) {
-
-        // }
+        deliveryOrder[order.orderstatus].push(order._id);
+        if (order.orderstatus === objOrderStatus.DELIVERED.value) {
+          collectedMoney = collectedMoney + order.goodMoney + order.shipFee;
+        }
       }
+      postData.orders = deliveryOrder;
+      postData.collectedMoney = collectedMoney;
       const result = await request(`/delivery/delivery-done/${this.props.deliveryId}`, { method: 'PUT', body: postData });
       if (result.status === 'success') {
         this.props.closeShowModal();
@@ -130,6 +105,10 @@ class Delivery extends Component {
             textPhoneNUmbers = `${textPhoneNUmbers}    ${phoneNumbers[k]}`;
           }
         }
+        let money = 0;
+        if (order.orderstatus === objOrderStatus.DELIVERED.value) {
+          money = order.goodMoney + order.shipFee;
+        }
         result.push({
           key: i,
           _id: order._id,
@@ -140,7 +119,8 @@ class Delivery extends Component {
           address: order.receiver.address,
           district: order.receiver.district.name,
           phoneNumbers: textPhoneNUmbers,
-          orderStatus: order.orderstatus,
+          orderstatus: order.orderstatus,
+          money,
         });
       }
       const columns = [
@@ -168,25 +148,27 @@ class Delivery extends Component {
           title: 'Quận',
           dataIndex: 'district',
           key: 'district',
-        },
-        {
+        }, {
           title: 'SĐT Người Nhận',
           dataIndex: 'phoneNumbers',
           key: 'phoneNumbers',
-        },
-        {
+        }, {
+          title: 'Tiền thu',
+          dataIndex: 'money',
+          key: 'money',
+        }, {
           title:
   <div style={{ textAlign: 'center' }}>
     <div> Trạng Thái </div>
     <br />
     <div> <Button type="primary" onClick={this.onClickChangeDelivered}>Đã Giao</Button> </div>
   </div>,
-          key: 'orderStatus',
+          key: 'orderstatus',
           render: record => (
             <Select
               style={{ minWidth: '150px' }}
               onChange={value => this.onChangeOrderStatus(value, record.key)}
-              value={record.orderStatus}
+              value={record.orderstatus}
               showSearch
               placeholder="Chọn trạng thái"
               optionFilterProp="children"
@@ -232,11 +214,6 @@ class Delivery extends Component {
         <div>
           {this.renderOrder()}
           <div style={{ textAlign: 'center' }}>
-            {/* <Button
-              type="primary"
-              onClick={() => this.onClickSave()}
-            > Lưu
-            </Button> */}
             <Button
               disabled={disableButton}
               type="primary"

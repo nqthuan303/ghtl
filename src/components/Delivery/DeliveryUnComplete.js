@@ -122,9 +122,6 @@ class DeliveryUnComplete extends Component {
         dataIndex: 'countOrders',
         key: 'countOrders',
       }, {
-        title: 'Tổng Thu',
-        key: 'monney',
-      }, {
         title: 'Chỉnh Sửa',
         key: 'edit',
         render: (text, record) => (
