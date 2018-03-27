@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Table, Icon } from 'antd';
+import { Table, Icon, Modal } from 'antd';
 import moment from 'moment';
 import request from '../../utils/request';
+import DeliveryInfo from './DeliveryInfo';
 import { delivery as deliveryStatus } from '../../constants/status';
 
 class DeliveryComplete extends Component {
@@ -9,12 +10,19 @@ class DeliveryComplete extends Component {
     super(props);
     this.state = {
       listDelivery: [],
+      showModal: false,
+      delivery: {},
     };
   }
   componentDidMount() {
     this.getDelivery();
   }
-
+  onClickInfo(delivery) {
+    this.setState({
+      showModal: true,
+      delivery,
+    });
+  }
   async getDelivery() {
     const data = await request('/delivery/list');
     if (data && data.data) {
@@ -22,7 +30,8 @@ class DeliveryComplete extends Component {
       const listDelivery = [];
       for (let i = 0; i < deliverys.length; i += 1) {
         const delivery = deliverys[i];
-        if (delivery.status === deliveryStatus.COMPLETED) {
+        if (delivery.status === deliveryStatus.COMPLETED ||
+          delivery.status === deliveryStatus.DONE) {
           delivery.key = i;
           listDelivery.push(delivery);
         }
@@ -30,41 +39,20 @@ class DeliveryComplete extends Component {
       this.setState({ listDelivery });
     }
   }
-  expandedRowRender = (record) => {
-    const columns = [
-      { title: 'Id', dataIndex: 'id', key: 'id' },
-      { title: 'Địa Chỉ', dataIndex: 'address', key: 'address' },
-      { title: 'Quận', dataIndex: 'district', key: 'district' },
-    ];
-
-    const data = [];
-    for (let i = 0; i < record.orders.length; i += 1) {
-      const order = record.orders[i];
-      data.push({
-        key: i,
-        id: order.id,
-        address: order.receiver.address,
-        district: order.receiver.district.name,
-      });
-    }
-    return (
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={data}
-        pagination={false}
-      />
-    );
-  };
+  closeShowModal = () => {
+    this.setState({
+      showModal: false,
+    });
+  }
   render() {
     const { listDelivery } = this.state;
     const columns = [{
       title: 'Chuyến Giao',
       key: 'id',
       render: record => (
-        <div>
+        <a onClick={() => this.onClickInfo(record)}>
           {record.id}
-        </div>
+        </a>
       ),
     }, {
       title: 'Kết Thúc',
@@ -92,8 +80,8 @@ class DeliveryComplete extends Component {
       ),
     }, {
       title: 'Tổng Thu',
-      dataIndex: 'collectedMoney',
-      key: 'collectedMoney',
+      dataIndex: 'money',
+      key: 'money',
     }, {
       title: 'Trạng Thái',
       key: 'status',
@@ -116,8 +104,19 @@ class DeliveryComplete extends Component {
         <Table
           dataSource={listDelivery}
           columns={columns}
-          expandedRowRender={this.expandedRowRender}
         />
+        <Modal
+          title="Thông tin đơn hàng của chuyến đi giao"
+          visible={this.state.showModal}
+          onCancel={this.closeShowModal}
+          width={1000}
+          footer={null}
+        >
+          <DeliveryInfo
+            delivery={this.state.delivery}
+            closeShowModal={this.closeShowModal}
+          />
+        </Modal>
       </div>
     );
   }

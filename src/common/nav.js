@@ -122,6 +122,20 @@ export const getNavData = app => [
         ],
       },
       {
+        name: 'Thu Tiền',
+        showOnSideBar: true,
+        icon: 'exception',
+        path: 'money',
+        children: [
+          {
+            name: 'Danh sách',
+            showOnSideBar: true,
+            path: 'list',
+            component: dynamicWrapper(app, ['money'], () => import('../routes/Money/List')),
+          },
+        ],
+      },
+      {
         name: 'Exception',
         showOnSideBar: false,
         path: 'exception',

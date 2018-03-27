@@ -72,7 +72,7 @@ class Delivery extends Component {
         }
       }
       postData.orders = deliveryOrder;
-      postData.collectedMoney = collectedMoney;
+      postData.money = collectedMoney;
       const result = await request(`/delivery/delivery-completed/${this.props.deliveryId}`, { method: 'PUT', body: postData });
       if (result.status === 'success') {
         this.props.closeShowModal();
