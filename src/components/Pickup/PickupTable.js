@@ -63,7 +63,7 @@ export default class PickupTable extends Component {
     ];
 
     return (
-      <div style={{ marginTop: 50 }}>
+      <div style={{ height: '200px', borderTop: '1px solid #ddd' }}>
         <Table
           showHeader={false}
           expandedRowRender={this.renderData}

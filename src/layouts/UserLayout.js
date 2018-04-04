@@ -2,13 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link, Route } from 'dva/router';
 import DocumentTitle from 'react-document-title';
-import { Icon } from 'antd';
-import GlobalFooter from '../components/GlobalFooter';
 import styles from './UserLayout.less';
-
-const links = [];
-
-const copyright = <div>Copyright <Icon type="copyright" /> 2017 GHTL</div>;
 
 class UserLayout extends React.PureComponent {
   static childContextTypes = {
@@ -55,7 +49,6 @@ class UserLayout extends React.PureComponent {
               )
             )
           }
-          <GlobalFooter className={styles.footer} links={links} copyright={copyright} />
         </div>
       </DocumentTitle>
     );

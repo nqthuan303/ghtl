@@ -8,7 +8,6 @@ import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import Debounce from 'lodash-decorators/debounce';
 import HeaderSearch from '../components/HeaderSearch';
-import GlobalFooter from '../components/GlobalFooter';
 import NotFound from '../routes/Exception/404';
 import styles from './BasicLayout.less';
 
@@ -286,8 +285,8 @@ class BasicLayout extends React.PureComponent {
               </Dropdown>
             </div>
           </Header>
-          <Content style={{ margin: '24px 24px 0', height: '100%' }}>
-            <div style={{ minHeight: 'calc(100vh - 260px)' }}>
+          <Content style={{ margin: '24px 24px 0', minHeight: '100%' }}>
+            <div style={{ minHeight: 'calc(100vh - 92px)' }}>
               <Switch>
                 {
                   getRouteData('BasicLayout').map(item =>
@@ -304,13 +303,6 @@ class BasicLayout extends React.PureComponent {
                 <Route component={NotFound} />
               </Switch>
             </div>
-            <GlobalFooter
-              copyright={
-                <div>
-                  Copyright <Icon type="copyright" /> 2017 GHTL
-                </div>
-              }
-            />
           </Content>
         </Layout>
       </Layout>

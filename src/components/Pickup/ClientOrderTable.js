@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Table, Select, Icon, Modal, notification } from 'antd';
 
 import request from '../../utils/request';
+import styles from './ClientOrderTable.less';
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -145,7 +146,7 @@ export default class ClientOrderTable extends Component {
     ];
 
     return (
-      <div>
+      <div className={styles.clientOrderContainer}>
         <Table
           showHeader={false}
           expandedRowRender={this.renderOrders}

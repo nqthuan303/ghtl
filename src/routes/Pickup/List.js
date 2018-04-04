@@ -64,6 +64,7 @@ class PickupList extends Component {
       <PageHeaderLayout title="Danh sách shop">
         <div>
           <Menu
+            style={{ height: 48 }}
             onClick={this.onChangeDistrict}
             selectedKeys={[districtId]}
             mode="horizontal"
@@ -78,8 +79,6 @@ class PickupList extends Component {
             onOrderChange={this.onOrderChange}
             districtId={districtId}
           />
-        </div>
-        <div>
           <PickupTable
             ref={(instance) => { this.pickupTableRef = instance; }}
           />
