@@ -85,9 +85,9 @@ class DeliveryComplete extends Component {
     }, {
       title: 'Trạng Thái',
       key: 'status',
-      render: () => (
+      render: record => (
         <div>
-          Hoàn Thành
+          {record.status === deliveryStatus.COMPLETED ? 'Hoàn Thành' : 'Đã Thu Tiền'}
         </div>
       ),
     }, {

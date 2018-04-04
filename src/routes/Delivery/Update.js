@@ -14,7 +14,7 @@ let orderEachDistrict = {};
 const deliveryOrders = {};
 let delivery = {};
 
-class UpdateDelivery extends Component {
+class Update extends Component {
   constructor(props) {
     super(props);
     this.deliveryId = this.props.match.params.id;
@@ -299,4 +299,4 @@ class UpdateDelivery extends Component {
     );
   }
 }
-export default UpdateDelivery;
+export default Update;

@@ -11,7 +11,7 @@ const { CheckableTag } = Tag;
 
 let orderEachDistrict = {};
 
-class AddDelivery extends Component {
+class Add extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -253,4 +253,4 @@ class AddDelivery extends Component {
     );
   }
 }
-export default AddDelivery;
+export default Add;

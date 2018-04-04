@@ -16,7 +16,7 @@ const AddDelivery = withRouter(({ history }) => (
   </Button>
 ));
 
-class DeliveryList extends Component {
+class List extends Component {
   onSaveData = () => {
     if (this.deliveryComplete) {
       this.deliveryComplete.getDelivery();
@@ -45,4 +45,4 @@ class DeliveryList extends Component {
   }
 }
 
-export default DeliveryList;
+export default List;

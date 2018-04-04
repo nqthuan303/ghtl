@@ -1,12 +1,12 @@
 import React from 'react';
-import { Table, Button, Modal, notification } from 'antd';
-// import moment from 'moment';
+import { Table, Modal, notification } from 'antd';
+import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import { delivery as deliveryStatus } from '../../constants/status';
 import request from '../../utils/request';
 
 const confirmModal = Modal.confirm;
-class List extends React.Component {
+class History extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,7 +40,7 @@ class List extends React.Component {
       const listDelivery = [];
       for (let i = 0; i < deliveries.length; i += 1) {
         const delivery = deliveries[i];
-        if (delivery.status === deliveryStatus.COMPLETED) {
+        if (delivery.status === deliveryStatus.DONE) {
           listDelivery.push({ ...delivery, key: i });
         }
       }
@@ -70,35 +70,29 @@ class List extends React.Component {
       key: 'id',
     },
     {
-      title: 'Nhân Viên',
-      colSpan: 2,
-      key: 'shipper',
-      render: record => (
-        <div>
-          {record.user.name} - {record.user.id}
-        </div>
-      ),
+      title: 'Ngày Thu',
+      key: 'date',
+      render: record => moment(record.endTime).format('DD-MM HH:mm'),
     },
     {
-      title: 'Phone Number',
-      colSpan: 0,
-      key: 'phoneNumber',
-      render: record => record.user.phone_number,
+      title: 'Người Thu',
+      key: 'ddddd',
+    },
+    {
+      title: 'Bưu Tá',
+      key: 'user',
+      render: record => (
+        <div>
+          {record.user.name} - {record.user.phone_number}
+        </div>
+      ),
     }, {
       title: 'Tổng Thu',
       dataIndex: 'money',
       key: 'money',
-    }, {
-      title: 'Thao Tác',
-      key: 'action',
-      render: record => (
-        <Button type="danger" onClick={() => this.onClickReceiveMoney(record)}>
-          Thu Tiền
-        </Button>
-      ),
     }];
     return (
-      <PageHeaderLayout title="Danh Sách">
+      <PageHeaderLayout title="Lịch Sử">
         <div>
           <Table dataSource={listDelivery} columns={columns} />
         </div>
@@ -106,4 +100,4 @@ class List extends React.Component {
     );
   }
 }
-export default List;
+export default History;
