@@ -410,8 +410,8 @@ class CreateForm extends React.Component {
             <br />
             <p style={{ fontWeight: 'bold' }}>4. Thu tiền</p>
             <FormItem {...formItemLayout} label="Tiền hàng">
-              {getFieldDecorator('require', {
-                rules: [{ required: false }],
+              {getFieldDecorator('goodsMoney', {
+                rules: [{ required: true }],
               })(
                 <Input />
               )}

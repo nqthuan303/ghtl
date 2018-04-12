@@ -56,7 +56,6 @@ export default class PickupTable extends Component {
 
   render() {
     const { pickups } = this.state;
-
     const columns = [
       { key: 'pickupId', dataIndex: 'id' },
       { key: 'shipperName', render: this.renderShiperName },
@@ -65,6 +64,7 @@ export default class PickupTable extends Component {
     return (
       <div style={{ height: '200px', borderTop: '1px solid #ddd' }}>
         <Table
+          rowKey="_id"
           showHeader={false}
           expandedRowRender={this.renderData}
           dataSource={pickups}

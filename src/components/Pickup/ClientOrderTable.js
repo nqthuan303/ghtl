@@ -120,13 +120,14 @@ export default class ClientOrderTable extends Component {
     const { orders } = record;
     const columns = [
       { key: 'id', dataIndex: 'id' },
-      { render: () => '123 abc' },
+      { render: () => '625.000' },
       { render: () => '625.000' },
       { render: () => 'Sửa' },
       { render: () => 'xxx' },
     ];
     return (
       <Table
+        rowKey="_id"
         showHeader={false}
         dataSource={orders}
         columns={columns}
@@ -134,11 +135,23 @@ export default class ClientOrderTable extends Component {
       />
     );
   }
-
+  renderDate = (record) => {
+    const { orders } = record;
+    const dateTime = new Date(orders[0].createdAt);
+    const month = dateTime.getMonth();
+    const date = dateTime.getDate();
+    const hour = dateTime.getHours();
+    const min = dateTime.getMinutes();
+    const result = `${date} / ${month} ${hour} : ${min}`;
+    return result;
+  }
   render() {
     const { clients } = this.state;
+
     const columns = [
-      { key: 'name' },
+      { key: 'id', dataIndex: 'id' },
+      { render: this.renderDate },
+      { key: 'name', dataIndex: 'name' },
       { render: this.renderAddress },
       { render: () => '1.200.000' },
       { render: () => <Icon type="printer" /> },
@@ -148,6 +161,7 @@ export default class ClientOrderTable extends Component {
     return (
       <div className={styles.clientOrderContainer}>
         <Table
+          rowKey="_id"
           showHeader={false}
           expandedRowRender={this.renderOrders}
           dataSource={clients}

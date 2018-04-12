@@ -43,7 +43,7 @@ class AddOrder extends React.Component {
 
   saveOrder = async () => {
     const { inProcessIds } = this.state;
-    const result = await request('/order/setStatus?status=pending', {
+    const result = await request('/order/saveOrder', {
       method: 'POST',
       body: inProcessIds,
     });
