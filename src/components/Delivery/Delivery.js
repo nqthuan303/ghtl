@@ -64,9 +64,9 @@ class Delivery extends Component {
         }
         deliveryOrder[order.orderstatus].push(order._id);
         if (order.orderstatus === objOrderStatus.DELIVERED.value) {
-          let money = order.goodMoney + order.shipFee;
+          let money = order.goodsMoney + order.shipFee;
           if (order.payBy === orderPayBy.SENDER.value) {
-            money = order.goodMoney;
+            money = order.goodsMoney;
           }
           collectedMoney += money;
         }
@@ -109,9 +109,9 @@ class Delivery extends Component {
             textPhoneNumbers = `${textPhoneNumbers}    ${phoneNumbers[k]}`;
           }
         }
-        let money = order.goodMoney + order.shipFee;
+        let money = order.goodsMoney + order.shipFee;
         if (order.payBy === orderPayBy.SENDER.value) {
-          money = order.goodMoney;
+          money = order.goodsMoney;
         }
         result.push({
           key: i,

@@ -51,9 +51,9 @@ class DeliveryInfo extends Component {
       return result;
     }
     renderMoney(order) {
-      let money = order.goodMoney + order.shipFee;
+      let money = order.goodsMoney + order.shipFee;
       if (order.payBy === orderPayBy.SENDER.value) {
-        money = order.goodMoney;
+        money = order.goodsMoney;
       }
       return money;
     }
