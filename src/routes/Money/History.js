@@ -83,7 +83,7 @@ class History extends React.Component {
       key: 'user',
       render: record => (
         <div>
-          {record.user.name} - {record.user.phone_number}
+          {record.user.name} - {record.user.phone}
         </div>
       ),
     }, {

@@ -83,7 +83,7 @@ class List extends React.Component {
       title: 'Phone Number',
       colSpan: 0,
       key: 'phoneNumber',
-      render: record => record.user.phone_number,
+      render: record => record.user.phone,
     }, {
       title: 'Tổng Thu',
       dataIndex: 'money',

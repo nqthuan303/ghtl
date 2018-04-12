@@ -6,7 +6,7 @@ import {
   // notification
 } from 'antd';
 // import moment from 'moment';
-import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+// import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 // import { delivery as deliveryStatus } from '../../constants/status';
 import request from '../../utils/request';
 
@@ -14,27 +14,35 @@ class List extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      listPayment: [],
+      clients: [],
     };
   }
 
   componentDidMount() {
     this.getList();
   }
+  onClickPayment(paymentId) {
+    const { history } = this.props;
+    history.push(`/payment/pay/${paymentId}`);
+  }
+  onClickAddPayment(clientId) {
+    const { history } = this.props;
+    history.push(`/payment/add/${clientId}`);
+  }
   async getList() {
     const data = await request('/client/client-for-payment');
     if (data && data.data) {
-      const deliveries = data.data;
-
-      this.setState({ listPayment: deliveries });
+      this.setState({ clients: data.data });
     }
   }
   render() {
-    const { listPayment } = this.state;
+    const { clients } = this.state;
     const columns = [{
       title: 'Tên Shop',
-      dataIndex: 'user',
-      key: 'user',
+      key: 'name',
+      render: record => (
+        <a onClick={() => this.onClickAddPayment(record._id)}>{record.name} - {record.phone}</a>
+      ),
     },
     {
       title: 'Địa Chỉ',
@@ -42,19 +50,25 @@ class List extends React.Component {
       key: 'address',
     }, {
       title: 'Quận',
-      dataIndex: 'district',
       key: 'district',
+      render: record => record.district.name,
     }, {
       title: 'Chưa thanh toán',
-      key: 'money',
-      dataIndex: 'money',
+      key: 'totalMoney',
+      dataIndex: 'totalMoney',
+    }, {
+      title: 'Bảng kê',
+      key: 'payment',
+      render: record => (
+        record.payment ?
+          <a onClick={() => this.onClickPayment(record.payment._id)}>{record.payment.id}</a>
+          : ''
+      ),
     }];
     return (
-      <PageHeaderLayout title="Danh Sách">
-        <div>
-          <Table dataSource={listPayment} columns={columns} />
-        </div>
-      </PageHeaderLayout>
+      <div>
+        <Table dataSource={clients} columns={columns} />
+      </div>
     );
   }
 }
