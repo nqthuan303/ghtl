@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Form, Input, Col, Button, Select, Row, Radio } from 'antd';
+import { Form, Input, Col, Button, Select, Row } from 'antd';
 import PlacesAutocomplete, { geocodeByAddress } from 'react-places-autocomplete';
 import globalStyle from '../../index.less';
 import request from '../../utils/request';
-
+import { orderPayBy } from '../../constants/status';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -38,12 +38,12 @@ const myStyles = {
   },
 };
 
-const clients = {};
 class CreateForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      clientOption: [],
+      client: {},
+      clients: [],
       districts: [],
       wards: [],
     };
@@ -55,17 +55,13 @@ class CreateForm extends React.Component {
   }
 
   onChangeClient = (value) => {
-    const clientSelected = clients[value];
     const { setFieldsValue } = this.props.form;
-
+    const { clients } = this.state;
+    this.setState({
+      client: clients[value],
+    });
     setFieldsValue({
       client: value,
-      sender: {
-        phone: clientSelected.phone,
-        address: clientSelected.address,
-        district: clientSelected.district,
-        paymentMethod: clientSelected.paymentMethod,
-      },
     });
   }
 
@@ -81,24 +77,9 @@ class CreateForm extends React.Component {
     }
   }
 
-  onChangeSenderAddress = (address) => {
-    this.props.form.setFieldsValue({
-      'sender.address': address,
-    });
-  }
-
   onChangeReceiverAddress = (address) => {
     this.props.form.setFieldsValue({
       'receiver.address': address,
-    });
-  }
-
-  onSelectSenderAddress = (address) => {
-    geocodeByAddress(address, (err) => {
-      if (err) { return; }
-      this.props.form.setFieldsValue({
-        'sender.address': address,
-      });
     });
   }
 
@@ -116,18 +97,18 @@ class CreateForm extends React.Component {
     onClickBtnEnd();
   }
   async getClientList() {
-    const result = await request('/client/listForSelect');
-    const clientOption = [];
-    for (let i = 0; i < result.length; i++) {
-      const data = result[i];
-      clients[data.key] = data;
-      clientOption.push({
-        key: data.key,
-        value: data.value,
-        text: data.text,
+    const result = await request('/client/list');
+    if (result.status === 'success') {
+      const { data } = result;
+      const clients = {};
+      for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+        clients[item._id] = item;
+      }
+      this.setState({
+        clients,
       });
     }
-    this.setState({ clientOption });
   }
   async getDistrictList() {
     const result = await request('/district/listForSelect');
@@ -163,25 +144,27 @@ class CreateForm extends React.Component {
     });
   }
   renderClientOption() {
-    const { clientOption } = this.state;
-    return clientOption.map((client) => {
-      return (
-        <Option key={client.value} value={client.value}>{client.text}</Option>
-      );
-    });
+    const { clients } = this.state;
+    const result = [];
+    for (const key in clients) {
+      if (Object.prototype.hasOwnProperty.call(clients, key)) {
+        const client = clients[key];
+        result.push(
+          <Option key={client._id} value={client._id}>{client.name}</Option>
+        );
+      }
+    }
+    return result;
   }
   render() {
-    const { form } = this.props;
-    const { getFieldDecorator, getFieldValue } = form;
-    const senderAddress = getFieldValue('sender.address');
-    const receiverAddress = getFieldValue('receiver.address');
+    const { form, shipFee } = this.props;
+    const { client } = this.state;
+    const clientDistrict = client.district;
 
-    const inputProps = {
-      value: senderAddress || '',
-      onChange: this.onChangeSenderAddress,
-      type: 'search',
-      placeholder: 'Địa chỉ người gửi',
-    };
+    const districtName = clientDistrict ? `${clientDistrict.type} ${clientDistrict.name}` : '';
+
+    const { getFieldDecorator, getFieldValue } = form;
+    const receiverAddress = getFieldValue('receiver.address');
 
     const receiverProps = {
       value: receiverAddress || '',
@@ -190,10 +173,12 @@ class CreateForm extends React.Component {
       placeholder: 'Địa chỉ người nhận',
     };
 
+    const totalMoney = Number(getFieldValue('goodsMoney')) + Number(shipFee);
+
     return (
       <Form onSubmit={this.handleSubmit} className={globalStyle.appContent}>
         <Row gutter={12}>
-          <Col span={4}>
+          <Col span={6}>
             <FormItem>
               {getFieldDecorator('client', {
                 rules: [{ required: true }],
@@ -209,63 +194,19 @@ class CreateForm extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col span={4}>
+          <Col span={6}>
             <FormItem>
-              {getFieldDecorator('sender.phone', {
-                rules: [{ required: true }],
-              })(
-                <Input placeholder="SĐT người gửi" />
-              )}
+              <Input value={client.phone} disabled placeholder="SĐT người gửi" />
             </FormItem>
           </Col>
-          <Col span={4}>
+          <Col span={6}>
             <FormItem>
-              {getFieldDecorator('sender.address', {
-                rules: [{ required: true }],
-              })(
-                <PlacesAutocomplete
-                  options={autocompleteOptions}
-                  classNames={cssClasses}
-                  styles={myStyles}
-                  inputProps={inputProps}
-                  onSelect={this.onSelectSenderAddress}
-                />
-              )}
+              <Input value={client.address} placeholder="Địa chỉ" disabled />
             </FormItem>
           </Col>
-          <Col span={4}>
+          <Col span={6}>
             <FormItem>
-              {getFieldDecorator('sender.district', {
-                rules: [{ required: true }],
-              })(
-                <Select
-                  showSearch
-                  placeholder="Quận/Huyện"
-                  optionFilterProp="children"
-                >
-                  {this.renderDistrictOption()}
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col span={4}>
-            <FormItem>
-              {getFieldDecorator('sender.paymentMethod', {
-                rules: [{ required: true }],
-              })(
-                <Select
-                  placeholder="Hình thức"
-                  optionFilterProp="children"
-                >
-                  <Option key="cod" value="cod">COD</Option>
-                  <Option key="ung" value="ung">Ứng</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col span={4}>
-            <FormItem>
-              <Button onClick={this.onClickBtnEnd}>Kết thúc</Button>
+              <Input value={districtName} placeholder="Quận/Huyện" disabled />
             </FormItem>
           </Col>
         </Row>
@@ -335,49 +276,15 @@ class CreateForm extends React.Component {
               </Row>
             </FormItem>
             <p style={{ fontWeight: 'bold' }}>2. Hàng hóa</p>
-            <FormItem {...formItemLayout} label="Khối lượng">
-              {getFieldDecorator('goods.weight', {
-                rules: [{ required: false }],
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem {...formItemLayout} label="Qui đổi">
-              <Row gutter={12}>
-                <Col span={8}>
-                  <FormItem>
-                    {getFieldDecorator('goods.length', {
-                      rules: [{ required: false }],
-                    })(
-                      <Input placeholder="Dài" />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem>
-                    {getFieldDecorator('goods.width', {
-                      rules: [{ required: false }],
-                    })(
-                      <Input placeholder="Rộng" />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem>
-                    {getFieldDecorator('goods.height', {
-                      rules: [{ required: false }],
-                    })(
-                      <Input placeholder="Cao" />
-                    )}
-                  </FormItem>
-                </Col>
-              </Row>
-            </FormItem>
             <FormItem {...formItemLayout} label="Yêu cầu">
               {getFieldDecorator('require', {
                 rules: [{ required: false }],
+                initialValue: 'notAllowSeeGoods',
               })(
-                <Input />
+                <Select>
+                  <Option value="notAllowSeeGoods">Không được xem hàng</Option>
+                  <Option value="allowSeeGoods">Được xem hàng</Option>
+                </Select>
               )}
             </FormItem>
             <FormItem {...formItemLayout} label="Ghi chú">
@@ -389,25 +296,6 @@ class CreateForm extends React.Component {
             </FormItem>
           </Col>
           <Col span={12}>
-            <p style={{ fontWeight: 'bold' }}>3. Cước phí</p>
-            <FormItem {...formItemLayout} label="Phí phụ">
-              {getFieldDecorator('bonusFee', {
-                rules: [{ required: false }],
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <Row gutter={8}>
-              <Col style={{ textAlign: 'right', color: '#000000' }} span={6}>Phí vận chuyển:</Col>
-              <Col span={18}>
-                {this.props.shipFee}
-              </Col>
-            </Row>
-            <Row gutter={8}>
-              <Col style={{ textAlign: 'right', color: '#000000' }} span={6}>Cước phí: </Col>
-              <Col span={18}> 0</Col>
-            </Row>
-            <br />
             <p style={{ fontWeight: 'bold' }}>4. Thu tiền</p>
             <FormItem {...formItemLayout} label="Tiền hàng">
               {getFieldDecorator('goodsMoney', {
@@ -416,34 +304,26 @@ class CreateForm extends React.Component {
                 <Input />
               )}
             </FormItem>
+            <FormItem {...formItemLayout} label="Cước phí">
+              {shipFee}
+            </FormItem>
             <FormItem {...formItemLayout} label="Trả cước">
-              <Row gutter={12}>
-                <Col span={8}>
-                  <FormItem>
-                    {getFieldDecorator('require', {
-                      rules: [{ required: false }],
-                    })(
-                      <Radio>Người gửi</Radio>
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={16}>
-                  <FormItem>
-                    {getFieldDecorator('require', {
-                      rules: [{ required: false }],
-                    })(
-                      <Radio>Người nhận</Radio>
-                    )}
-                  </FormItem>
-                </Col>
-              </Row>
+              {getFieldDecorator('payBy', {
+                rules: [{ required: true }],
+                initialValue: orderPayBy.SENDER.value,
+              })(
+                <Select>
+                  <Option value={orderPayBy.SENDER.value}>Người gửi</Option>
+                  <Option value={orderPayBy.RECEIVER.value}>Người nhận</Option>
+                </Select>
+              )}
             </FormItem>
             <FormItem {...formItemLayout} label="Thu khách">
-              0
+              {totalMoney}
             </FormItem>
             <FormItem {...tailFormItemLayout}>
-              <Button style={{ marginRight: 5 }} type="primary" htmlType="submit">Tạo vận đơn</Button>
-              <Button>Quay lại</Button>
+              <Button style={{ marginRight: 5 }} type="primary" htmlType="submit">Tạo tiếp</Button>
+              <Button onClick={this.onClickBtnEnd}>Kết thúc</Button>
             </FormItem>
           </Col>
         </Row>

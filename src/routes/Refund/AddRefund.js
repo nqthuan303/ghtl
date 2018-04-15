@@ -75,7 +75,7 @@ class AddRefund extends Component {
         orderEachDistrict = {};
         for (let i = 0; i < orders.length; i += 1) {
           const order = orders[i];
-          const districId = order.sender.district._id;
+          const districId = order.client.district._id;
           if (!orderEachDistrict[districId]) {
             orderEachDistrict[districId] = [];
           }
@@ -129,7 +129,7 @@ class AddRefund extends Component {
     const { selectedTags, selectList } = this.state;
     const staticOrders = JSON.parse(JSON.stringify(orderEachDistrict));
     for (let i = 0; i < selectList.length; i += 1) {
-      const districtId = selectList[i].sender.district._id;
+      const districtId = selectList[i].client.district._id;
       if (staticOrders[districtId]) {
         const arrOrder = staticOrders[districtId];
         for (let k = 0; k < arrOrder.length; k += 1) {
@@ -201,7 +201,7 @@ class AddRefund extends Component {
             checked={selectedTags.indexOf(districtId) > -1}
             onChange={checked => this.handleChangeTag(districtId, checked)}
           >
-            {orderEachDistrict[districtId][0].sender.district.name}
+            {orderEachDistrict[districtId][0].client.district.name}
             ({orderEachDistrict[districtId].length})
           </CheckableTag>
         );

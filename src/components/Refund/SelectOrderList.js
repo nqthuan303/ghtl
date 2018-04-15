@@ -33,9 +33,9 @@ export default class SelectOrderList extends Component {
           count: i + 1,
           id: order.id,
           createAt: orderCreatedAt,
-          name: order.sender.name,
-          address: order.sender.address,
-          district: order.sender.district.name,
+          name: order.client.name,
+          address: order.client.address,
+          district: order.client.district.name,
           order,
         });
       }

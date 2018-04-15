@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Select, Icon, Modal, notification } from 'antd';
+import { Table, Select, Modal, notification } from 'antd';
 
 import request from '../../utils/request';
 import styles from './ClientOrderTable.less';
@@ -142,8 +142,16 @@ export default class ClientOrderTable extends Component {
     const date = dateTime.getDate();
     const hour = dateTime.getHours();
     const min = dateTime.getMinutes();
-    const result = `${date} / ${month} ${hour} : ${min}`;
+    const result = `${date}/${month} ${hour}:${min}`;
     return result;
+  }
+  renderName = (record) => {
+    return (
+      <div>
+        <span>{record.name}</span><br />
+        <span>({record.phone})</span>
+      </div>
+    );
   }
   render() {
     const { clients } = this.state;
@@ -151,10 +159,9 @@ export default class ClientOrderTable extends Component {
     const columns = [
       { key: 'id', dataIndex: 'id' },
       { render: this.renderDate },
-      { key: 'name', dataIndex: 'name' },
+      { render: this.renderName },
       { render: this.renderAddress },
       { render: () => '1.200.000' },
-      { render: () => <Icon type="printer" /> },
       { render: this.renderShipers },
     ];
 
