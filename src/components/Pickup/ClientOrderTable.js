@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Table, Select, Modal, notification } from 'antd';
 
 import request from '../../utils/request';
-import styles from './ClientOrderTable.less';
+import styles from './styles.less';
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -115,15 +115,22 @@ export default class ClientOrderTable extends Component {
     const { district } = record;
     return `${record.address}, ${district.type} ${district.name}`;
   }
-
+  renderMoney = (record) => {
+    const money = Number(record.goodsMoney) + Number(record.shipFee);
+    return money;
+  }
+  renderOrderAddress = (record) => {
+    const { receiver } = record;
+    const result = receiver.address;
+    return result;
+  }
   renderOrders = (record) => {
     const { orders } = record;
     const columns = [
       { key: 'id', dataIndex: 'id' },
-      { render: () => '625.000' },
-      { render: () => '625.000' },
+      { render: this.renderOrderAddress },
+      { render: this.renderMoney },
       { render: () => 'Sửa' },
-      { render: () => 'xxx' },
     ];
     return (
       <Table
@@ -134,6 +141,17 @@ export default class ClientOrderTable extends Component {
         pagination={false}
       />
     );
+  }
+
+  renderTotalMoney = (record) => {
+    const { orders } = record;
+    let result = 0;
+    for (let i = 0; i < orders.length; i++) {
+      const order = orders[i];
+      const money = Number(order.goodsMoney) + Number(order.shipFee);
+      result += money;
+    }
+    return result;
   }
   renderDate = (record) => {
     const { orders } = record;
@@ -153,15 +171,15 @@ export default class ClientOrderTable extends Component {
       </div>
     );
   }
+
   render() {
     const { clients } = this.state;
-
     const columns = [
       { key: 'id', dataIndex: 'id' },
       { render: this.renderDate },
       { render: this.renderName },
       { render: this.renderAddress },
-      { render: () => '1.200.000' },
+      { render: this.renderTotalMoney },
       { render: this.renderShipers },
     ];
 

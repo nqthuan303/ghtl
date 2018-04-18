@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Table, notification } from 'antd';
 import request from '../../utils/request';
+import styles from './styles.less';
 
 export default class PickupTable extends Component {
   constructor(props) {
@@ -35,19 +36,36 @@ export default class PickupTable extends Component {
     );
   }
 
+  renderName = (record) => {
+    const { orders } = record;
+    return (
+      <div>
+        <span>({orders.length}) {record.name}</span> <br />
+        <span>{record.phone}</span>
+      </div>
+    );
+  }
+
+  renderAddress = (record) => {
+    const { district, ward } = record;
+    const result = `${record.address}, ${ward.type} ${ward.name}, ${district.type} ${district.name}`;
+    return result;
+  }
+
   renderData = (record) => {
-    const { data } = record;
+    const { clients } = record;
     const columns = [
       { key: 'id', dataIndex: 'id' },
-      { render: () => '123 abc' },
-      { render: () => '625.000' },
+      { render: this.renderName },
+      { render: this.renderAddress },
       { render: () => 'Sửa' },
       { render: () => 'xxx' },
     ];
     return (
       <Table
+        rowKey="_id"
         showHeader={false}
-        dataSource={data}
+        dataSource={clients}
         columns={columns}
         pagination={false}
       />
@@ -62,7 +80,7 @@ export default class PickupTable extends Component {
     ];
 
     return (
-      <div style={{ height: '200px', borderTop: '1px solid #ddd' }}>
+      <div className={styles.pickupTable}>
         <Table
           rowKey="_id"
           showHeader={false}
