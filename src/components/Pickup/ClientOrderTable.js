@@ -70,7 +70,6 @@ export default class ClientOrderTable extends Component {
     const result = await request(url);
     if (result.status === 'success') {
       const { data } = result;
-
       this.setState({
         clients: data,
       });

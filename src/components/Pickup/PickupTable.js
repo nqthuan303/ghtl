@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, notification } from 'antd';
+import { Table, notification, Modal } from 'antd';
 import request from '../../utils/request';
 import styles from './styles.less';
 
@@ -8,16 +8,28 @@ export default class PickupTable extends Component {
     super(props);
     this.state = {
       pickups: [],
+      client: {
+        district: {},
+        ward: {},
+      },
+      showOrder: false,
     };
     this.shiperId = '';
   }
   componentDidMount() {
     this.getPickUpList();
   }
+
+  onCancelModal = () => {
+    this.setState({
+      showOrder: false,
+    });
+  }
   async getPickUpList() {
     const result = await request('/pickup/list');
     if (result.status === 'success') {
       const { data } = result;
+
       this.setState({
         pickups: data,
       });
@@ -28,14 +40,20 @@ export default class PickupTable extends Component {
       });
     }
   }
-
-  renderShiperName = (value, row) => {
-    const { shipper } = row;
-    return (
-      <p>{shipper.name} - {shipper.id}/{shipper.phone}</p>
-    );
+  showOrders(record) {
+    const { orders, name, phone, address, district, ward } = record;
+    this.setState({
+      client: {
+        name,
+        phone,
+        address,
+        district,
+        ward,
+        orders,
+      },
+      showOrder: true,
+    });
   }
-
   renderName = (record) => {
     const { orders } = record;
     return (
@@ -52,14 +70,43 @@ export default class PickupTable extends Component {
     return result;
   }
 
+  renderMoney = (record) => {
+    const { orders } = record;
+    let money = 0;
+    for (let i = 0; i < orders.length; i++) {
+      const order = orders[i];
+      money += Number(order.goodsMoney) + Number(order.shipFee);
+    }
+    return money;
+  }
+
+  renderDate = (record) => {
+    const { orders } = record;
+    const dateTime = new Date(orders[0].createdAt);
+    const month = dateTime.getMonth();
+    const date = dateTime.getDate();
+    const hour = dateTime.getHours();
+    const min = dateTime.getMinutes();
+    const result = `${date}/${month} ${hour}:${min}`;
+    return result;
+  }
+
+  renderShowOrder = (record) => {
+    return (
+      <a onClick={() => this.showOrders(record)}>Xem</a>
+    );
+  }
+
   renderData = (record) => {
     const { clients } = record;
+
     const columns = [
       { key: 'id', dataIndex: 'id' },
+      { render: this.renderDate },
       { render: this.renderName },
       { render: this.renderAddress },
-      { render: () => 'Sửa' },
-      { render: () => 'xxx' },
+      { render: this.renderMoney },
+      { render: this.renderShowOrder },
     ];
     return (
       <Table
@@ -72,8 +119,59 @@ export default class PickupTable extends Component {
     );
   }
 
+  renderDateModal = (record) => {
+    const { createdAt } = record;
+    const dateTime = new Date(createdAt);
+    const month = dateTime.getMonth();
+    const date = dateTime.getDate();
+    const hour = dateTime.getHours();
+    const min = dateTime.getMinutes();
+    const result = `${date}/${month} ${hour}:${min}`;
+    return result;
+  }
+
+  renderAddressModal = (record) => {
+    const { receiver: { address, district, ward } } = record;
+    const result = `${address}, ${ward.type} ${ward.name}, ${district.type} ${district.name}`;
+    return result;
+  }
+
+  renderMoneyModal = (record) => {
+    return Number(record.goodsMoney) + Number(record.shipFee);
+  }
+
+  renderOrderList() {
+    const { client } = this.state;
+    const { orders, district, ward, address } = client;
+
+    const columns = [
+      { title: 'Mã', width: '8%', dataIndex: 'id' },
+      { title: 'Ngày tạo', render: this.renderDateModal },
+      { title: 'Người nhận', dataIndex: 'receiver.name' },
+      { title: 'Địa chỉ', width: '35%', render: this.renderAddressModal },
+      { title: 'Thu khách', render: this.renderMoneyModal },
+    ];
+    const fullAddress = `${address}, ${ward.type} ${ward.name}, ${district.type} ${district.name}`;
+    return (
+      <div>
+        <span>{client.name} ({client.phone}) - {fullAddress}</span> <br /> <br />
+        <Table
+          rowKey="_id"
+          dataSource={orders}
+          columns={columns}
+        />
+      </div>
+    );
+  }
+
+  renderShiperName = (value, row) => {
+    const { shipper } = row;
+    return (
+      <p>{shipper.name} - {shipper.id}/{shipper.phone}</p>
+    );
+  }
   render() {
-    const { pickups } = this.state;
+    const { pickups, showOrder } = this.state;
     const columns = [
       { key: 'pickupId', dataIndex: 'id' },
       { key: 'shipperName', render: this.renderShiperName },
@@ -89,6 +187,15 @@ export default class PickupTable extends Component {
           columns={columns}
           pagination={false}
         />
+        <Modal
+          title="Danh sách đơn hàng"
+          visible={showOrder}
+          footer={null}
+          width={800}
+          onCancel={this.onCancelModal}
+        >
+          {this.renderOrderList()}
+        </Modal>
       </div>
     );
   }
