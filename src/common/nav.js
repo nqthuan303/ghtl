@@ -165,6 +165,12 @@ export const getNavData = app => [
             path: 'pay/:id',
             component: dynamicWrapper(app, ['payment'], () => import('../routes/Payment/Pay')),
           },
+          {
+            name: 'Lịch Sử',
+            showOnSideBar: true,
+            path: 'history',
+            component: dynamicWrapper(app, ['payment'], () => import('../routes/Payment/History')),
+          },
         ],
       },
       {

@@ -5,6 +5,7 @@ import {
   Col,
   Button,
   // Modal,
+  Badge,
   notification,
 } from 'antd';
 import moment from 'moment';
@@ -34,23 +35,25 @@ class Add extends React.Component {
     this.setState({ selectedRowKeys });
   }
   async getClient() {
-    const data = await request(`/client/findOne/${this.clientId}`);
+    const data = await request(`/client/find-one-payment/${this.clientId}`);
     if (data && data.data) {
       const result = [];
       const client = data.data;
-      for (let i = 0; i < client.orders.length; i++) {
-        const order = client.orders[i];
-        if (order.orderstatus === orderStatus.DELIVERED.value
-          || order.orderstatus === orderStatus.RETURNFEESTORAGE.value
-          || order.orderstatus === orderStatus.RETURNFEEPREPARE.value
-          || order.orderstatus === orderStatus.RETURNINGFEE.value
-          || order.orderstatus === orderStatus.RETURNEDFEE.value
-          || order.orderstatus === orderStatus.RETURNSTORAGE.value
-          || order.orderstatus === orderStatus.RETURNPREPARE.value
-          || order.orderstatus === orderStatus.RETURNING.value
-          || order.orderstatus === orderStatus.RETURNED.value
-        ) {
-          result.push({ ...order, key: order._id });
+      if (client.orders) {
+        for (let i = 0; i < client.orders.length; i++) {
+          const order = client.orders[i];
+          if (order.orderstatus === orderStatus.DELIVERED.value
+            || order.orderstatus === orderStatus.RETURNFEESTORAGE.value
+            || order.orderstatus === orderStatus.RETURNFEEPREPARE.value
+            || order.orderstatus === orderStatus.RETURNINGFEE.value
+            || order.orderstatus === orderStatus.RETURNEDFEE.value
+            || order.orderstatus === orderStatus.RETURNSTORAGE.value
+            || order.orderstatus === orderStatus.RETURNPREPARE.value
+            || order.orderstatus === orderStatus.RETURNING.value
+            || order.orderstatus === orderStatus.RETURNED.value
+          ) {
+            result.push(order);
+          }
         }
       }
       delete client.orders;
@@ -69,12 +72,13 @@ class Add extends React.Component {
     const url = '/payment/add';
     const method = 'POST';
     request(url, { method, body: payment }).then((result) => {
-      console.log(result);
       if (result.status === 'success') {
         notification.success({
           message: 'Thành Công',
           description: 'Tạo bảng kê thành công',
         });
+        const { history } = this.props;
+        history.push(`/payment/pay/${result.data._id}`);
       } else {
         notification.error({
           message: 'Xãy ra lỗi',
@@ -162,17 +166,20 @@ class Add extends React.Component {
           <Table
             dataSource={orders}
             columns={columns}
+            rowKey={record => record._id}
             rowSelection={rowSelection}
             pagination={{ showSizeChanger: true, pageSize: 20 }}
           />
           <div style={{ textAlign: 'right' }}>
             <Button onClick={this.onClickBlack} style={{ marginRight: 10 }}> Quay Lại</Button>
-            <Button
-              type="primary"
-              onClick={this.createPayment}
-              disabled={client.payment}
-            > Tạo Bảng Kê
-            </Button>
+            <Badge count={selectedRowKeys.length} showZero>
+              <Button
+                type="primary"
+                onClick={this.createPayment}
+                disabled={client.payment}
+              > Tạo Bảng Kê
+              </Button>
+            </Badge>
           </div>
         </div>
       </PageHeaderLayout>

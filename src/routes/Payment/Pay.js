@@ -4,13 +4,32 @@ import {
   Row,
   Col,
   Button,
-  // Modal,
-  // notification,
+  Modal,
+  notification,
+  Form,
+  Select,
+  Input,
 } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import { order as orderStatus, orderPayBy } from '../../constants/status';
+import { order as orderStatus, orderPayBy, payment as paymentStatus } from '../../constants/status';
 import request from '../../utils/request';
+
+const { confirm } = Modal;
+const { Option } = Select;
+const FormItem = Form.Item;
+
+const formItemLayout = {
+  labelCol: { xs: { span: 24 }, sm: { span: 6 } },
+  wrapperCol: { xs: { span: 24 }, sm: { span: 16 } },
+};
+
+const tailFormItemLayout = {
+  wrapperCol: {
+    xs: { span: 24, offset: 0 },
+    sm: { span: 14, offset: 6 },
+  },
+};
 
 class Pay extends React.Component {
   constructor(props) {
@@ -18,24 +37,102 @@ class Pay extends React.Component {
     this.paymentId = this.props.match.params.id;
     this.state = {
       payment: {},
+      showModal: false,
+      bank: '',
+      bill: '',
+      money: 0,
     };
   }
 
   componentDidMount() {
     this.getPayment();
   }
+  onConfirmCancel = async () => {
+    const result = await request(`/payment/payment-cancel/${this.paymentId}`, { method: 'PUT' });
+    if (result.status === 'success') {
+      notification.success({
+        message: 'Thành Công',
+        description: 'Hủy bảng kê thành công',
+      });
+      const { history } = this.props;
+      history.push('/payment/list');
+    } else {
+      notification.error({
+        message: 'Xãy ra lỗi',
+        description: result.data.msg,
+      });
+    }
+  }
+  onClickCancel = () => {
+    const _this = this;
+    confirm({
+      title: 'Xác nhận xóa?',
+      content: 'Bạn có chắc muốn HỦY bảng kê này không?',
+      okText: 'Xác nhận',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: _this.onConfirmCancel,
+    });
+  }
+  onClickConfirm = () => {
+    this.setState({ showModal: true });
+  }
   onClickBlack = () => {
     const { history } = this.props;
     history.push('/payment/list');
   }
-  async getPayment() {
-    const data = await request(`/payment/findOne/${this.paymentId}`);
-    console.log(data);
-    if (data && data.data) {
-      this.setState({
-        payment: data.data,
+  onChangeBank = (bank) => {
+    this.setState({ bank });
+  }
+  onChangeBill = (e) => {
+    this.setState({ bill: e.target.value });
+  }
+  onConfirmComplete = async () => {
+    const { bank, bill, money } = this.state;
+    const result = await request(`/payment/payment-done/${this.paymentId}?money=${money}&bank=${bank}&bill=${bill}`, { method: 'PUT' });
+    if (result.status === 'success') {
+      notification.success({
+        message: 'Thành Công',
+        description: result.data,
+      });
+      const { history } = this.props;
+      history.push('/payment/list');
+    } else {
+      notification.error({
+        message: 'Xãy ra lỗi',
+        description: result.data.msg,
       });
     }
+  }
+  async getPayment() {
+    const data = await request(`/payment/findOne/${this.paymentId}`);
+    if (data && data.data) {
+      const payment = data.data;
+      if (payment.status !== paymentStatus.DOING) {
+        const { history } = this.props;
+        history.push('/payment/list');
+      }
+      let totalMoney = 0;
+      for (let i = 0; i < payment.orders.length; i++) {
+        const order = payment.orders[i];
+        let money = 0;
+        if (order.orderstatus === orderStatus.DELIVERED.value) {
+          money = order.goodMoney + order.shipFee;
+          if (order.payBy === orderPayBy.SENDER.value) {
+            money = order.goodMoney;
+          }
+        }
+        money -= order.shipFee;
+        totalMoney += money;
+      }
+      this.setState({
+        payment,
+        money: totalMoney,
+      });
+    }
+  }
+  closeShowModal = () => {
+    this.setState({ showModal: false });
   }
   renderMoney = (order) => {
     let money = 0;
@@ -70,7 +167,7 @@ class Pay extends React.Component {
     return money;
   }
   render() {
-    const { payment } = this.state;
+    const { payment, showModal, money, bank } = this.state;
     const columns = [{
       title: 'MVĐ',
       dataIndex: 'id',
@@ -137,6 +234,8 @@ class Pay extends React.Component {
           : ''}
 
           <Table
+            bordered
+            rowKey={record => record._id}
             dataSource={payment.orders}
             columns={columns}
             pagination={{ showSizeChanger: true, pageSize: 20 }}
@@ -146,10 +245,48 @@ class Pay extends React.Component {
             <Button onClick={this.onClickCancel} type="danger" style={{ marginRight: 10 }}> Hủy Bảng</Button>
             <Button
               type="primary"
-              onClick={this.onClickDone}
+              onClick={this.onClickConfirm}
             > Xác Nhận Thanh Toán
             </Button>
           </div>
+          <Modal
+            title="Xác nhận"
+            visible={showModal}
+            onCancel={this.closeShowModal}
+            width={550}
+            footer={null}
+          >
+            <Form >
+              <FormItem {...formItemLayout} label="Tổng tiền" >
+                {money}
+              </FormItem>
+              <FormItem {...formItemLayout} label="Mã giao dịch" >
+                <Input onChange={this.onChangeBill} />
+              </FormItem>
+              <FormItem {...formItemLayout} label="Ngân hàng" >
+                <Select
+                  showSearch
+                  placeholder="Chọn ngân hàng"
+                  optionFilterProp="children"
+                  filterOption={this.filterOption}
+                  onChange={this.onChangeBank}
+                  value={bank}
+                >
+                  <Option key="Techcombank" value="Techcombank">Techcombank - Ngân hàng TMCP Kỹ thương Việt Nam</Option>
+                  <Option key="VPBank" value="VpBank">VPBank - Ngân hàng VN Thịnh Vượng</Option>
+                </Select>
+              </FormItem>
+              <FormItem {...tailFormItemLayout}>
+                <Button type="primary" onClick={this.onConfirmComplete}>Xác Nhận</Button>
+                <Button
+                  onClick={this.closeShowModal}
+                  style={{ marginLeft: 8 }}
+                >
+                  Hủy
+                </Button>
+              </FormItem>
+            </Form>
+          </Modal>
         </div>
       </PageHeaderLayout>
     );

@@ -6,7 +6,7 @@ import {
   // notification
 } from 'antd';
 // import moment from 'moment';
-// import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 // import { delivery as deliveryStatus } from '../../constants/status';
 import request from '../../utils/request';
 
@@ -66,9 +66,16 @@ class List extends React.Component {
       ),
     }];
     return (
-      <div>
-        <Table dataSource={clients} columns={columns} />
-      </div>
+      <PageHeaderLayout title="Shop cần thanh toán">
+        <div>
+          <Table
+            bordered
+            dataSource={clients}
+            rowKey={record => record._id}
+            columns={columns}
+          />
+        </div>
+      </PageHeaderLayout>
     );
   }
 }

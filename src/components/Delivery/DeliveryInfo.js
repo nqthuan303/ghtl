@@ -70,7 +70,7 @@ class DeliveryInfo extends Component {
           title: 'Mã Vận Đơn',
           key: 'id',
           render: record => (
-            <div>{record.orderId.id}</div>
+            <div>{record.order.id}</div>
           ),
         },
         {
@@ -83,17 +83,17 @@ class DeliveryInfo extends Component {
         {
           title: 'Tiền Thu',
           key: 'money',
-          render: record => this.renderMoney(record.orderId),
+          render: record => this.renderMoney(record.order),
         },
         {
           title: 'Người Nhận',
           key: 'receiver',
-          render: record => this.renderReceiver(record.orderId),
+          render: record => this.renderReceiver(record.order),
         },
         {
           title: 'Địa chỉ',
           key: 'address',
-          render: record => record.orderId.receiver.address,
+          render: record => record.order.receiver.address,
         },
         {
           title: 'Trạng thái',
@@ -104,6 +104,7 @@ class DeliveryInfo extends Component {
       return (<Table
         columns={columns}
         dataSource={orders}
+        rowKey={record => record._id}
       />);
     }
     render() {
