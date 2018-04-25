@@ -80,7 +80,7 @@ class PickupList extends Component {
             districtId={districtId}
           />
           <PickupTable
-            ref={(instance) => { this.pickupTableRef = instance; }}
+            wrappedComponentRef={(instance) => { this.pickupTableRef = instance; }}
           />
         </div>
       </PageHeaderLayout>

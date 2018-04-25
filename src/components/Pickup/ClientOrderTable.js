@@ -13,6 +13,7 @@ export default class ClientOrderTable extends Component {
     this.state = {
       shippers: [],
       clients: [],
+      spin: true,
     };
   }
 
@@ -66,12 +67,12 @@ export default class ClientOrderTable extends Component {
   }
   async getOrdersEachClient(options) {
     const url = this.buildUrl('/client/orders-each-client', options);
-
     const result = await request(url);
     if (result.status === 'success') {
       const { data } = result;
       this.setState({
         clients: data,
+        spin: false,
       });
     }
   }
@@ -172,7 +173,7 @@ export default class ClientOrderTable extends Component {
   }
 
   render() {
-    const { clients } = this.state;
+    const { clients, spin } = this.state;
     const columns = [
       { key: 'id', dataIndex: 'id' },
       { render: this.renderDate },
@@ -191,6 +192,7 @@ export default class ClientOrderTable extends Component {
           dataSource={clients}
           columns={columns}
           pagination={false}
+          loading={spin}
         />
       </div>
     );

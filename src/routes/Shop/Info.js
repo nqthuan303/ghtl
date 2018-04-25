@@ -64,5 +64,5 @@ class ShopInfo extends React.Component {
     );
   }
 }
-const ShopInfoƯithRouter = withRouter(ShopInfo);
-export default ShopInfoƯithRouter;
+const ShopInfoWithRouter = withRouter(ShopInfo);
+export default ShopInfoWithRouter;
