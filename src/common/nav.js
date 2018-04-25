@@ -36,6 +36,12 @@ export const getNavData = app => [
         component: dynamicWrapper(app, ['order'], () => import('../routes/Pickup/List')),
       },
       {
+        name: 'Chi tiết chuyến đi lấy',
+        showOnSideBar: false,
+        path: 'pickup/:id',
+        component: dynamicWrapper(app, ['order'], () => import('../routes/Pickup/Detail')),
+      },
+      {
         name: 'Chuyến đi giao',
         showOnSideBar: true,
         icon: 'arrows-alt',
