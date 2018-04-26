@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Table, notification, Modal } from 'antd';
+import { withRouter } from 'react-router';
 import request from '../../utils/request';
 import styles from './styles.less';
 
-export default class PickupTable extends Component {
+class PickupTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -12,6 +13,7 @@ export default class PickupTable extends Component {
         district: {},
         ward: {},
       },
+      spin: true,
       showOrder: false,
     };
     this.shiperId = '';
@@ -25,6 +27,11 @@ export default class PickupTable extends Component {
       showOrder: false,
     });
   }
+
+  onClickPickupId(pickupId) {
+    const { history } = this.props;
+    history.push(`/pickup/${pickupId}`);
+  }
   async getPickUpList() {
     const result = await request('/pickup/list');
     if (result.status === 'success') {
@@ -32,6 +39,7 @@ export default class PickupTable extends Component {
 
       this.setState({
         pickups: data,
+        spin: false,
       });
     } else {
       notification.error({
@@ -99,7 +107,6 @@ export default class PickupTable extends Component {
 
   renderData = (record) => {
     const { clients } = record;
-
     const columns = [
       { key: 'id', dataIndex: 'id' },
       { render: this.renderDate },
@@ -170,10 +177,15 @@ export default class PickupTable extends Component {
       <p>{shipper.name} - {shipper.id}/{shipper.phone}</p>
     );
   }
+  renderPickupId = (record) => {
+    return (
+      <a onClick={() => this.onClickPickupId(record._id)}>{record.id}</a>
+    );
+  }
   render() {
-    const { pickups, showOrder } = this.state;
+    const { pickups, showOrder, spin } = this.state;
     const columns = [
-      { key: 'pickupId', dataIndex: 'id' },
+      { key: 'pickupId', render: this.renderPickupId },
       { key: 'shipperName', render: this.renderShiperName },
     ];
 
@@ -186,6 +198,7 @@ export default class PickupTable extends Component {
           dataSource={pickups}
           columns={columns}
           pagination={false}
+          loading={spin}
         />
         <Modal
           title="Danh sách đơn hàng"
@@ -200,3 +213,5 @@ export default class PickupTable extends Component {
     );
   }
 }
+
+export default withRouter(PickupTable, { withRef: true });
