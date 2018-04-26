@@ -10,6 +10,7 @@ import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import { payment as paymentStatus } from '../../constants/status';
 import PaymentInfo from '../../components/Payment/PaymentInfo';
 import request from '../../utils/request';
+import FormBill from '../../components/Payment/FormBill';
 
 class History extends React.Component {
   constructor(props) {
@@ -18,6 +19,7 @@ class History extends React.Component {
       payments: [],
       payment: {},
       showModal: false,
+      showModalBill: false,
     };
   }
 
@@ -30,6 +32,16 @@ class History extends React.Component {
       showModal: true,
     });
   }
+  onClickUpdateBill(record) {
+    this.setState({
+      payment: record,
+      showModalBill: true,
+    });
+  }
+  onDataSaved = () => {
+    this.setState({ showModalBill: false });
+    this.getList();
+  }
   async getList() {
     const data = await request('/payment/list');
     if (data && data.data) {
@@ -37,10 +49,12 @@ class History extends React.Component {
     }
   }
   closeShowModal = () => {
-    this.setState({
-      showModal: false,
-    });
+    this.setState({ showModal: false });
   }
+  closeShowModalBill = () => {
+    this.setState({ showModalBill: false });
+  }
+
   renderShopName = (record) => {
     let nameShop = '';
     let phoneShop = '';
@@ -91,7 +105,9 @@ class History extends React.Component {
     }, {
       title: 'Mã giao dịch',
       key: 'bill',
-      dataIndex: 'bill',
+      render: record => (
+        <a onClick={() => this.onClickUpdateBill(record)}>{record.bill}</a>
+      ),
     }];
     return (
       <PageHeaderLayout title="Lịch sử thanh thanh toán">
@@ -103,7 +119,7 @@ class History extends React.Component {
             columns={columns}
           />
           <Modal
-            title="Thông tin đơn hàng của chuyến đi giao"
+            title={<div> Thông tin đơn hàng đã thanh toán ({moment(payment.endTime).format('DD-MM HH:mm')}) </div>}
             visible={this.state.showModal}
             onCancel={this.closeShowModal}
             width={1000}
@@ -112,6 +128,19 @@ class History extends React.Component {
             <PaymentInfo
               payment={payment}
               closeShowModal={this.closeShowModal}
+            />
+          </Modal>
+          <Modal
+            title="Cập nhật mã giao dịch"
+            visible={this.state.showModalBill}
+            onCancel={this.closeShowModalBill}
+            width={450}
+            footer={null}
+          >
+            <FormBill
+              payment={payment}
+              closeShowModalBill={this.closeShowModalBill}
+              onDataSaved={this.onDataSaved}
             />
           </Modal>
         </div>

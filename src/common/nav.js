@@ -174,6 +174,20 @@ export const getNavData = app => [
         ],
       },
       {
+        name: 'Nhân Viên',
+        showOnSideBar: true,
+        icon: 'user',
+        path: 'employee',
+        children: [
+          {
+            name: 'Danh sách',
+            showOnSideBar: true,
+            path: 'list',
+            component: dynamicWrapper(app, ['employee'], () => import('../routes/Employee/List')),
+          },
+        ],
+      },
+      {
         name: 'Exception',
         showOnSideBar: false,
         path: 'exception',

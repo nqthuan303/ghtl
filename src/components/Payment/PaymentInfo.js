@@ -101,6 +101,9 @@ class DeliveryInfo extends Component {
       }];
       return (
         <div>
+          <div style={{ fontSize: '16px' }}>
+            <b> Tổng tiền thanh toán: {this.props.payment.money}</b>
+          </div>
           <Row gutter={8}>
             <Col span={12}>
               <div> Thông Tin Shop</div>
@@ -120,12 +123,13 @@ class DeliveryInfo extends Component {
             </Col>
           </Row>
           <Table
+            pagination={false}
             bordered
             columns={columns}
             dataSource={orders}
             rowKey={record => record._id}
           />
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', marginTop: 20 }}>
             <Button
               onClick={() => this.props.closeShowModal()}
             > Đóng

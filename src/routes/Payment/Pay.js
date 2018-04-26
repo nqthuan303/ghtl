@@ -210,7 +210,10 @@ class Pay extends React.Component {
       render: this.renderReveiverMoney,
     }];
     return (
-      <PageHeaderLayout title="Tạo bảng">
+      <PageHeaderLayout title="Xác nhận thanh toán">
+        <div style={{ fontSize: '16px' }}>
+          <b> Tổng tiền cần thanh toán: {money}</b>
+        </div>
         <div>
           {payment.client ?
             <Row gutter={8}>
@@ -238,9 +241,9 @@ class Pay extends React.Component {
             rowKey={record => record._id}
             dataSource={payment.orders}
             columns={columns}
-            pagination={{ showSizeChanger: true, pageSize: 20 }}
+            pagination={false}
           />
-          <div style={{ textAlign: 'right' }}>
+          <div style={{ textAlign: 'right', marginTop: 20 }}>
             <Button onClick={this.onClickBlack} style={{ marginRight: 10 }}> Quay Lại</Button>
             <Button onClick={this.onClickCancel} type="danger" style={{ marginRight: 10 }}> Hủy Bảng</Button>
             <Button
