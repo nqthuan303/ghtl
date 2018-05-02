@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import PlacesAutocomplete, { geocodeByAddress } from 'react-places-autocomplete';
-import { Form, Button, Input, notification, Select } from 'antd';
+import { Form, Button, Input, notification, Select, Row, Col } from 'antd';
 import request from '../../utils/request';
 
 const { Option } = Select;
@@ -32,7 +32,7 @@ const myStyles = {
   },
 };
 
-class FormEmployee extends Component {
+class FormAddShop extends Component {
     static propTypes = {
       closeShowModal: PropTypes.func.isRequired,
       onDataSaved: PropTypes.func.isRequired,
@@ -40,13 +40,24 @@ class FormEmployee extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        roles: [],
+        districts: [],
+        wards: [],
       };
     }
     componentDidMount() {
-      this.getRole();
+      this.getDistrictList();
     }
-
+    onChangeDistrict = async (value) => {
+      const result = await request(`/ward/listForSelect?districtId=${value}`);
+      if (result.status === 'success') {
+        const { form } = this.props;
+        const { setFieldsValue } = form;
+        setFieldsValue({
+          ward: null,
+        });
+        this.setState({ wards: result.data });
+      }
+    }
     onSelectReceiverAddress = (address) => {
       geocodeByAddress(address, (err) => {
         if (err) { return; }
@@ -56,11 +67,9 @@ class FormEmployee extends Component {
     onChangeReceiverAddress = (address) => {
       this.props.form.setFieldsValue({ address });
     }
-    async getRole() {
-      const result = await request('/role/list');
-      if (result.status === 'success') {
-        this.setState({ roles: result.data });
-      }
+    async getDistrictList() {
+      const result = await request('/district/listForSelect');
+      this.setState({ districts: result });
     }
     handleSubmit = (e) => {
       e.preventDefault();
@@ -70,26 +79,32 @@ class FormEmployee extends Component {
           const method = 'POST';
           const postData = Object.assign({}, values);
           postData.username = values.phone;
-          const result = await request('/user/add', { method, body: postData });
+          const result = await request('/client/add', { method, body: postData });
           if (result.status === 'success') {
             notification.success({
               message: 'Thành Công',
-              description: result.data,
+              description: 'Thêm shop thành công',
             });
             onDataSaved();
           }
         }
       });
     }
-    renderRole() {
-      const { roles } = this.state;
-      const result = [];
-      for (let i = 0; i < roles.length; i += 1) {
-        result.push(
-          <Option key={i} value={roles[i]._id}>{roles[i].name}</Option>
+    renderDistrictOption() {
+      const { districts } = this.state;
+      return districts.map((district) => {
+        return (
+          <Option key={district.value} value={district.value}>{district.text}</Option>
         );
-      }
-      return result;
+      });
+    }
+    renderWardOption() {
+      const { wards } = this.state;
+      return wards.map((ward) => {
+        return (
+          <Option key={ward.value} value={ward.value}>{ward.text}</Option>
+        );
+      });
     }
     render() {
       const { form: { getFieldDecorator, getFieldValue } } = this.props;
@@ -102,8 +117,13 @@ class FormEmployee extends Component {
       };
       return (
         <Form onSubmit={this.handleSubmit}>
-          <FormItem {...formItemLayout} label="Tên">
+          <FormItem {...formItemLayout} label="Tên Shop">
             {getFieldDecorator('name', { rules: [{ required: true }] })(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label="Người liên hệ">
+            {getFieldDecorator('contactName', { rules: [{ required: true }] })(
               <Input />
             )}
           </FormItem>
@@ -133,19 +153,40 @@ class FormEmployee extends Component {
               />
             )}
           </FormItem>
-          <FormItem {...formItemLayout} label="Vai Trò">
-            {getFieldDecorator('role', { rules: [{ required: true }] })(
-              <Select
-                showSearch
-                placeholder="Chọn vai trò"
-                optionFilterProp="children"
-                filterOption={
-                  (input, option) =>
-                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-              >
-                {this.renderRole()}
-              </Select>
-            )}
+          <FormItem colon={false} {...formItemLayout} label=" ">
+            <Row gutter={12}>
+              <Col span={12}>
+                <FormItem>
+                  {getFieldDecorator('district', {
+                    rules: [{ required: true }],
+                  })(
+                    <Select
+                      showSearch
+                      onChange={this.onChangeDistrict}
+                      placeholder="Quận/Huyện"
+                      optionFilterProp="children"
+                    >
+                      {this.renderDistrictOption()}
+                    </Select>
+                  )}
+                </FormItem>
+              </Col>
+              <Col span={12}>
+                <FormItem>
+                  {getFieldDecorator('ward', {
+                    rules: [{ required: true }],
+                  })(
+                    <Select
+                      showSearch
+                      placeholder="Phường/Xã"
+                      optionFilterProp="children"
+                    >
+                      {this.renderWardOption()}
+                    </Select>
+                  )}
+                </FormItem>
+              </Col>
+            </Row>
           </FormItem>
           <FormItem {...tailFormItemLayout}>
             <Button type="primary" htmlType="submit">Tạo</Button>
@@ -166,5 +207,5 @@ const x = Form.create({
   mapPropsToFields() {
     return {};
   },
-})(FormEmployee);
+})(FormAddShop);
 export default x;

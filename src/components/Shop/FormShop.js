@@ -149,7 +149,7 @@ class FormShop extends React.Component {
               <FormItem>
                 <Col span={11}>
                   <FormItem>
-                    {getFieldDecorator('userName', {
+                    {getFieldDecorator('username', {
                       rules: [{ required: true }],
                     })(
                       <Input placeholder="Tên đăng nhập" />
@@ -280,7 +280,7 @@ const x = Form.create({
     const { data } = props;
     let result = {
       name: Form.createFormField({ value: '' }),
-      userName: Form.createFormField({ value: '' }),
+      username: Form.createFormField({ value: '' }),
       email: Form.createFormField({ value: '' }),
       password: Form.createFormField({ value: '' }),
       website: Form.createFormField({ value: '' }),
@@ -298,7 +298,7 @@ const x = Form.create({
     if (data) {
       result = {
         name: Form.createFormField({ value: data.name }),
-        userName: Form.createFormField({ value: data.userName }),
+        username: Form.createFormField({ value: data.username }),
         email: Form.createFormField({ value: data.email }),
         password: Form.createFormField({ value: data.password }),
         website: Form.createFormField({ value: data.website }),

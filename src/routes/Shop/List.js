@@ -1,8 +1,9 @@
 import React from 'react';
-import { Divider, Table, Alert, Modal } from 'antd';
+import { Divider, Table, Alert, Modal, Button } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import globalStyles from '../../index.less';
 import request from '../../utils/request';
+import FormAddShop from '../../components/Shop/FormAddShop';
 
 const { confirm } = Modal;
 
@@ -11,6 +12,7 @@ class ShopList extends React.Component {
     super(props);
     this.state = {
       items: [],
+      showModal: false,
       notice: {
         type: 'success',
         message: '',
@@ -19,6 +21,13 @@ class ShopList extends React.Component {
   }
 
   componentDidMount() {
+    this.getList();
+  }
+  onClickAddShop = () => {
+    this.setState({ showModal: true });
+  }
+  onDataSaved = () => {
+    this.setState({ showModal: false });
     this.getList();
   }
   onClickDelete(record, index) {
@@ -34,7 +43,6 @@ class ShopList extends React.Component {
       },
     });
   }
-
   async onOk(record, index) {
     const clientId = record._id;
     const delUrl = `/client/delete/${clientId}`;
@@ -73,9 +81,11 @@ class ShopList extends React.Component {
       this.setState({ items: data });
     }
   }
-
+  closeShowModal = () => {
+    this.setState({ showModal: false });
+  }
   render() {
-    const { items, notice } = this.state;
+    const { items, notice, showModal } = this.state;
 
     const columns = [
       {
@@ -123,6 +133,10 @@ class ShopList extends React.Component {
     ];
     return (
       <PageHeaderLayout title="Danh sách shop">
+        <div>
+          <Button type="primary" onClick={this.onClickAddShop}> Tạo mới</Button>
+        </div>
+        <br />
         <div className={globalStyles.tableList}>
           {notice.message !== '' ?
             <Alert closable style={{ marginBottom: 10 }} message={notice.message} type={notice.type} /> : ''}
@@ -133,6 +147,18 @@ class ShopList extends React.Component {
             pagination={{ showSizeChanger: true }}
           />
         </div>
+        <Modal
+          title="Thêm Khách Hàng"
+          visible={showModal}
+          onCancel={this.closeShowModal}
+          width={500}
+          footer={null}
+        >
+          <FormAddShop
+            closeShowModal={this.closeShowModal}
+            onDataSaved={this.onDataSaved}
+          />
+        </Modal>
       </PageHeaderLayout>
 
     );

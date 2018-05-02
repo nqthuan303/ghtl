@@ -5,7 +5,7 @@ import {
   Modal,
   // notification
 } from 'antd';
-// import moment from 'moment';
+import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import FormEmployee from '../../components/Employee/FormEmployee';
 // import { delivery as deliveryStatus } from '../../constants/status';
@@ -15,7 +15,7 @@ class List extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      clients: [],
+      users: [],
       showModal: false,
     };
   }
@@ -23,55 +23,61 @@ class List extends React.Component {
   componentDidMount() {
     this.getList();
   }
-  onClickPayment(paymentId) {
+  onClickUpdateUser(employee) {
     const { history } = this.props;
-    history.push(`/payment/pay/${paymentId}`);
-  }
-  onClickAddPayment(clientId) {
-    const { history } = this.props;
-    history.push(`/payment/add/${clientId}`);
+    history.push(`/employee/update/${employee}`);
   }
   onClickAddUser = () => {
     this.setState({ showModal: true });
   }
+  onDataSaved = () => {
+    this.setState({ showModal: false });
+    this.getList();
+  }
   async getList() {
-    const data = await request('/client/client-for-payment');
+    const data = await request('/user/list');
     if (data && data.data) {
-      this.setState({ clients: data.data });
+      this.setState({ users: data.data });
     }
   }
   closeShowModal = () => {
     this.setState({ showModal: false });
   }
+
   render() {
-    const { clients, showModal } = this.state;
+    const { users, showModal } = this.state;
     const columns = [{
-      title: 'Tên Shop',
-      key: 'name',
+      title: 'MNV',
+      key: 'id',
       render: record => (
-        <a onClick={() => this.onClickAddPayment(record._id)}>{record.name} - {record.phone}</a>
+        <a onClick={() => this.onClickUpdateUser(record._id)}>{record.id}</a>
       ),
     },
     {
-      title: 'Địa Chỉ',
-      dataIndex: 'address',
-      key: 'address',
+      title: 'Tên nhân viên',
+      dataIndex: 'name',
+      key: 'name',
     }, {
-      title: 'Quận',
-      key: 'district',
-      render: record => record.district.name,
+      title: 'SĐT',
+      key: 'phone',
+      dataIndex: 'phone',
     }, {
-      title: 'Chưa thanh toán',
-      key: 'totalMoney',
-      dataIndex: 'totalMoney',
-    }, {
-      title: 'Bảng kê',
-      key: 'payment',
+      title: 'Chức vụ',
+      key: 'role',
       render: record => (
-        record.payment ?
-          <a onClick={() => this.onClickPayment(record.payment._id)}>{record.payment.id}</a>
+        record.role ?
+          <div>{record.role.name}</div>
           : ''
       ),
+    }, {
+      title: 'Trạng thái',
+      key: 'status',
+      dataIndex: 'status',
+    },
+    {
+      title: 'Thời gian bắt đầu',
+      key: 'startTIme',
+      render: record => moment(record.createdAt).format('DD-MM HH:mm'),
     }];
     return (
       <PageHeaderLayout title="Danh sách nhân viên">
@@ -82,7 +88,7 @@ class List extends React.Component {
         <div>
           <Table
             bordered
-            dataSource={clients}
+            dataSource={users}
             rowKey={record => record._id}
             columns={columns}
           />

@@ -17,6 +17,10 @@ class List extends React.Component {
   componentDidMount() {
     this.getDelivery();
   }
+  onClickHistory = () => {
+    const { history } = this.props;
+    history.push('/money/history');
+  }
   onClickReceiveMoney(delivery) {
     const _this = this;
     confirmModal({
@@ -100,6 +104,10 @@ class List extends React.Component {
     return (
       <PageHeaderLayout title="Danh Sách">
         <div>
+          <div>
+            <Button onClick={this.onClickHistory} type="primary">Lịch Sử Thu Tiền</Button>
+          </div>
+          <br />
           <Table dataSource={listDelivery} columns={columns} />
         </div>
       </PageHeaderLayout>

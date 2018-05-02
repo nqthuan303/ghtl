@@ -102,7 +102,7 @@ export const getNavData = app => [
       {
         name: 'Xác Nhận Thanh Toán',
         showOnSideBar: false,
-        path: 'pay/:id',
+        path: 'payment/pay/:id',
         component: dynamicWrapper(app, ['payment'], () => import('../routes/Payment/Pay')),
       },
       {
@@ -128,15 +128,15 @@ export const getNavData = app => [
         name: 'Nhân Viên',
         showOnSideBar: true,
         icon: 'user',
-        path: 'employee',
-        children: [
-          {
-            name: 'Danh sách',
-            showOnSideBar: true,
-            path: 'list',
-            component: dynamicWrapper(app, ['employee'], () => import('../routes/Employee/List')),
-          },
-        ],
+        path: 'employee/list',
+        component: dynamicWrapper(app, ['employee'], () => import('../routes/Employee/List')),
+      },
+      {
+        name: 'Cập nhật nhân viên',
+        showOnSideBar: false,
+        icon: 'user',
+        path: 'employee/update/:id',
+        component: dynamicWrapper(app, ['employee'], () => import('../routes/Employee/Update')),
       },
       {
         name: 'Exception',

@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Table,
-  // Button,
+  Button,
   // Modal,
   // notification
 } from 'antd';
@@ -28,6 +28,10 @@ class List extends React.Component {
   onClickAddPayment(clientId) {
     const { history } = this.props;
     history.push(`/payment/add/${clientId}`);
+  }
+  onClickHistory = () => {
+    const { history } = this.props;
+    history.push('/payment/history');
   }
   async getList() {
     const data = await request('/client/client-for-payment');
@@ -68,6 +72,10 @@ class List extends React.Component {
     return (
       <PageHeaderLayout title="Shop cần thanh toán">
         <div>
+          <div>
+            <Button onClick={this.onClickHistory} type="primary">Lịch Sử Thanh Toán</Button>
+          </div>
+          <br />
           <Table
             bordered
             dataSource={clients}
