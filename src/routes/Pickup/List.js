@@ -61,7 +61,7 @@ class PickupList extends Component {
   render() {
     const { districtId } = this.state;
     return (
-      <PageHeaderLayout title="Danh sách shop">
+      <PageHeaderLayout title="Chuyến đi lấy">
         <div>
           <Menu
             style={{ height: 48 }}

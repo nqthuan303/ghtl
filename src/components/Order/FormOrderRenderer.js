@@ -38,6 +38,35 @@ const myStyles = {
   },
 };
 
+function hasErrors(fieldsError) {
+  let result = false;
+  for (const key in fieldsError) {
+    if (Object.prototype.hasOwnProperty.call(fieldsError, key)) {
+      const error = fieldsError[key];
+      if (error) {
+        if (Array.isArray(error)) {
+          result = true;
+          break;
+        } else {
+          for (const childKey in error) {
+            if (Object.prototype.hasOwnProperty.call(error, childKey)) {
+              const childError = error[childKey];
+              if (Array.isArray(childError)) {
+                result = true;
+                break;
+              }
+            }
+          }
+          if (result) {
+            break;
+          }
+        }
+      }
+    }
+  }
+  return result;
+}
+
 class CreateForm extends React.Component {
   constructor(props) {
     super(props);
@@ -50,6 +79,7 @@ class CreateForm extends React.Component {
   }
 
   componentDidMount() {
+    this.props.form.validateFields();
     this.getClientList();
     this.getDistrictList();
   }
@@ -68,11 +98,6 @@ class CreateForm extends React.Component {
   onChangeDistrict = async (value) => {
     const result = await request(`/ward/listForSelect?districtId=${value}`);
     if (result.status === 'success') {
-      const { form } = this.props;
-      const { setFieldsValue } = form;
-      setFieldsValue({
-        'receiver.ward': null,
-      });
       this.setState({ wards: result.data });
     }
   }
@@ -157,29 +182,43 @@ class CreateForm extends React.Component {
     return result;
   }
   render() {
-    const { form, shipFee } = this.props;
+    const { form, shipFee, showEndButton } = this.props;
     const { client } = this.state;
     const clientDistrict = client.district;
 
     const districtName = clientDistrict ? `${clientDistrict.type} ${clientDistrict.name}` : '';
 
-    const { getFieldDecorator, getFieldValue } = form;
+    const {
+      getFieldDecorator,
+      getFieldValue,
+      getFieldsError,
+      isFieldTouched,
+      getFieldError,
+    } = form;
     const receiverAddress = getFieldValue('receiver.address');
-
     const receiverProps = {
       value: receiverAddress || '',
       onChange: this.onChangeReceiverAddress,
       type: 'search',
       placeholder: 'Địa chỉ người nhận',
     };
-
-    const totalMoney = Number(getFieldValue('goodsMoney')) + Number(shipFee);
-
+    const goodsMoney = getFieldValue('goodsMoney') ? Number(getFieldValue('goodsMoney')) : 0;
+    const totalMoney = goodsMoney + Number(shipFee);
+    const receiverPhoneError = isFieldTouched('receiver.phone') && getFieldError('receiver.phone');
+    const receiverNameError = isFieldTouched('receiver.name') && getFieldError('receiver.name');
+    const receiverAddressError = isFieldTouched('receiver.address') && getFieldError('receiver.address');
+    const receiverDistrictError = isFieldTouched('receiver.district') && getFieldError('receiver.district');
+    const receiverWardError = isFieldTouched('receiver.ward') && getFieldError('receiver.ward');
+    const clientError = isFieldTouched('client') && getFieldError('client');
+    const errors = getFieldsError();
     return (
       <Form onSubmit={this.handleSubmit} className={globalStyle.appContent}>
         <Row gutter={12}>
           <Col span={6}>
-            <FormItem>
+            <FormItem
+              validateStatus={clientError ? 'error' : ''}
+              help={clientError || ''}
+            >
               {getFieldDecorator('client', {
                 rules: [{ required: true }],
               })(
@@ -213,21 +252,36 @@ class CreateForm extends React.Component {
         <Row gutter={12}>
           <Col span={12}>
             <p style={{ fontWeight: 'bold' }}>1. Người nhận</p>
-            <FormItem {...formItemLayout} label="Số điện thoại">
+            <FormItem
+              validateStatus={receiverPhoneError ? 'error' : ''}
+              help={receiverPhoneError || ''}
+              {...formItemLayout}
+              label="Số điện thoại"
+            >
               {getFieldDecorator('receiver.phone', {
                 rules: [{ required: true }],
               })(
                 <Input />
               )}
             </FormItem>
-            <FormItem {...formItemLayout} label="Họ tên">
+            <FormItem
+              validateStatus={receiverNameError ? 'error' : ''}
+              help={receiverNameError || ''}
+              {...formItemLayout}
+              label="Họ tên"
+            >
               {getFieldDecorator('receiver.name', {
                 rules: [{ required: true }],
               })(
                 <Input />
               )}
             </FormItem>
-            <FormItem {...formItemLayout} label="Địa chỉ">
+            <FormItem
+              validateStatus={receiverAddressError ? 'error' : ''}
+              help={receiverAddressError || ''}
+              {...formItemLayout}
+              label="Địa chỉ"
+            >
               {getFieldDecorator('receiver.address', {
                 rules: [{ required: true }],
               })(
@@ -243,7 +297,10 @@ class CreateForm extends React.Component {
             <FormItem colon={false} {...formItemLayout} label=" ">
               <Row gutter={12}>
                 <Col span={12}>
-                  <FormItem>
+                  <FormItem
+                    validateStatus={receiverDistrictError ? 'error' : ''}
+                    help={receiverDistrictError || ''}
+                  >
                     {getFieldDecorator('receiver.district', {
                       rules: [{ required: true }],
                     })(
@@ -259,7 +316,10 @@ class CreateForm extends React.Component {
                   </FormItem>
                 </Col>
                 <Col span={12}>
-                  <FormItem>
+                  <FormItem
+                    validateStatus={receiverWardError ? 'error' : ''}
+                    help={receiverWardError || ''}
+                  >
                     {getFieldDecorator('receiver.ward', {
                       rules: [{ required: true }],
                     })(
@@ -300,6 +360,7 @@ class CreateForm extends React.Component {
             <FormItem {...formItemLayout} label="Tiền hàng">
               {getFieldDecorator('goodsMoney', {
                 rules: [{ required: true }],
+                initialValue: 0,
               })(
                 <Input />
               )}
@@ -322,8 +383,15 @@ class CreateForm extends React.Component {
               {totalMoney}
             </FormItem>
             <FormItem {...tailFormItemLayout}>
-              <Button style={{ marginRight: 5 }} type="primary" htmlType="submit">Tạo tiếp</Button>
-              <Button onClick={this.onClickBtnEnd}>Kết thúc</Button>
+              <Button
+                disabled={hasErrors(errors)}
+                style={{ marginRight: 5 }}
+                type="primary"
+                htmlType="submit"
+              >
+                Tạo tiếp
+              </Button>
+              {showEndButton ? <Button type="danger" onClick={this.onClickBtnEnd}>Kết thúc</Button> : ''}
             </FormItem>
           </Col>
         </Row>

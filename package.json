@@ -19,7 +19,7 @@
     "test:all": "node ./tests/run-tests.js"
   },
   "dependencies": {
-    "antd": "^3.0.0",
+    "antd": "^3.4.4",
     "babel-runtime": "^6.9.2",
     "classnames": "^2.2.5",
     "core-js": "^2.5.1",
@@ -34,10 +34,10 @@
     "numeral": "^2.0.6",
     "prop-types": "^15.5.10",
     "qs": "^6.5.0",
-    "react": "^16.0.0",
+    "react": "^16.3.2",
     "react-container-query": "^0.9.1",
     "react-document-title": "^2.0.3",
-    "react-dom": "^16.0.0",
+    "react-dom": "^16.3.2",
     "react-fittext": "^1.0.0",
     "react-places-autocomplete": "^5.4.3"
   },

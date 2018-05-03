@@ -83,8 +83,10 @@ class FormOrder extends React.Component {
   }
   render() {
     const { shipFee } = this.state;
+    const { showEndButton } = this.props;
     return (
       <FormOrderRenderer
+        showEndButton={showEndButton}
         onClickBtnEnd={this.onClickBtnEnd}
         onFormSubmit={this.onFormSubmit}
         shipFee={shipFee}

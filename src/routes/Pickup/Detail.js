@@ -1,7 +1,7 @@
 import React from 'react';
 import { Checkbox, Spin, Button, notification } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import { order as orderStatus } from '../../constants/status';
+import { order as orderStatus, pickup as pickupStatus } from '../../constants/status';
 import request from '../../utils/request';
 
 class PickupDetail extends React.Component {
@@ -23,7 +23,24 @@ class PickupDetail extends React.Component {
     this.getPickup();
   }
 
-  onClickSave = async () => {
+  onClickEnd = async () => {
+    const saved = await this.onClickSave('endPickup');
+    if (saved) {
+      const url = '/pickup/save';
+      const result = await request(url, {
+        method: 'POST',
+        body: { pickupId: this.pickupId },
+      });
+      if (result.status === 'success') {
+        notification.success({
+          message: 'Thành công',
+          description: 'Đã kết thúc chuyến đi!',
+        });
+      }
+    }
+  }
+
+  onClickSave = async (type) => {
     const { objChecked } = this.state;
     const url = '/order/update-status';
     const orderIds = [];
@@ -45,13 +62,18 @@ class PickupDetail extends React.Component {
       method: 'POST',
       body,
     });
+    let saved = false;
     if (result.status === 'success') {
-      notification.success({
-        message: 'Thành công',
-        description: 'Lưu chuyến đi thành công!',
-      });
+      if (type !== 'endPickup') {
+        notification.success({
+          message: 'Thành công',
+          description: 'Lưu chuyến đi thành công!',
+        });
+      }
       this.getPickup();
+      saved = true;
     }
+    return saved;
   }
   onCheckClient(checked, client) {
     const clientId = client._id;
@@ -167,8 +189,10 @@ class PickupDetail extends React.Component {
           Nhân viên lấy: {shipper.name} - (id: {shipper.id}) <br /> <br />
           {this.renderData()}
         </Spin>
-        <Button onClick={this.onClickSave} type="primary" style={{ marginRight: 10 }}>Lưu</Button>
-        <Button>Kết thúc</Button>
+        { pickup.status !== pickupStatus.DONE ?
+          <Button onClick={this.onClickSave} type="primary" style={{ marginRight: 10 }}>Lưu</Button> : ''}
+        { pickup.status !== pickupStatus.DONE ?
+          <Button onClick={this.onClickEnd}>Kết thúc</Button> : '' }
       </PageHeaderLayout>
     );
   }

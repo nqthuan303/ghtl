@@ -43,6 +43,7 @@ class AddOrder extends React.Component {
 
   saveOrder = async () => {
     const { inProcessIds } = this.state;
+    const { history } = this.props;
     const result = await request('/order/saveOrder', {
       method: 'POST',
       body: inProcessIds,
@@ -52,7 +53,7 @@ class AddOrder extends React.Component {
         message: 'Thành công!',
         description: 'Cập nhật thành công!',
       });
-      this.getTempOrderList();
+      history.push('/pickup/list');
     }
   }
 
@@ -75,9 +76,14 @@ class AddOrder extends React.Component {
 
   render() {
     const { tempOrders } = this.state;
+    const showEndButton = tempOrders.length > 0;
     return (
       <PageHeaderLayout title="Thêm đơn hàng">
-        <FormOrder saveOrder={this.saveOrder} onSave={this.onSaveTempOrder} />
+        <FormOrder
+          showEndButton={showEndButton}
+          saveOrder={this.saveOrder}
+          onSave={this.onSaveTempOrder}
+        />
         <TempOrder removeOrder={this.removeOrder} data={tempOrders} />
       </PageHeaderLayout>
     );
