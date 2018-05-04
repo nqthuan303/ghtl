@@ -15,3 +15,12 @@ export function getPlainNode(nodeList, parentPath = '') {
   });
   return arr;
 }
+export function convertDateTime(dateTime) {
+  const objDateTime = new Date(dateTime);
+  const month = objDateTime.getMonth();
+  const date = objDateTime.getDate();
+  const hour = objDateTime.getHours();
+  const min = objDateTime.getMinutes();
+  const result = `${date}/${month} ${hour}:${min}`;
+  return result;
+}

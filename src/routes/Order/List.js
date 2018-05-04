@@ -3,6 +3,9 @@ import { Menu, Table, Divider, Modal, notification, Button } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import globalStyles from '../../index.less';
 import request from '../../utils/request';
+import { convertDateTime } from '../../utils/utils';
+import styles from './styles.less';
+import { orderPayBy } from '../../constants/status';
 
 const { confirm } = Modal;
 
@@ -106,44 +109,79 @@ class OrderList extends React.Component {
     });
   }
 
+  renderId = (record) => {
+    const { createdAt } = record;
+    const dateTime = convertDateTime(createdAt);
+    return (
+      <div className={styles.colOrderId}>
+        <a className={styles.orderId}>{record.id}</a>
+        <p className={styles.createdAt}>({dateTime})</p>
+      </div>
+    );
+  }
+
+  renderSender = ({ client }) => {
+    return client ? client.name : '';
+  }
+
+  renderReceiverName = ({ receiver }) => {
+    return receiver ? receiver.name : '';
+  }
+
+  renderReceiverAddress = ({ receiver }) => {
+    return receiver ? receiver.address : '';
+  }
+
+  renderTotalMoney = ({ goodsMoney, payBy, shipFee }) => {
+    let result = 0;
+    if (payBy === orderPayBy.SENDER.value) {
+      result = goodsMoney;
+    }
+    if (payBy === orderPayBy.RECEIVER.value) {
+      result = Number(goodsMoney) + Number(shipFee);
+    }
+    return result;
+  }
+
   render() {
     const { items, currentMenu } = this.state;
     const columns = [
       {
+        key: 'id',
         title: 'Mã',
-        width: '6%',
-        dataIndex: 'id',
+        render: this.renderId,
+        width: '120px',
+        align: 'center',
       },
       {
-        title: 'Ngày tạo',
-        dataIndex: 'createdAt',
-
+        key: 'senderName',
+        title: 'Người gửi',
+        render: this.renderSender,
       },
       {
-        title: 'Shop',
-        render: (text, record) => {
-          return record.client ? record.client.name : '';
-        },
+        key: 'ReceiverName',
+        title: 'Người nhận',
+        render: this.renderReceiverName,
       },
       {
-        title: 'Địa chỉ nhận',
-        render: (text, record) => {
-          return record.receiver ? record.receiver.address : '';
-        },
+        key: 'ReceiverAddress',
+        title: 'Đ/c nhận',
+        render: this.renderReceiverAddress,
+        width: '200px',
       },
       {
-        title: 'Số ĐT',
-        render: () => {
-          return '';
-        },
+        key: 'TotalMoney',
+        title: 'Thu khách',
+        render: this.renderTotalMoney,
       },
       {
         title: 'Trạng thái',
         dataIndex: 'orderstatus',
-
+        key: 'orderstatus',
       },
       {
-        title: 'Hoạt động',
+        title: '',
+        key: 'action',
         render: (text, record, index) => (
           <div>
             <a onClick={() => this.onClickDelete(record, index)}>Xóa</a>
