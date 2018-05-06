@@ -5,7 +5,7 @@ import globalStyles from '../../index.less';
 import request from '../../utils/request';
 import { convertDateTime } from '../../utils/utils';
 import styles from './styles.less';
-import { orderPayBy } from '../../constants/status';
+import { orderPayBy, order as orderStatus } from '../../constants/status';
 
 const { confirm } = Modal;
 
@@ -16,6 +16,7 @@ class OrderList extends React.Component {
       ordersInStatus: [],
       currentMenu: 'all',
     };
+    this.selectedOrder = '';
   }
   componentDidMount() {
     this.getOrderList();
@@ -69,6 +70,25 @@ class OrderList extends React.Component {
         message: 'Lỗi',
         description: result.data.msg,
       });
+    }
+  }
+  onClickCancel(orderId) {
+    this.selectedOrder = orderId;
+    confirm({
+      title: 'Hủy đơn hàng',
+      content: 'Bạn có chắc chắn muốn hủy đơn hàng này?',
+      onOk: this.onConfirmCancelOrder,
+    });
+  }
+  onConfirmCancelOrder = async () => {
+    const url = '/order/cancel';
+    const result = await request(url, {
+      body: { orderId: this.selectedOrder },
+      method: 'POST',
+    });
+    if (result.status === 'success') {
+      this.getOrderList();
+      this.getOrdersInStatus();
     }
   }
   async getOrdersInStatus() {
@@ -131,7 +151,6 @@ class OrderList extends React.Component {
   renderReceiverAddress = ({ receiver }) => {
     return receiver ? receiver.address : '';
   }
-
   renderTotalMoney = ({ goodsMoney, payBy, shipFee }) => {
     let result = 0;
     if (payBy === orderPayBy.SENDER.value) {
@@ -141,6 +160,35 @@ class OrderList extends React.Component {
       result = Number(goodsMoney) + Number(shipFee);
     }
     return result;
+  }
+  renderAction = (text, record, index) => {
+    const { orderstatus } = record;
+    let result = '-';
+    const { TEMP, PENDING, PICKUP, STORAGE, DELIVERYPREPARE } = orderStatus;
+    if (orderstatus === TEMP.value) {
+      result = (
+        <div>
+          <a onClick={() => this.onClickDelete(record, index)}>Xóa</a>
+          <Divider type="vertical" />
+          <a>Duyệt</a>
+        </div>
+      );
+    }
+    if (
+      orderstatus === PENDING.value ||
+      orderstatus === PICKUP.value ||
+      orderstatus === STORAGE.value ||
+      orderstatus === DELIVERYPREPARE.value
+    ) {
+      result = (
+        <a onClick={() => this.onClickCancel(record._id)}>Hủy</a>
+      );
+    }
+    return (
+      <div>
+        {result}
+      </div>
+    );
   }
 
   render() {
@@ -182,13 +230,7 @@ class OrderList extends React.Component {
       {
         title: '',
         key: 'action',
-        render: (text, record, index) => (
-          <div>
-            <a onClick={() => this.onClickDelete(record, index)}>Xóa</a>
-            <Divider type="vertical" />
-            <a>Sửa</a>
-          </div>
-        ),
+        render: this.renderAction,
       },
     ];
 

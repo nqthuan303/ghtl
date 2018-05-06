@@ -100,8 +100,7 @@ const status = {
     },
   },
   pickup: {
-    PENDING: 'pending',
-    DOING: 'doing',
+    INPROCESS: 'inProcess',
     DONE: 'done',
   },
   delivery: {

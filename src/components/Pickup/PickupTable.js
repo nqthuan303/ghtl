@@ -90,13 +90,15 @@ class PickupTable extends Component {
 
   renderDate = (record) => {
     const { orders } = record;
-    const dateTime = new Date(orders[0].createdAt);
-    const month = dateTime.getMonth();
-    const date = dateTime.getDate();
-    const hour = dateTime.getHours();
-    const min = dateTime.getMinutes();
-    const result = `${date}/${month} ${hour}:${min}`;
-    return result;
+    if (orders[0]) {
+      const dateTime = new Date(orders[0].createdAt);
+      const month = dateTime.getMonth();
+      const date = dateTime.getDate();
+      const hour = dateTime.getHours();
+      const min = dateTime.getMinutes();
+      const result = `${date}/${month} ${hour}:${min}`;
+      return result;
+    }
   }
 
   renderShowOrder = (record) => {
@@ -111,7 +113,7 @@ class PickupTable extends Component {
       { key: 'id', dataIndex: 'id' },
       { render: this.renderDate },
       { render: this.renderName },
-      { render: this.renderAddress },
+      { render: this.renderAddress, width: '250px' },
       { render: this.renderMoney },
       { render: this.renderShowOrder },
     ];

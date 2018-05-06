@@ -12,6 +12,7 @@ class PickupDetail extends React.Component {
       numOfOrders: 0,
       loading: true,
       objChecked: {},
+      checkedIds: [],
       pickup: {
         clients: [],
         shipper: {},
@@ -24,25 +25,85 @@ class PickupDetail extends React.Component {
   }
 
   onClickEnd = async () => {
-    const saved = await this.onClickSave('endPickup');
-    if (saved) {
-      const url = '/pickup/save';
-      const result = await request(url, {
-        method: 'POST',
-        body: { pickupId: this.pickupId },
+    const { objChecked } = this.state;
+    const url = '/pickup/save';
+    const result = await request(url, {
+      method: 'POST',
+      body: { pickupId: this.pickupId, objChecked },
+    });
+    if (result.status === 'success') {
+      notification.success({
+        message: 'Thành công',
+        description: 'Đã kết thúc chuyến đi!',
       });
-      if (result.status === 'success') {
-        notification.success({
-          message: 'Thành công',
-          description: 'Đã kết thúc chuyến đi!',
-        });
-      }
+      this.getPickup();
     }
   }
 
-  onClickSave = async (type) => {
-    const { objChecked } = this.state;
+  onClickSave = async () => {
     const url = '/order/update-status';
+    const orderIds = this.getCheckedOrder();
+    const body = { status: orderStatus.STORAGE.value, orderIds };
+    const result = await request(url, {
+      method: 'POST',
+      body,
+    });
+    if (result.status === 'success') {
+      notification.success({
+        message: 'Thành công',
+        description: 'Lưu chuyến đi thành công!',
+      });
+      this.getPickup();
+    }
+  }
+  onCheckClient(checked, client) {
+    const clientId = client._id;
+    const { orders } = client;
+    const { objChecked, checkedIds } = this.state;
+    const checkedClient = objChecked[clientId];
+    for (let i = 0; i < orders.length; i++) {
+      const order = orders[i];
+      const orderId = order._id;
+      if (order.orderstatus !== orderStatus.STORAGE.value) {
+        checkedClient[orderId] = checked;
+      }
+      const indexOfOrder = checkedIds.indexOf(orderId);
+      if (checked) {
+        if (indexOfOrder === -1) {
+          checkedIds.push(orderId);
+        }
+      } else if (indexOfOrder > -1) {
+        checkedIds.splice(indexOfOrder, 1);
+      }
+    }
+    this.setState({
+      checkedIds,
+      objChecked: {
+        ...objChecked, [clientId]: checkedClient,
+      },
+    });
+  }
+  onCheckOrder(checked, clientId, orderId) {
+    const { objChecked, checkedIds } = this.state;
+    const indexOfOrder = checkedIds.indexOf(orderId);
+    if (checked) {
+      if (indexOfOrder === -1) {
+        checkedIds.push(orderId);
+      }
+    } else if (indexOfOrder > -1) {
+      checkedIds.splice(indexOfOrder, 1);
+    }
+    this.setState({
+      objChecked: {
+        ...objChecked,
+        [clientId]: {
+          ...objChecked[clientId], [orderId]: checked,
+        },
+      },
+    });
+  }
+  getCheckedOrder() {
+    const { objChecked } = this.state;
     const orderIds = [];
     for (const clientId in objChecked) {
       if (Object.prototype.hasOwnProperty.call(objChecked, clientId)) {
@@ -57,52 +118,7 @@ class PickupDetail extends React.Component {
         }
       }
     }
-    const body = { status: orderStatus.STORAGE.value, orderIds };
-    const result = await request(url, {
-      method: 'POST',
-      body,
-    });
-    let saved = false;
-    if (result.status === 'success') {
-      if (type !== 'endPickup') {
-        notification.success({
-          message: 'Thành công',
-          description: 'Lưu chuyến đi thành công!',
-        });
-      }
-      this.getPickup();
-      saved = true;
-    }
-    return saved;
-  }
-  onCheckClient(checked, client) {
-    const clientId = client._id;
-    const { orders } = client;
-    const { objChecked } = this.state;
-    const checkedClient = objChecked[clientId];
-    for (let i = 0; i < orders.length; i++) {
-      const order = orders[i];
-      const orderId = order._id;
-      if (order.orderstatus !== orderStatus.STORAGE.value) {
-        checkedClient[orderId] = checked;
-      }
-    }
-    this.setState({
-      objChecked: {
-        ...objChecked, [clientId]: checkedClient,
-      },
-    });
-  }
-  onCheckOrder(checked, clientId, orderId) {
-    const { objChecked } = this.state;
-    this.setState({
-      objChecked: {
-        ...objChecked,
-        [clientId]: {
-          ...objChecked[clientId], [orderId]: checked,
-        },
-      },
-    });
+    return orderIds;
   }
   async getPickup() {
     const url = `/pickup/${this.pickupId}`;
@@ -112,6 +128,7 @@ class PickupDetail extends React.Component {
       const { clients } = data;
       const objChecked = {};
       let numOfOrders = 0;
+      const checkedIds = [];
       for (let i = 0; i < clients.length; i++) {
         const client = clients[i];
         const { orders } = client;
@@ -121,6 +138,7 @@ class PickupDetail extends React.Component {
           const { orderstatus } = order;
           if (orderstatus === orderStatus.STORAGE.value) {
             objChecked[client._id][order._id] = true;
+            checkedIds.push(order._id);
           } else {
             objChecked[client._id][order._id] = false;
           }
@@ -132,6 +150,7 @@ class PickupDetail extends React.Component {
         pickup: data,
         numOfOrders,
         objChecked,
+        checkedIds,
       });
     }
   }
@@ -160,6 +179,7 @@ class PickupDetail extends React.Component {
   renderData() {
     const { pickup } = this.state;
     const { clients } = pickup;
+    const { DONE } = pickupStatus;
     return clients.map((client) => {
       const { orders } = client;
       const { address, district, ward } = client;
@@ -168,6 +188,7 @@ class PickupDetail extends React.Component {
         <div style={{ height: 100 }} key={client._id}>
           <div style={{ width: 250, float: 'left' }} >
             <Checkbox
+              disabled={pickup.status === DONE}
               onChange={({ target: { checked } }) => this.onCheckClient(checked, client)}
             >{client.name} (0/{orders.length})
             </Checkbox> <br />
@@ -180,8 +201,9 @@ class PickupDetail extends React.Component {
   }
 
   render() {
-    const { pickup, numOfOrders, loading } = this.state;
+    const { pickup, numOfOrders, loading, checkedIds } = this.state;
     const { shipper } = pickup;
+    const { INPROCESS } = pickupStatus;
     return (
       <PageHeaderLayout title="Danh sách shop">
         <Spin spinning={loading}>
@@ -189,10 +211,22 @@ class PickupDetail extends React.Component {
           Nhân viên lấy: {shipper.name} - (id: {shipper.id}) <br /> <br />
           {this.renderData()}
         </Spin>
-        { pickup.status !== pickupStatus.DONE ?
-          <Button onClick={this.onClickSave} type="primary" style={{ marginRight: 10 }}>Lưu</Button> : ''}
-        { pickup.status !== pickupStatus.DONE ?
-          <Button onClick={this.onClickEnd}>Kết thúc</Button> : '' }
+        { pickup.status === INPROCESS ?
+          <Button
+            disabled={checkedIds.length === 0}
+            onClick={this.onClickSave}
+            type="primary"
+            style={{ marginRight: 10 }}
+          >
+            Lưu
+          </Button> : ''}
+        { pickup.status === INPROCESS ?
+          <Button
+            disabled={checkedIds.length === 0}
+            onClick={this.onClickEnd}
+          >
+            Kết thúc
+          </Button> : '' }
       </PageHeaderLayout>
     );
   }
