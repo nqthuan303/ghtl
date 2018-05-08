@@ -125,29 +125,36 @@ class PickupDetail extends React.Component {
     const result = await request(url);
     if (result.status === 'success') {
       const { data } = result;
-      const { clients } = data;
+      const { clients, orders } = data;
       const objChecked = {};
       let numOfOrders = 0;
       const checkedIds = [];
+      const objPickup = data;
       for (let i = 0; i < clients.length; i++) {
         const client = clients[i];
-        const { orders } = client;
-        objChecked[client._id] = {};
+        const clientId = client._id;
+        objChecked[clientId] = {};
+        const objOrders = [];
         for (let j = 0; j < orders.length; j++) {
           const order = orders[j];
-          const { orderstatus } = order;
-          if (orderstatus === orderStatus.STORAGE.value) {
-            objChecked[client._id][order._id] = true;
-            checkedIds.push(order._id);
-          } else {
-            objChecked[client._id][order._id] = false;
+          if (order.client === clientId) {
+            objOrders.push(order);
+            const orderId = order._id;
+            const { orderstatus } = order;
+            if (orderstatus === orderStatus.STORAGE.value) {
+              objChecked[clientId][orderId] = true;
+              checkedIds.push(orderId);
+            } else {
+              objChecked[clientId][orderId] = false;
+            }
           }
         }
+        objPickup.clients[i].orders = objOrders;
         numOfOrders += orders.length;
       }
       this.setState({
         loading: false,
-        pickup: data,
+        pickup: objPickup,
         numOfOrders,
         objChecked,
         checkedIds,

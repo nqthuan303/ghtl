@@ -48,8 +48,8 @@ class PickupTable extends Component {
       });
     }
   }
-  showOrders(record) {
-    const { orders, name, phone, address, district, ward } = record;
+  showOrders(record, orders) {
+    const { name, phone, address, district, ward } = record;
     this.setState({
       client: {
         name,
@@ -62,8 +62,7 @@ class PickupTable extends Component {
       showOrder: true,
     });
   }
-  renderName = (record) => {
-    const { orders } = record;
+  renderName(record, orders) {
     return (
       <div>
         <span>({orders.length}) {record.name}</span> <br />
@@ -78,8 +77,7 @@ class PickupTable extends Component {
     return result;
   }
 
-  renderMoney = (record) => {
-    const { orders } = record;
+  renderMoney(orders) {
     let money = 0;
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
@@ -88,8 +86,7 @@ class PickupTable extends Component {
     return money;
   }
 
-  renderDate = (record) => {
-    const { orders } = record;
+  renderDate(orders) {
     if (orders[0]) {
       const dateTime = new Date(orders[0].createdAt);
       const month = dateTime.getMonth();
@@ -101,21 +98,21 @@ class PickupTable extends Component {
     }
   }
 
-  renderShowOrder = (record) => {
+  renderShowOrder(record, orders) {
     return (
-      <a onClick={() => this.showOrders(record)}>Xem</a>
+      <a onClick={() => this.showOrders(record, orders)}>Xem</a>
     );
   }
 
   renderData = (record) => {
-    const { clients } = record;
+    const { clients, orders } = record;
     const columns = [
       { key: 'id', dataIndex: 'id' },
-      { render: this.renderDate },
-      { render: this.renderName },
+      { render: () => this.renderDate(orders) },
+      { render: client => this.renderName(client, orders) },
       { render: this.renderAddress, width: '250px' },
-      { render: this.renderMoney },
-      { render: this.renderShowOrder },
+      { render: () => this.renderMoney(orders) },
+      { render: client => this.renderShowOrder(client, orders) },
     ];
     return (
       <Table
