@@ -48,8 +48,8 @@ class PickupTable extends Component {
       });
     }
   }
-  showOrders(record, orders) {
-    const { name, phone, address, district, ward } = record;
+  showOrders({ client, orders }) {
+    const { name, phone, address, district, ward } = client;
     this.setState({
       client: {
         name,
@@ -62,22 +62,22 @@ class PickupTable extends Component {
       showOrder: true,
     });
   }
-  renderName(record, orders) {
+  renderName = ({ client, orders }) => {
     return (
       <div>
-        <span>({orders.length}) {record.name}</span> <br />
-        <span>{record.phone}</span>
+        <span>({orders.length}) {client.name}</span> <br />
+        <span>{client.phone}</span>
       </div>
     );
   }
 
-  renderAddress = (record) => {
-    const { district, ward } = record;
-    const result = `${record.address}, ${ward.type} ${ward.name}, ${district.type} ${district.name}`;
+  renderAddress = ({ client }) => {
+    const { district, ward, address } = client;
+    const result = `${address}, ${ward.type} ${ward.name}, ${district.type} ${district.name}`;
     return result;
   }
 
-  renderMoney(orders) {
+  renderMoney({ orders }) {
     let money = 0;
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
@@ -86,7 +86,7 @@ class PickupTable extends Component {
     return money;
   }
 
-  renderDate(orders) {
+  renderDate = ({ orders }) => {
     if (orders[0]) {
       const dateTime = new Date(orders[0].createdAt);
       const month = dateTime.getMonth();
@@ -98,27 +98,27 @@ class PickupTable extends Component {
     }
   }
 
-  renderShowOrder(record, orders) {
+  renderAction = (record) => {
     return (
-      <a onClick={() => this.showOrders(record, orders)}>Xem</a>
+      <a onClick={() => this.showOrders(record)}>Xem</a>
     );
   }
 
   renderData = (record) => {
-    const { clients, orders } = record;
+    const { data: items } = record;
     const columns = [
-      { key: 'id', dataIndex: 'id' },
-      { render: () => this.renderDate(orders) },
-      { render: client => this.renderName(client, orders) },
-      { render: this.renderAddress, width: '250px' },
-      { render: () => this.renderMoney(orders) },
-      { render: client => this.renderShowOrder(client, orders) },
+      { key: 'clientId', dataIndex: 'client.id' },
+      { key: 'dateNewestOrder', render: this.renderDate },
+      { key: 'clientName', render: this.renderName },
+      { key: 'clientAddress', render: this.renderAddress, width: '250px' },
+      { key: 'totalMoney', render: this.renderMoney },
+      { key: 'clientAction', render: this.renderAction },
     ];
     return (
       <Table
-        rowKey="_id"
+        rowKey={({ client }) => client._id}
         showHeader={false}
-        dataSource={clients}
+        dataSource={items}
         columns={columns}
         pagination={false}
       />
@@ -151,11 +151,11 @@ class PickupTable extends Component {
     const { orders, district, ward, address } = client;
 
     const columns = [
-      { title: 'Mã', width: '8%', dataIndex: 'id' },
-      { title: 'Ngày tạo', render: this.renderDateModal },
-      { title: 'Người nhận', dataIndex: 'receiver.name' },
-      { title: 'Địa chỉ', width: '35%', render: this.renderAddressModal },
-      { title: 'Thu khách', render: this.renderMoneyModal },
+      { key: 'orderId', title: 'Mã', width: '8%', dataIndex: 'id' },
+      { key: 'orderDate', title: 'Ngày tạo', render: this.renderDateModal },
+      { key: 'orderReceiver', title: 'Người nhận', dataIndex: 'receiver.name' },
+      { key: 'orderAddress', title: 'Địa chỉ', width: '35%', render: this.renderAddressModal },
+      { key: 'orderTotalMoney', title: 'Thu khách', render: this.renderMoneyModal },
     ];
     const fullAddress = `${address}, ${ward.type} ${ward.name}, ${district.type} ${district.name}`;
     return (

@@ -14,7 +14,7 @@ class PickupDetail extends React.Component {
       objChecked: {},
       checkedIds: [],
       pickup: {
-        clients: [],
+        data: [],
         shipper: {},
       },
     };
@@ -56,9 +56,7 @@ class PickupDetail extends React.Component {
       this.getPickup();
     }
   }
-  onCheckClient(checked, client) {
-    const clientId = client._id;
-    const { orders } = client;
+  onCheckClient(checked, clientId, orders) {
     const { objChecked, checkedIds } = this.state;
     const checkedClient = objChecked[clientId];
     for (let i = 0; i < orders.length; i++) {
@@ -125,20 +123,19 @@ class PickupDetail extends React.Component {
     const result = await request(url);
     if (result.status === 'success') {
       const { data } = result;
-      const { clients, orders } = data;
+      const { data: dataPickups } = data;
       const objChecked = {};
       let numOfOrders = 0;
       const checkedIds = [];
       const objPickup = data;
-      for (let i = 0; i < clients.length; i++) {
-        const client = clients[i];
+      for (let i = 0; i < dataPickups.length; i++) {
+        const dataPickup = dataPickups[i];
+        const { client, orders } = dataPickup;
         const clientId = client._id;
         objChecked[clientId] = {};
-        const objOrders = [];
         for (let j = 0; j < orders.length; j++) {
           const order = orders[j];
           if (order.client === clientId) {
-            objOrders.push(order);
             const orderId = order._id;
             const { orderstatus } = order;
             if (orderstatus === orderStatus.STORAGE.value) {
@@ -149,7 +146,6 @@ class PickupDetail extends React.Component {
             }
           }
         }
-        objPickup.clients[i].orders = objOrders;
         numOfOrders += orders.length;
       }
       this.setState({
@@ -185,10 +181,10 @@ class PickupDetail extends React.Component {
   }
   renderData() {
     const { pickup } = this.state;
-    const { clients } = pickup;
+    const { data: dataPickups } = pickup;
     const { DONE } = pickupStatus;
-    return clients.map((client) => {
-      const { orders } = client;
+    return dataPickups.map((dataPickup) => {
+      const { client, orders } = dataPickup;
       const { address, district, ward } = client;
       const fullAddress = `${address}, ${ward.type} ${ward.name}, ${district.type} ${district.name}`;
       return (
@@ -196,7 +192,9 @@ class PickupDetail extends React.Component {
           <div style={{ width: 250, float: 'left' }} >
             <Checkbox
               disabled={pickup.status === DONE}
-              onChange={({ target: { checked } }) => this.onCheckClient(checked, client)}
+              onChange={
+                ({ target: { checked } }) => this.onCheckClient(checked, client._id, orders)
+              }
             >{client.name} (0/{orders.length})
             </Checkbox> <br />
             {fullAddress}
