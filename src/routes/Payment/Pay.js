@@ -117,9 +117,9 @@ class Pay extends React.Component {
         const order = payment.orders[i];
         let money = 0;
         if (order.orderstatus === orderStatus.DELIVERED.value) {
-          money = order.goodMoney + order.shipFee;
+          money = order.goodsMoney + order.shipFee;
           if (order.payBy === orderPayBy.SENDER.value) {
-            money = order.goodMoney;
+            money = order.goodsMoney;
           }
         }
         money -= order.shipFee;
@@ -137,9 +137,9 @@ class Pay extends React.Component {
   renderMoney = (order) => {
     let money = 0;
     if (order.orderstatus === orderStatus.DELIVERED.value) {
-      money = order.goodMoney + order.shipFee;
+      money = order.goodsMoney + order.shipFee;
       if (order.payBy === orderPayBy.SENDER.value) {
-        money = order.goodMoney;
+        money = order.goodsMoney;
       }
     }
     return money;
@@ -158,9 +158,9 @@ class Pay extends React.Component {
   renderReveiverMoney = (order) => {
     let money = 0;
     if (order.orderstatus === orderStatus.DELIVERED.value) {
-      money = order.goodMoney + order.shipFee;
+      money = order.goodsMoney + order.shipFee;
       if (order.payBy === orderPayBy.SENDER.value) {
-        money = order.goodMoney;
+        money = order.goodsMoney;
       }
     }
     money -= order.shipFee;

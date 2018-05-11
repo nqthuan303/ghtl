@@ -202,8 +202,11 @@ class CreateForm extends React.Component {
       type: 'search',
       placeholder: 'Địa chỉ người nhận',
     };
+    const payBy = getFieldValue('payBy');
     const goodsMoney = getFieldValue('goodsMoney') ? Number(getFieldValue('goodsMoney')) : 0;
-    const totalMoney = goodsMoney + Number(shipFee);
+    const totalMoney = (payBy === orderPayBy.RECEIVER.value) ?
+      goodsMoney + Number(shipFee) :
+      goodsMoney;
     const receiverPhoneError = isFieldTouched('receiver.phone') && getFieldError('receiver.phone');
     const receiverNameError = isFieldTouched('receiver.name') && getFieldError('receiver.name');
     const receiverAddressError = isFieldTouched('receiver.address') && getFieldError('receiver.address');

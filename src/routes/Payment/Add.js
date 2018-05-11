@@ -90,9 +90,9 @@ class Add extends React.Component {
   renderMoney = (order) => {
     let money = 0;
     if (order.orderstatus === orderStatus.DELIVERED.value) {
-      money = order.goodMoney + order.shipFee;
-      if (order.payBy === orderPayBy.SENDER.value) {
-        money = order.goodMoney;
+      money = order.goodsMoney;
+      if (order.payBy === orderPayBy.RECEIVER.value) {
+        money += order.shipFee;
       }
     }
     return money;
@@ -107,6 +107,19 @@ class Add extends React.Component {
         }
       }
     }
+  }
+  renderShipFee = (record) => {
+    const { orderstatus, shipFee } = record;
+    let result = 0;
+    if (
+      orderstatus === orderStatus.DELIVERED.value ||
+      orderstatus === orderStatus.RETURNFEESTORAGE.value ||
+      orderstatus === orderStatus.RETURNEDFEE.value ||
+      orderstatus === orderStatus.RETURNFEEPREPARE.value
+    ) {
+      result = shipFee;
+    }
+    return result;
   }
   render() {
     const { client, orders, selectedRowKeys } = this.state;
@@ -129,7 +142,7 @@ class Add extends React.Component {
       render: this.renderMoney,
     }, {
       title: 'Cước phí',
-      dataIndex: 'shipFee',
+      render: this.renderShipFee,
       key: 'shipFee',
     }, {
       title: 'Trạng thái',
