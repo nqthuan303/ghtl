@@ -4,7 +4,7 @@ import {
   Row,
   Col,
   Button,
-  // Modal,
+  Tooltip,
   Badge,
   notification,
 } from 'antd';
@@ -21,6 +21,8 @@ class Add extends React.Component {
       client: {},
       orders: [],
       selectedRowKeys: [],
+      numOfOrders: 0,
+      totalReceivedMoney: 0,
     };
   }
 
@@ -33,6 +35,21 @@ class Add extends React.Component {
   }
   onSelectChange = (selectedRowKeys) => {
     this.setState({ selectedRowKeys });
+  }
+  onSelectRow = (record, selected, selectedRows) => {
+    let totalMoney = 0;
+    let numOfOrders = 0;
+    let totalShipFee = 0;
+    for (let i = 0; i < selectedRows.length; i++) {
+      const selectedRow = selectedRows[i];
+      numOfOrders++;
+      totalMoney += this.getMoneyFromReceiver(selectedRow);
+      totalShipFee += this.getShipFee(selectedRow);
+    }
+    const totalReceivedMoney = totalMoney - totalShipFee;
+    this.setState({
+      numOfOrders, totalReceivedMoney,
+    });
   }
   async getClient() {
     const data = await request(`/client/find-one-payment/${this.clientId}`);
@@ -63,6 +80,29 @@ class Add extends React.Component {
       });
     }
   }
+  getMoneyFromReceiver = (order) => {
+    let money = 0;
+    if (order.orderstatus === orderStatus.DELIVERED.value) {
+      money = order.goodsMoney;
+      if (order.payBy === orderPayBy.RECEIVER.value) {
+        money += order.shipFee;
+      }
+    }
+    return money;
+  }
+  getShipFee = (record) => {
+    const { orderstatus, shipFee } = record;
+    let result = 0;
+    if (
+      orderstatus === orderStatus.DELIVERED.value ||
+      orderstatus === orderStatus.RETURNFEESTORAGE.value ||
+      orderstatus === orderStatus.RETURNEDFEE.value ||
+      orderstatus === orderStatus.RETURNFEEPREPARE.value
+    ) {
+      result = shipFee;
+    }
+    return result;
+  }
   createPayment= () => {
     const { client, selectedRowKeys } = this.state;
     const payment = {
@@ -87,16 +127,6 @@ class Add extends React.Component {
       }
     });
   }
-  renderMoney = (order) => {
-    let money = 0;
-    if (order.orderstatus === orderStatus.DELIVERED.value) {
-      money = order.goodsMoney;
-      if (order.payBy === orderPayBy.RECEIVER.value) {
-        money += order.shipFee;
-      }
-    }
-    return money;
-  }
   renderStatus(status) {
     for (const key in orderStatus) {
       if (key === 'DELIVERED' || key === 'RETURNFEESTORAGE' || key === 'RETURNFEEPREPARE' ||
@@ -108,21 +138,8 @@ class Add extends React.Component {
       }
     }
   }
-  renderShipFee = (record) => {
-    const { orderstatus, shipFee } = record;
-    let result = 0;
-    if (
-      orderstatus === orderStatus.DELIVERED.value ||
-      orderstatus === orderStatus.RETURNFEESTORAGE.value ||
-      orderstatus === orderStatus.RETURNEDFEE.value ||
-      orderstatus === orderStatus.RETURNFEEPREPARE.value
-    ) {
-      result = shipFee;
-    }
-    return result;
-  }
   render() {
-    const { client, orders, selectedRowKeys } = this.state;
+    const { client, orders, selectedRowKeys, numOfOrders, totalReceivedMoney } = this.state;
     const columns = [{
       title: 'MVĐ',
       dataIndex: 'id',
@@ -139,10 +156,10 @@ class Add extends React.Component {
     }, {
       title: 'Đã thu khách',
       key: 'money',
-      render: this.renderMoney,
+      render: this.getMoneyFromReceiver,
     }, {
       title: 'Cước phí',
-      render: this.renderShipFee,
+      render: this.getShipFee,
       key: 'shipFee',
     }, {
       title: 'Trạng thái',
@@ -152,7 +169,15 @@ class Add extends React.Component {
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange,
+      onSelect: this.onSelectRow,
     };
+
+    let toolTipText = '';
+    if (client.payment) {
+      toolTipText = `Cần thanh toán bảng kê: ${client.payment.id}`;
+    } else if (rowSelection.selectedRowKeys.length === 0) {
+      toolTipText = 'Chưa chọn đơn';
+    }
     return (
       <PageHeaderLayout title="Tạo bảng">
         <div>
@@ -175,24 +200,30 @@ class Add extends React.Component {
             </Col>
           </Row>
 
-
           <Table
             dataSource={orders}
             columns={columns}
             rowKey={record => record._id}
             rowSelection={rowSelection}
-            pagination={{ showSizeChanger: true, pageSize: 20 }}
+            pagination={false}
           />
-          <div style={{ textAlign: 'right' }}>
+          <div style={{ textAlign: 'right', marginTop: 20 }}>
+            {!client.payment ?
+              <div>
+                <p>Tổng số đơn: <span style={{ fontWeight: 'bold' }}>{numOfOrders}</span></p>
+                <p>Thực nhận: <span style={{ fontWeight: 'bold' }}>{totalReceivedMoney}</span></p>
+              </div> : ''}
             <Button onClick={this.onClickBlack} style={{ marginRight: 10 }}> Quay Lại</Button>
-            <Badge count={selectedRowKeys.length} showZero>
-              <Button
-                type="primary"
-                onClick={this.createPayment}
-                disabled={client.payment}
-              > Tạo Bảng Kê
-              </Button>
-            </Badge>
+            <Tooltip title={toolTipText}>
+              <Badge count={selectedRowKeys.length} showZero>
+                <Button
+                  type="primary"
+                  onClick={this.createPayment}
+                  disabled={client.payment || rowSelection.selectedRowKeys.length === 0}
+                > Tạo Bảng Kê
+                </Button>
+              </Badge>
+            </Tooltip>
           </div>
         </div>
       </PageHeaderLayout>
