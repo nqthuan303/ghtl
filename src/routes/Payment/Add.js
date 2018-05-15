@@ -118,7 +118,7 @@ class Add extends React.Component {
           description: 'Tạo bảng kê thành công',
         });
         const { history } = this.props;
-        history.push(`/payment/pay/${result.data._id}`);
+        history.push(`/payment/${result.data._id}`);
       } else {
         notification.error({
           message: 'Xãy ra lỗi',
@@ -211,7 +211,7 @@ class Add extends React.Component {
             {!client.payment ?
               <div>
                 <p>Tổng số đơn: <span style={{ fontWeight: 'bold' }}>{numOfOrders}</span></p>
-                <p>Thực nhận: <span style={{ fontWeight: 'bold' }}>{totalReceivedMoney}</span></p>
+                <p>Tổng thanh toán: <span style={{ fontWeight: 'bold' }}>{totalReceivedMoney}</span></p>
               </div> : ''}
             <Button onClick={this.onClickBlack} style={{ marginRight: 10 }}> Quay Lại</Button>
             <Tooltip title={toolTipText}>

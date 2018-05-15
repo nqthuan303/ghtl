@@ -8,7 +8,7 @@ import {
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import { payment as paymentStatus } from '../../constants/status';
-import PaymentInfo from '../../components/Payment/PaymentInfo';
+import PaymentInfo from '../../components/Payment/Info';
 import request from '../../utils/request';
 import FormBill from '../../components/Payment/FormBill';
 

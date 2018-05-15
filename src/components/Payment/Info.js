@@ -5,7 +5,7 @@ import moment from 'moment';
 import request from '../../utils/request';
 import { order as objOrderStatus, orderPayBy } from '../../constants/status';
 
-class DeliveryInfo extends Component {
+class PaymentInfo extends Component {
     static propTypes = {
       payment: PropTypes.object.isRequired,
       closeShowModal: PropTypes.func.isRequired,
@@ -140,4 +140,4 @@ class DeliveryInfo extends Component {
     }
 }
 
-export default DeliveryInfo;
+export default PaymentInfo;

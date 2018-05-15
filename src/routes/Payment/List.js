@@ -23,7 +23,7 @@ class List extends React.Component {
   }
   onClickPayment(paymentId) {
     const { history } = this.props;
-    history.push(`/payment/pay/${paymentId}`);
+    history.push(`/payment/${paymentId}`);
   }
   onClickAddPayment(clientId) {
     const { history } = this.props;

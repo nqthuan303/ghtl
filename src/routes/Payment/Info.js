@@ -31,7 +31,7 @@ const tailFormItemLayout = {
   },
 };
 
-class Pay extends React.Component {
+class PaymentInfo extends React.Component {
   constructor(props) {
     super(props);
     this.paymentId = this.props.match.params.id;
@@ -40,7 +40,7 @@ class Pay extends React.Component {
       showModal: false,
       bank: '',
       bill: '',
-      money: 0,
+      totalMoneyNeedToBePaid: 0,
     };
   }
 
@@ -88,8 +88,8 @@ class Pay extends React.Component {
     this.setState({ bill: e.target.value });
   }
   onConfirmComplete = async () => {
-    const { bank, bill, money } = this.state;
-    const result = await request(`/payment/payment-done/${this.paymentId}?money=${money}&bank=${bank}&bill=${bill}`, { method: 'PUT' });
+    const { bank, bill, totalMoneyNeedToBePaid } = this.state;
+    const result = await request(`/payment/payment-done/${this.paymentId}?money=${totalMoneyNeedToBePaid}&bank=${bank}&bill=${bill}`, { method: 'PUT' });
     if (result.status === 'success') {
       notification.success({
         message: 'Thành Công',
@@ -112,37 +112,49 @@ class Pay extends React.Component {
         const { history } = this.props;
         history.push('/payment/list');
       }
-      let totalMoney = 0;
+      let totalMoneyNeedToBePaid = 0;
       for (let i = 0; i < payment.orders.length; i++) {
         const order = payment.orders[i];
-        let money = 0;
-        if (order.orderstatus === orderStatus.DELIVERED.value) {
-          money = order.goodsMoney + order.shipFee;
-          if (order.payBy === orderPayBy.SENDER.value) {
-            money = order.goodsMoney;
-          }
-        }
-        money -= order.shipFee;
-        totalMoney += money;
+        const moneyFromReceiver = this.getMoneyFromReceiver(order);
+        const shipFee = this.getShipFee(order);
+        totalMoneyNeedToBePaid += (moneyFromReceiver - shipFee);
       }
       this.setState({
         payment,
-        money: totalMoney,
+        totalMoneyNeedToBePaid,
       });
     }
   }
-  closeShowModal = () => {
-    this.setState({ showModal: false });
-  }
-  renderMoney = (order) => {
+  getMoneyFromReceiver = (order) => {
     let money = 0;
     if (order.orderstatus === orderStatus.DELIVERED.value) {
-      money = order.goodsMoney + order.shipFee;
-      if (order.payBy === orderPayBy.SENDER.value) {
-        money = order.goodsMoney;
+      money = order.goodsMoney;
+      if (order.payBy === orderPayBy.RECEIVER.value) {
+        money += order.shipFee;
       }
     }
     return money;
+  }
+  getShipFee = (record) => {
+    const { orderstatus, shipFee } = record;
+    let result = 0;
+    if (
+      orderstatus === orderStatus.DELIVERED.value ||
+      orderstatus === orderStatus.RETURNFEESTORAGE.value ||
+      orderstatus === orderStatus.RETURNEDFEE.value ||
+      orderstatus === orderStatus.RETURNFEEPREPARE.value
+    ) {
+      result = shipFee;
+    }
+    return result;
+  }
+  getReceivedMoney = (order) => {
+    const moneyFromReceiver = this.getMoneyFromReceiver(order);
+    const shipFee = this.getShipFee(order);
+    return (moneyFromReceiver - shipFee);
+  }
+  closeShowModal = () => {
+    this.setState({ showModal: false });
   }
   renderStatus(status) {
     for (const key in orderStatus) {
@@ -155,21 +167,10 @@ class Pay extends React.Component {
       }
     }
   }
-  renderReveiverMoney = (order) => {
-    let money = 0;
-    if (order.orderstatus === orderStatus.DELIVERED.value) {
-      money = order.goodsMoney + order.shipFee;
-      if (order.payBy === orderPayBy.SENDER.value) {
-        money = order.goodsMoney;
-      }
-    }
-    money -= order.shipFee;
-    return money;
-  }
   render() {
-    const { payment, showModal, money, bank } = this.state;
+    const { payment, showModal, totalMoneyNeedToBePaid, bank } = this.state;
     const columns = [{
-      title: 'MVĐ',
+      title: 'ID',
       dataIndex: 'id',
       key: 'id',
     },
@@ -189,6 +190,7 @@ class Pay extends React.Component {
       title: 'Địa chỉ nhận',
       key: 'address',
       render: record => record.receiver.address,
+      width: 150,
     },
     {
       title: 'Trạng thái',
@@ -198,21 +200,22 @@ class Pay extends React.Component {
     {
       title: 'Đã thu khách',
       key: 'money',
-      render: this.renderMoney,
-    }, {
+      render: this.getMoneyFromReceiver,
+    },
+    {
       title: 'Cước phí',
-      dataIndex: 'shipFee',
       key: 'shipFee',
+      render: this.getShipFee,
     },
     {
       title: 'Thực nhận',
       key: 'receiverMoney',
-      render: this.renderReveiverMoney,
+      render: this.getReceivedMoney,
     }];
     return (
       <PageHeaderLayout title="Xác nhận thanh toán">
         <div style={{ fontSize: '16px' }}>
-          <b> Tổng tiền cần thanh toán: {money}</b>
+          <b> Tổng tiền cần thanh toán: {totalMoneyNeedToBePaid}</b>
         </div>
         <div>
           {payment.client ?
@@ -226,11 +229,12 @@ class Pay extends React.Component {
                 </ul>
               </Col>
               <Col span={12}>
-                <div>Thanh Toán: Chuyển khoản</div>
+                <div>Thông tin tài khoản</div>
                 <ul>
-                  <li>{payment.client.bankBranch}</li>
-                  <li>{payment.client.bankAccount}</li>
-                  <li>{payment.client.bankNumber}</li>
+                  <li>Ngân hàng: {payment.client.bankName ? payment.client.bankName : 'N/A'}</li>
+                  <li>Chi Nhánh: {payment.client.bankBranch ? payment.client.bankBranch : 'N/A'}</li>
+                  <li>Tài khoản: {payment.client.bankAccount ? payment.client.bankAccount : 'N/A'}</li>
+                  <li>Số Tài khoản: {payment.client.bankNumber ? payment.client.bankNumber : 'N/A'}</li>
                 </ul>
               </Col>
             </Row>
@@ -261,7 +265,7 @@ class Pay extends React.Component {
           >
             <Form >
               <FormItem {...formItemLayout} label="Tổng tiền" >
-                {money}
+                {totalMoneyNeedToBePaid}
               </FormItem>
               <FormItem {...formItemLayout} label="Mã giao dịch" >
                 <Input onChange={this.onChangeBill} />
@@ -295,4 +299,4 @@ class Pay extends React.Component {
     );
   }
 }
-export default Pay;
+export default PaymentInfo;
