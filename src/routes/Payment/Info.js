@@ -6,30 +6,14 @@ import {
   Button,
   Modal,
   notification,
-  Form,
-  Select,
-  Input,
 } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import { order as orderStatus, orderPayBy, payment as paymentStatus } from '../../constants/status';
 import request from '../../utils/request';
+import ConfirmPayment from '../../components/Payment/ConfirmPayment';
 
 const { confirm } = Modal;
-const { Option } = Select;
-const FormItem = Form.Item;
-
-const formItemLayout = {
-  labelCol: { xs: { span: 24 }, sm: { span: 6 } },
-  wrapperCol: { xs: { span: 24 }, sm: { span: 16 } },
-};
-
-const tailFormItemLayout = {
-  wrapperCol: {
-    xs: { span: 24, offset: 0 },
-    sm: { span: 14, offset: 6 },
-  },
-};
 
 class PaymentInfo extends React.Component {
   constructor(props) {
@@ -38,8 +22,6 @@ class PaymentInfo extends React.Component {
     this.state = {
       payment: {},
       showModal: false,
-      bank: '',
-      bill: '',
       totalMoneyNeedToBePaid: 0,
     };
   }
@@ -80,29 +62,6 @@ class PaymentInfo extends React.Component {
   onClickBlack = () => {
     const { history } = this.props;
     history.push('/payment/list');
-  }
-  onChangeBank = (bank) => {
-    this.setState({ bank });
-  }
-  onChangeBill = (e) => {
-    this.setState({ bill: e.target.value });
-  }
-  onConfirmComplete = async () => {
-    const { bank, bill, totalMoneyNeedToBePaid } = this.state;
-    const result = await request(`/payment/payment-done/${this.paymentId}?money=${totalMoneyNeedToBePaid}&bank=${bank}&bill=${bill}`, { method: 'PUT' });
-    if (result.status === 'success') {
-      notification.success({
-        message: 'Thành Công',
-        description: result.data,
-      });
-      const { history } = this.props;
-      history.push('/payment/list');
-    } else {
-      notification.error({
-        message: 'Xãy ra lỗi',
-        description: result.data.msg,
-      });
-    }
   }
   async getPayment() {
     const result = await request(`/payment/findOne/${this.paymentId}`);
@@ -168,7 +127,7 @@ class PaymentInfo extends React.Component {
     }
   }
   render() {
-    const { payment, showModal, totalMoneyNeedToBePaid, bank } = this.state;
+    const { payment, showModal, totalMoneyNeedToBePaid } = this.state;
     const columns = [{
       title: 'ID',
       dataIndex: 'id',
@@ -263,36 +222,10 @@ class PaymentInfo extends React.Component {
             width={550}
             footer={null}
           >
-            <Form >
-              <FormItem {...formItemLayout} label="Tổng tiền" >
-                {totalMoneyNeedToBePaid}
-              </FormItem>
-              <FormItem {...formItemLayout} label="Mã giao dịch" >
-                <Input onChange={this.onChangeBill} />
-              </FormItem>
-              <FormItem {...formItemLayout} label="Ngân hàng" >
-                <Select
-                  showSearch
-                  placeholder="Chọn ngân hàng"
-                  optionFilterProp="children"
-                  filterOption={this.filterOption}
-                  onChange={this.onChangeBank}
-                  value={bank}
-                >
-                  <Option key="Techcombank" value="Techcombank">Techcombank - Ngân hàng TMCP Kỹ thương Việt Nam</Option>
-                  <Option key="VPBank" value="VpBank">VPBank - Ngân hàng VN Thịnh Vượng</Option>
-                </Select>
-              </FormItem>
-              <FormItem {...tailFormItemLayout}>
-                <Button type="primary" onClick={this.onConfirmComplete}>Xác Nhận</Button>
-                <Button
-                  onClick={this.closeShowModal}
-                  style={{ marginLeft: 8 }}
-                >
-                  Hủy
-                </Button>
-              </FormItem>
-            </Form>
+            <ConfirmPayment
+              totalMoneyNeedToBePaid={totalMoneyNeedToBePaid}
+              paymentId={this.paymentId}
+            />
           </Modal>
         </div>
       </PageHeaderLayout>

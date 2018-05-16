@@ -119,6 +119,16 @@ const status = {
     DOING: 'doing', // bảng kê chưa thanh toán cho shop
     DONE: 'done', // bảng kê đã thanh toán cho shop
   },
+  paymentType: {
+    TRANSFER: {
+      value: 'transfer',
+      name: 'Chuyển khoản',
+    },
+    CASH: {
+      value: 'cash',
+      name: 'Tiền mặt',
+    },
+  },
 };
 
 module.exports = status;
