@@ -102,13 +102,13 @@ export const getNavData = app => [
       {
         name: 'Xác Nhận Thanh Toán',
         showOnSideBar: false,
-        path: 'payment/:id',
+        path: 'payment/info/:id',
         component: dynamicWrapper(app, ['payment'], () => import('../routes/Payment/Info')),
       },
       {
         name: 'Lịch Sử',
         showOnSideBar: false,
-        path: 'payment/history',
+        path: 'payment/history/',
         component: dynamicWrapper(app, ['payment'], () => import('../routes/Payment/History')),
       },
       {

@@ -23,7 +23,7 @@ class List extends React.Component {
   }
   onClickPayment(paymentId) {
     const { history } = this.props;
-    history.push(`/payment/${paymentId}`);
+    history.push(`/payment/info/${paymentId}`);
   }
   onClickAddPayment(clientId) {
     const { history } = this.props;
@@ -34,10 +34,19 @@ class List extends React.Component {
     history.push('/payment/history');
   }
   async getList() {
-    const data = await request('/client/client-for-payment');
-    if (data && data.data) {
-      this.setState({ clients: data.data });
+    const result = await request('/client/client-for-payment');
+    if (result.status === 'success') {
+      this.setState({ clients: result.data });
     }
+  }
+  renderPaymentId = ({ payments }) => {
+    let result = '';
+    if (payments && payments.length > 0) {
+      result = (
+        <a onClick={() => this.onClickPayment(payments[0]._id)}>{payments[0].id}</a>
+      );
+    }
+    return result;
   }
   render() {
     const { clients } = this.state;
@@ -63,11 +72,7 @@ class List extends React.Component {
     }, {
       title: 'Bảng kê',
       key: 'payment',
-      render: record => (
-        record.payment ?
-          <a onClick={() => this.onClickPayment(record.payment._id)}>{record.payment.id}</a>
-          : ''
-      ),
+      render: this.renderPaymentId,
     }];
     return (
       <PageHeaderLayout title="Shop cần thanh toán">

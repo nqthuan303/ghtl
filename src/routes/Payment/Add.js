@@ -118,7 +118,7 @@ class Add extends React.Component {
           description: 'Tạo bảng kê thành công',
         });
         const { history } = this.props;
-        history.push(`/payment/${result.data._id}`);
+        history.push(`/payment/info/${result.data._id}`);
       } else {
         notification.error({
           message: 'Xãy ra lỗi',
@@ -173,8 +173,8 @@ class Add extends React.Component {
     };
 
     let toolTipText = '';
-    if (client.payment) {
-      toolTipText = `Cần thanh toán bảng kê: ${client.payment.id}`;
+    if (client.payments && client.payments.length > 0) {
+      toolTipText = `Cần thanh toán bảng kê: ${client.payments[0].id}`;
     } else if (rowSelection.selectedRowKeys.length === 0) {
       toolTipText = 'Chưa chọn đơn';
     }
@@ -208,7 +208,7 @@ class Add extends React.Component {
             pagination={false}
           />
           <div style={{ textAlign: 'right', marginTop: 20 }}>
-            {!client.payment ?
+            {!client.payments ?
               <div>
                 <p>Tổng số đơn: <span style={{ fontWeight: 'bold' }}>{numOfOrders}</span></p>
                 <p>Tổng thanh toán: <span style={{ fontWeight: 'bold' }}>{totalReceivedMoney}</span></p>
@@ -219,7 +219,10 @@ class Add extends React.Component {
                 <Button
                   type="primary"
                   onClick={this.createPayment}
-                  disabled={client.payment || rowSelection.selectedRowKeys.length === 0}
+                  disabled={
+                    (client.payments && client.payments.length > 0)
+                    || rowSelection.selectedRowKeys.length === 0
+                  }
                 > Tạo Bảng Kê
                 </Button>
               </Badge>

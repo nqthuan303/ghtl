@@ -105,9 +105,9 @@ class PaymentInfo extends React.Component {
     }
   }
   async getPayment() {
-    const data = await request(`/payment/findOne/${this.paymentId}`);
-    if (data && data.data) {
-      const payment = data.data;
+    const result = await request(`/payment/findOne/${this.paymentId}`);
+    if (result.status === 'success') {
+      const payment = result.data;
       if (payment.status !== paymentStatus.DOING) {
         const { history } = this.props;
         history.push('/payment/list');
