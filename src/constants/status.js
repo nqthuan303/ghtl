@@ -119,7 +119,7 @@ const status = {
     DOING: 'doing', // bảng kê chưa thanh toán cho shop
     DONE: 'done', // bảng kê đã thanh toán cho shop
   },
-  paymentType: {
+  paymentMethods: {
     TRANSFER: {
       value: 'transfer',
       name: 'Chuyển khoản',

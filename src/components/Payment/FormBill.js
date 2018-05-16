@@ -26,8 +26,7 @@ class FormBill extends Component {
       const { form, onDataSaved, payment } = this.props;
       form.validateFields(async (err, values) => {
         if (!err) {
-          const method = 'PUT';
-          const result = await request(`/payment/update/${payment._id}`, { method, body: { bill: values.bill } });
+          const result = await request(`/payment/update/${payment._id}`, { method: 'POST', body: { bill: values.bill } });
           if (result.status === 'success') {
             notification.success({
               message: 'Thành Công',

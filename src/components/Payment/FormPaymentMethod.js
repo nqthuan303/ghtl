@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Button, Input, Select, notification } from 'antd';
-import { withRouter } from 'react-router';
-import { paymentType } from '../../constants/status';
+import { paymentMethods } from '../../constants/status';
 import request from '../../utils/request';
 
 const { Option } = Select;
@@ -19,40 +18,42 @@ const tailFormItemLayout = {
 };
 
 
-class ConfirmPayment extends Component {
+class FormPaymentMethod extends Component {
   static propTypes = {
-    totalMoneyNeedToBePaid: PropTypes.number.isRequired,
-    paymentId: PropTypes.string.isRequired,
+    data: PropTypes.object.isRequired,
+    action: PropTypes.string.isRequired,
+    onDataSaved: PropTypes.func.isRequired,
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
-    const { form, totalMoneyNeedToBePaid, paymentId } = this.props;
+    const { form, data, action, onDataSaved } = this.props;
     form.validateFields(async (err, values) => {
       if (!err) {
         const body = {
-          paymentId,
-          type: values.type,
-          money: totalMoneyNeedToBePaid,
+          method: values.method,
+          money: data.money,
         };
-        if (values.type === paymentType.TRANSFER.value) {
+        if (values.method === paymentMethods.TRANSFER.value) {
           body.bank = values.bank;
           body.bill = values.bill;
         }
-        const result = await request(
-          '/payment/payment-done',
-          { method: 'POST', body },
-        );
+        let description = 'Cập nhật bảng kê thành công!!!';
+        let url = `/payment/update/${data.paymentId}`;
+        if (action === 'donePayment') {
+          url = `/payment/payment-done/${data.paymentId}`;
+          description = 'Bảng kê đã được thanh toán thành công!!!';
+        }
+        const result = await request(url, { method: 'POST', body });
         if (result.status === 'success') {
           notification.success({
             message: 'Thành Công',
-            description: result.data,
+            description,
           });
-          const { history } = this.props;
-          history.push('/payment/list');
+          onDataSaved(result.data);
         } else {
           notification.error({
-            message: 'Xãy ra lỗi',
+            message: 'Lỗi',
             description: result.data.msg,
           });
         }
@@ -60,33 +61,33 @@ class ConfirmPayment extends Component {
     });
   }
   render() {
-    const { form: { getFieldDecorator, getFieldValue }, totalMoneyNeedToBePaid } = this.props;
-    const type = getFieldValue('type') ? getFieldValue('type') : paymentType.TRANSFER.value;
+    const { form: { getFieldDecorator, getFieldValue }, data } = this.props;
+    const method = getFieldValue('method') ? getFieldValue('method') : paymentMethods.TRANSFER.value;
     return (
       <Form onSubmit={this.handleSubmit}>
         <FormItem {...formItemLayout} label="Tổng tiền" >
-          {totalMoneyNeedToBePaid}
+          {data.money}
         </FormItem>
         <FormItem {...formItemLayout} label="Hình thức" >
-          {getFieldDecorator('type', {
+          {getFieldDecorator('method', {
             rules: [{ required: true }],
-            initialValue: paymentType.TRANSFER.value,
+            initialValue: paymentMethods.TRANSFER.value,
           })(
             <Select
               showSearch
               optionFilterProp="children"
               filterOption={this.filterOption}
             >
-              <Option key={paymentType.TRANSFER.value} value={paymentType.TRANSFER.value}>
-                {paymentType.TRANSFER.name}
+              <Option key={paymentMethods.TRANSFER.value} value={paymentMethods.TRANSFER.value}>
+                {paymentMethods.TRANSFER.name}
               </Option>
-              <Option key={paymentType.CASH.value} value={paymentType.CASH.value}>
-                {paymentType.CASH.name}
+              <Option key={paymentMethods.CASH.value} value={paymentMethods.CASH.value}>
+                {paymentMethods.CASH.name}
               </Option>
             </Select>
           )}
         </FormItem>
-        { type === paymentType.TRANSFER.value ?
+        { method === paymentMethods.TRANSFER.value ?
           <FormItem {...formItemLayout} label="Mã giao dịch" >
             {getFieldDecorator('bill', {
               rules: [{ required: true }],
@@ -94,7 +95,7 @@ class ConfirmPayment extends Component {
               <Input />
             )}
           </FormItem> : ''}
-        { type === paymentType.TRANSFER.value ?
+        { method === paymentMethods.TRANSFER.value ?
           <FormItem {...formItemLayout} label="Ngân hàng" >
             {getFieldDecorator('bank', {
               rules: [{ required: true }],
@@ -120,9 +121,17 @@ class ConfirmPayment extends Component {
 }
 
 const componentWithForm = Form.create({
-  mapPropsToFields() {
-    return { };
+  mapPropsToFields(props) {
+    const { data } = props;
+    const result = {};
+    if (data.method) {
+      result.method = Form.createFormField({ value: data.method });
+    }
+    if (data.method === paymentMethods.TRANSFER.value) {
+      result.bill = Form.createFormField({ value: data.bill });
+      result.bank = Form.createFormField({ value: data.bank });
+    }
+    return result;
   },
-})(ConfirmPayment);
-const componentWithRouter = withRouter(componentWithForm);
-export default componentWithRouter;
+})(FormPaymentMethod);
+export default componentWithForm;

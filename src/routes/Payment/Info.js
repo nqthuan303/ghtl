@@ -11,7 +11,7 @@ import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import { order as orderStatus, orderPayBy, payment as paymentStatus } from '../../constants/status';
 import request from '../../utils/request';
-import ConfirmPayment from '../../components/Payment/ConfirmPayment';
+import FormPaymentMethod from '../../components/Payment/FormPaymentMethod';
 
 const { confirm } = Modal;
 
@@ -63,6 +63,33 @@ class PaymentInfo extends React.Component {
     const { history } = this.props;
     history.push('/payment/list');
   }
+  onPaymentMethodSaved = () => {
+    const { history } = this.props;
+    history.push('/payment/list');
+  }
+  getShipFee = (record) => {
+    const { orderstatus, shipFee } = record;
+    let result = 0;
+    if (
+      orderstatus === orderStatus.DELIVERED.value ||
+      orderstatus === orderStatus.RETURNFEESTORAGE.value ||
+      orderstatus === orderStatus.RETURNEDFEE.value ||
+      orderstatus === orderStatus.RETURNFEEPREPARE.value
+    ) {
+      result = shipFee;
+    }
+    return result;
+  }
+  getMoneyFromReceiver = (order) => {
+    let money = 0;
+    if (order.orderstatus === orderStatus.DELIVERED.value) {
+      money = order.goodsMoney;
+      if (order.payBy === orderPayBy.RECEIVER.value) {
+        money += order.shipFee;
+      }
+    }
+    return money;
+  }
   async getPayment() {
     const result = await request(`/payment/findOne/${this.paymentId}`);
     if (result.status === 'success') {
@@ -83,29 +110,6 @@ class PaymentInfo extends React.Component {
         totalMoneyNeedToBePaid,
       });
     }
-  }
-  getMoneyFromReceiver = (order) => {
-    let money = 0;
-    if (order.orderstatus === orderStatus.DELIVERED.value) {
-      money = order.goodsMoney;
-      if (order.payBy === orderPayBy.RECEIVER.value) {
-        money += order.shipFee;
-      }
-    }
-    return money;
-  }
-  getShipFee = (record) => {
-    const { orderstatus, shipFee } = record;
-    let result = 0;
-    if (
-      orderstatus === orderStatus.DELIVERED.value ||
-      orderstatus === orderStatus.RETURNFEESTORAGE.value ||
-      orderstatus === orderStatus.RETURNEDFEE.value ||
-      orderstatus === orderStatus.RETURNFEEPREPARE.value
-    ) {
-      result = shipFee;
-    }
-    return result;
   }
   getReceivedMoney = (order) => {
     const moneyFromReceiver = this.getMoneyFromReceiver(order);
@@ -171,6 +175,10 @@ class PaymentInfo extends React.Component {
       key: 'receiverMoney',
       render: this.getReceivedMoney,
     }];
+    const paymentMethodData = {
+      money: totalMoneyNeedToBePaid,
+      paymentId: this.paymentId,
+    };
     return (
       <PageHeaderLayout title="Xác nhận thanh toán">
         <div style={{ fontSize: '16px' }}>
@@ -222,9 +230,10 @@ class PaymentInfo extends React.Component {
             width={550}
             footer={null}
           >
-            <ConfirmPayment
-              totalMoneyNeedToBePaid={totalMoneyNeedToBePaid}
-              paymentId={this.paymentId}
+            <FormPaymentMethod
+              onDataSaved={this.onPaymentMethodSaved}
+              action="donePayment"
+              data={paymentMethodData}
             />
           </Modal>
         </div>

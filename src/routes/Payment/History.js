@@ -1,16 +1,11 @@
 import React from 'react';
-import {
-  Table,
-  // Button,
-  Modal,
-  // notification
-} from 'antd';
+import { Table, Modal } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import { payment as paymentStatus } from '../../constants/status';
+import { payment as paymentStatus, paymentMethods } from '../../constants/status';
 import PaymentInfo from '../../components/Payment/Info';
 import request from '../../utils/request';
-import FormBill from '../../components/Payment/FormBill';
+import FormPaymentMethod from '../../components/Payment/FormPaymentMethod';
 
 class History extends React.Component {
   constructor(props) {
@@ -32,20 +27,29 @@ class History extends React.Component {
       showModal: true,
     });
   }
-  onClickUpdateBill(record) {
+  onClickUpdateBill(record, index) {
+    this.selectedPayment = index;
     this.setState({
       payment: record,
       showModalBill: true,
     });
   }
-  onDataSaved = () => {
-    this.setState({ showModalBill: false });
-    this.getList();
+  onPaymentMethodSaved = ({ method, bank, bill }) => {
+    const { payments } = this.state;
+    payments[this.selectedPayment].method = method;
+    if (method === paymentMethods.TRANSFER.value) {
+      payments[this.selectedPayment].bank = bank;
+      payments[this.selectedPayment].bill = bill;
+    }
+    this.setState({
+      showModalBill: false,
+      payments,
+    });
   }
   async getList() {
-    const data = await request('/payment/list');
-    if (data && data.data) {
-      this.setState({ payments: data.data });
+    const result = await request('/payment/list');
+    if (result.status === 'success') {
+      this.setState({ payments: result.data });
     }
   }
   closeShowModal = () => {
@@ -64,7 +68,7 @@ class History extends React.Component {
     }
     return (<div>{nameShop} - {phoneShop}</div>);
   }
-  renderStatus(status) {
+  renderStatus({ status }) {
     if (status === paymentStatus.DONE) {
       return 'Đã thanh toán';
     } else if (status === paymentStatus.DOING) {
@@ -97,18 +101,25 @@ class History extends React.Component {
     }, {
       title: 'Trạng thái',
       key: 'status',
-      render: record => this.renderStatus(record.status),
+      render: this.renderStatus,
     }, {
       title: 'Ngày thanh toán',
       key: 'endTime',
       render: record => moment(record.endTime).format('DD-MM HH:mm'),
     }, {
-      title: 'Mã giao dịch',
-      key: 'bill',
-      render: record => (
-        <a onClick={() => this.onClickUpdateBill(record)}>{record.bill}</a>
+      title: 'Phương thức',
+      key: 'paymentMethod',
+      render: (text, record, index) => (
+        <a onClick={() => this.onClickUpdateBill(record, index)}>{record.method}</a>
       ),
     }];
+    const paymentMethodData = {
+      money: payment.money,
+      paymentId: payment._id,
+      method: payment.method,
+      bill: payment.bill,
+      bank: payment.bank,
+    };
     return (
       <PageHeaderLayout title="Lịch sử thanh thanh toán">
         <div>
@@ -137,10 +148,10 @@ class History extends React.Component {
             width={450}
             footer={null}
           >
-            <FormBill
-              payment={payment}
-              closeShowModalBill={this.closeShowModalBill}
-              onDataSaved={this.onDataSaved}
+            <FormPaymentMethod
+              onDataSaved={this.onPaymentMethodSaved}
+              action="updatePayment"
+              data={paymentMethodData}
             />
           </Modal>
         </div>
