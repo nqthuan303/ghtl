@@ -1,11 +1,19 @@
 import React from 'react';
-import { Menu, Table, Divider, Modal, notification, Button } from 'antd';
+import {
+  Menu, Table,
+  Divider, Modal,
+  notification, Button,
+} from 'antd';
+
+import queryString from 'query-string';
+
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import globalStyles from '../../index.less';
 import request from '../../utils/request';
 import { convertDateTime } from '../../utils/utils';
 import styles from './styles.less';
 import { orderPayBy, order as orderStatus } from '../../constants/status';
+import SearchOrder from '../../components/Order/SearchOrder';
 
 const { confirm } = Modal;
 
@@ -15,10 +23,16 @@ class OrderList extends React.Component {
     this.state = {
       ordersInStatus: [],
       currentMenu: 'all',
+      objSearch: {},
     };
     this.selectedOrder = '';
   }
   componentDidMount() {
+    const { location: { search } } = this.props;
+    const objSearch = queryString.parse(search);
+    if (Object.keys(objSearch).length > 0) {
+      this.setState({ objSearch });
+    }
     this.getOrderList();
     this.getOrdersInStatus();
   }
@@ -89,6 +103,13 @@ class OrderList extends React.Component {
     if (result.status === 'success') {
       this.getOrderList();
       this.getOrdersInStatus();
+    }
+  }
+  onSearch = () => {
+    const { location: { search } } = this.props;
+    const objSearch = queryString.parse(search);
+    if (Object.keys(objSearch).length > 0) {
+      this.setState({ objSearch });
     }
   }
   async getOrdersInStatus() {
@@ -192,7 +213,7 @@ class OrderList extends React.Component {
   }
 
   render() {
-    const { items, currentMenu } = this.state;
+    const { items, currentMenu, objSearch } = this.state;
     const columns = [
       {
         key: 'id',
@@ -237,6 +258,7 @@ class OrderList extends React.Component {
     return (
       <PageHeaderLayout title="Danh sách đơn hàng">
         <Button onClick={this.onClickAddOrder}>Thêm đơn hàng</Button>
+        <SearchOrder onSearch={this.onSearch} objSearch={objSearch} />
         <div className={globalStyles.tableList}>
           <Menu
             style={{ marginBottom: 20 }}
