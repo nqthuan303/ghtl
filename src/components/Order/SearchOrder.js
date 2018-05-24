@@ -4,8 +4,9 @@ import {
   Input, DatePicker,
 } from 'antd';
 import moment from 'moment';
-
 import { withRouter } from 'react-router';
+
+import { generateQueryString } from '../../utils/utils';
 
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -18,21 +19,26 @@ class SearchOrder extends React.Component {
   }
   handleSearch= (e) => {
     e.preventDefault();
-    const { form, onSearch } = this.props;
-    form.validateFields((err, values) => {
+    const { form: { validateFields } } = this.props;
+    validateFields((err, values) => {
       if (!err) {
         const objQuery = Object.assign({}, values);
         if (values.createdDate) {
           const createdDate = this.generateDate(values.createdDate);
           objQuery.createdDate = createdDate;
         }
-        const queryStr = this.serialize(objQuery);
+        const queryStr = generateQueryString(objQuery);
         this.props.history.push({
           pathname: '/order/list',
           search: queryStr,
         });
-        onSearch();
       }
+    });
+  }
+  clearSearch = () => {
+    this.props.history.push({
+      pathname: '/order/list',
+      search: 'orderstatus=all',
     });
   }
   generateDate(dates) {
@@ -44,18 +50,6 @@ class SearchOrder extends React.Component {
     }
     return result;
   }
-  serialize(obj) {
-    const str = [];
-    for (const p in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, p)) {
-        if (obj[p]) {
-          const url = `${encodeURIComponent(p)}=${encodeURIComponent(obj[p])}`;
-          str.push(url);
-        }
-      }
-    }
-    return str.join('&');
-  }
   render() {
     const { form: { getFieldDecorator } } = this.props;
     return (
@@ -66,19 +60,17 @@ class SearchOrder extends React.Component {
           })(
             <Input placeholder="Mã vận đơn" />
           )}
+          {getFieldDecorator('orderstatus', {
+            rules: [{ required: false }],
+          })(
+            <Input type="hidden" />
+          )}
         </FormItem>
         <FormItem>
           {getFieldDecorator('senderNameOrPhone', {
             rules: [{ required: false }],
           })(
             <Input placeholder="Tên/SĐT người gửi" />
-          )}
-        </FormItem>
-        <FormItem>
-          {getFieldDecorator('senderAddress', {
-            rules: [{ required: false }],
-          })(
-            <Input placeholder="Địa chỉ lấy hàng" />
           )}
         </FormItem>
         <FormItem>
@@ -100,6 +92,7 @@ class SearchOrder extends React.Component {
         </FormItem>
         <FormItem>
           <Button style={{ marginRight: 8 }} htmlType="submit" type="primary" icon="search">Tìm</Button>
+          <Button onClick={this.clearSearch} style={{ marginRight: 8 }} type="danger" icon="close">Hủy tìm</Button>
           <Button htmlType="button" icon="export">Xuất file</Button>
         </FormItem>
       </Form>
@@ -112,8 +105,8 @@ export default withRouter(Form.create({
     const { objSearch } = props;
     const result = {
       orderId: Form.createFormField({ value: '' }),
+      orderStatus: Form.createFormField({ value: '' }),
       senderNameOrPhone: Form.createFormField({ value: '' }),
-      senderAddress: Form.createFormField({ value: '' }),
       receiverNameOrPhone: Form.createFormField({ value: '' }),
       createdDate: Form.createFormField({ value: '' }),
     };

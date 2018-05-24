@@ -20,8 +20,8 @@
       <file leaf-file-name="List.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/routes/Order/List.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="103">
-              <caret line="106" column="3" lean-forward="false" selection-start-line="106" selection-start-column="3" selection-end-line="106" selection-end-column="3" />
+            <state relative-caret-position="193">
+              <caret line="158" column="31" lean-forward="false" selection-start-line="158" selection-start-column="31" selection-end-line="158" selection-end-column="31" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
               </folding>
@@ -29,24 +29,44 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".eslintrc" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.eslintrc">
+      <file leaf-file-name="List.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/routes/Pickup/List.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="21" column="40" lean-forward="false" selection-start-line="21" selection-start-column="40" selection-end-line="21" selection-end-column="40" />
+            <state relative-caret-position="289">
+              <caret line="76" column="18" lean-forward="false" selection-start-line="76" selection-start-column="18" selection-end-line="76" selection-end-column="18" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SearchOrder.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ClientOrderTable.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/components/Pickup/ClientOrderTable.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="114" column="4" lean-forward="false" selection-start-line="114" selection-start-column="4" selection-end-line="115" selection-end-column="66" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SearchOrder.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/Order/SearchOrder.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="53" column="9" lean-forward="true" selection-start-line="53" selection-start-column="9" selection-end-line="53" selection-end-column="9" />
+            <state relative-caret-position="133">
+              <caret line="74" column="19" lean-forward="true" selection-start-line="74" selection-start-column="19" selection-end-line="74" selection-end-column="19" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="utils.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/utils/utils.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="323">
+              <caret line="31" column="42" lean-forward="false" selection-start-line="31" selection-start-column="42" selection-end-line="31" selection-end-column="42" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -54,7 +74,7 @@
       <file leaf-file-name="History.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/routes/Money/History.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="163">
+            <state relative-caret-position="1035">
               <caret line="74" column="30" lean-forward="false" selection-start-line="74" selection-start-column="24" selection-end-line="74" selection-end-column="30" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
@@ -66,7 +86,7 @@
       <file leaf-file-name="PickupTable.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/Pickup/PickupTable.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
+            <state relative-caret-position="195">
               <caret line="17" column="6" lean-forward="false" selection-start-line="17" selection-start-column="6" selection-end-line="17" selection-end-column="6" />
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
@@ -78,8 +98,8 @@
       <file leaf-file-name="FormOrder.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/Order/FormOrder.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="353">
-              <caret line="94" column="6" lean-forward="true" selection-start-line="94" selection-start-column="6" selection-end-line="94" selection-end-column="6" />
+            <state relative-caret-position="1365">
+              <caret line="94" column="6" lean-forward="false" selection-start-line="94" selection-start-column="6" selection-end-line="94" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -88,7 +108,7 @@
       <file leaf-file-name="FormOrderRenderer.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/Order/FormOrderRenderer.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2572">
+            <state relative-caret-position="3105">
               <caret line="212" column="60" lean-forward="false" selection-start-line="212" selection-start-column="60" selection-end-line="212" selection-end-column="60" />
               <folding />
             </state>
@@ -98,7 +118,7 @@
       <file leaf-file-name="FormPaymentMethod.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/Payment/FormPaymentMethod.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
+            <state relative-caret-position="1800">
               <caret line="124" column="4" lean-forward="false" selection-start-line="124" selection-start-column="4" selection-end-line="133" selection-end-column="18" />
               <folding />
             </state>
@@ -117,20 +137,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>&lt;FormBill</find>
-      <find>onClickPaymentInfo</find>
-      <find>payment</find>
-      <find>ConfirmPayment</find>
-      <find>totalMoneyNeedToBePaid</find>
-      <find>onDataSaved</find>
-      <find>payment/update</find>
-      <find>action</find>
-      <find>getMoneyFromReceiver</find>
-      <find>paymentid</find>
-      <find>getreceivedmoney</find>
-      <find>onpayment</find>
-      <find>description</find>
-      <find>paymentType</find>
       <find>paymenttype</find>
       <find>Mã giao dịch</find>
       <find>chuyển khoản</find>
@@ -146,7 +152,21 @@
       <find>values</find>
       <find>objQuery</find>
       <find>cre</find>
+      <find>currentMenu</find>
+      <find>serialize</find>
+      <find>generateQueryString</find>
+      <find>queryStr</find>
+      <find>search</find>
+      <find>onClickmenu</find>
       <find>onsearch</find>
+      <find>order/list</find>
+      <find>hidden</find>
+      <find>orderstatus</find>
+      <find>senderAddress</find>
+      <find>getOrderList</find>
+      <find>renderReceiver</find>
+      <find>ordersInStatus</find>
+      <find>cancel</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -186,7 +206,6 @@
         <option value="$PROJECT_DIR$/src/routes/Order/Add.js" />
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/src/components/Order/FormOrder.js" />
-        <option value="$PROJECT_DIR$/src/utils/utils.js" />
         <option value="$PROJECT_DIR$/src/components/Pickup/styles.less" />
         <option value="$PROJECT_DIR$/src/components/Order/styles.less" />
         <option value="$PROJECT_DIR$/src/components/Pickup/PickupTable.js" />
@@ -207,8 +226,9 @@
         <option value="$PROJECT_DIR$/src/routes/Payment/History.js" />
         <option value="$PROJECT_DIR$/src/routes/Order/styles.less" />
         <option value="$PROJECT_DIR$/.eslintrc" />
-        <option value="$PROJECT_DIR$/src/routes/Order/List.js" />
         <option value="$PROJECT_DIR$/src/components/Order/SearchOrder.js" />
+        <option value="$PROJECT_DIR$/src/routes/Order/List.js" />
+        <option value="$PROJECT_DIR$/src/utils/utils.js" />
       </list>
     </option>
   </component>
@@ -257,6 +277,30 @@
               <item name="ghtl" type="b2602c69:ProjectViewProjectNode" />
               <item name="ghtl" type="462c0819:PsiDirectoryNode" />
               <item name="public" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ghtl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ghtl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ghtl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ghtl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="routes" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ghtl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ghtl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="routes" type="462c0819:PsiDirectoryNode" />
+              <item name="Pickup" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ghtl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ghtl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="utils" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -366,12 +410,13 @@
       <workItem from="1526474252008" duration="13733000" />
       <workItem from="1526739461147" duration="2327000" />
       <workItem from="1526745510814" duration="1060000" />
-      <workItem from="1526904057445" duration="10726000" />
+      <workItem from="1526904057445" duration="13070000" />
+      <workItem from="1527122590103" duration="9489000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="336405000" />
+    <option name="totallyTimeSpent" value="348238000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1234" height="777" extended-state="6" />
@@ -410,13 +455,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/components/Delivery/Delivery.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1680">
-          <caret line="117" column="25" lean-forward="true" selection-start-line="117" selection-start-column="25" selection-end-line="117" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/layouts/PageHeaderLayout.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -442,13 +480,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="570">
           <caret line="40" column="38" lean-forward="true" selection-start-line="40" selection-start-column="38" selection-end-line="40" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/components/Delivery/DeliveryInfo.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="77" />
         </state>
       </provider>
     </entry>
@@ -576,31 +607,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/utils/utils.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" column="37" lean-forward="false" selection-start-line="20" selection-start-column="37" selection-end-line="20" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/components/Pickup/styles.less">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="12" column="0" lean-forward="true" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/routes/Pickup/List.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="268">
-          <caret line="76" column="21" lean-forward="true" selection-start-line="76" selection-start-column="21" selection-end-line="76" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/components/Pickup/ClientOrderTable.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="30" column="2" lean-forward="false" selection-start-line="30" selection-start-column="2" selection-end-line="30" selection-end-column="2" />
         </state>
       </provider>
     </entry>
@@ -707,7 +717,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="10" lean-forward="false" selection-start-line="0" selection-start-column="10" selection-end-line="0" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -715,13 +724,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="55" column="18" lean-forward="false" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="18" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/components/Pickup/PickupTable.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
+        <state relative-caret-position="195">
           <caret line="17" column="6" lean-forward="false" selection-start-line="17" selection-start-column="6" selection-end-line="17" selection-end-column="6" />
           <folding>
             <element signature="e#0#41#0" expanded="true" />
@@ -731,7 +739,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/routes/Money/History.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
+        <state relative-caret-position="1035">
           <caret line="74" column="30" lean-forward="false" selection-start-line="74" selection-start-column="24" selection-end-line="74" selection-end-column="30" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
@@ -741,15 +749,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/components/Order/FormOrder.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="353">
-          <caret line="94" column="6" lean-forward="true" selection-start-line="94" selection-start-column="6" selection-end-line="94" selection-end-column="6" />
+        <state relative-caret-position="1365">
+          <caret line="94" column="6" lean-forward="false" selection-start-line="94" selection-start-column="6" selection-end-line="94" selection-end-column="6" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/components/Order/FormOrderRenderer.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2572">
+        <state relative-caret-position="3105">
           <caret line="212" column="60" lean-forward="false" selection-start-line="212" selection-start-column="60" selection-end-line="212" selection-end-column="60" />
           <folding />
         </state>
@@ -757,7 +765,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/components/Payment/FormPaymentMethod.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
+        <state relative-caret-position="1800">
           <caret line="124" column="4" lean-forward="false" selection-start-line="124" selection-start-column="4" selection-end-line="133" selection-end-column="18" />
           <folding />
         </state>
@@ -771,6 +779,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/utils/utils.less">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/.eslintrc">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -779,23 +794,57 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/routes/Order/List.js">
+    <entry file="file://$PROJECT_DIR$/src/components/Order/SearchOrder.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="103">
-          <caret line="106" column="3" lean-forward="false" selection-start-line="106" selection-start-column="3" selection-end-line="106" selection-end-column="3" />
+        <state relative-caret-position="133">
+          <caret line="74" column="19" lean-forward="true" selection-start-line="74" selection-start-column="19" selection-end-line="74" selection-end-column="19" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/components/Order/SearchOrder.js">
+    <entry file="file://$PROJECT_DIR$/src/components/Delivery/DeliveryInfo.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="53" column="9" lean-forward="true" selection-start-line="53" selection-start-column="9" selection-end-line="53" selection-end-column="9" />
+        <state relative-caret-position="391">
+          <caret line="90" column="47" lean-forward="false" selection-start-line="90" selection-start-column="33" selection-end-line="90" selection-end-column="47" />
+          <folding>
+            <element signature="e#0#41#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/routes/Pickup/List.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="76" column="18" lean-forward="false" selection-start-line="76" selection-start-column="18" selection-end-line="76" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/Pickup/ClientOrderTable.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="114" column="4" lean-forward="false" selection-start-line="114" selection-start-column="4" selection-end-line="115" selection-end-column="66" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/routes/Order/List.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="193">
+          <caret line="158" column="31" lean-forward="false" selection-start-line="158" selection-start-column="31" selection-end-line="158" selection-end-column="31" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/utils/utils.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="31" column="42" lean-forward="false" selection-start-line="31" selection-start-column="42" selection-end-line="31" selection-end-column="42" />
+          <folding />
         </state>
       </provider>
     </entry>

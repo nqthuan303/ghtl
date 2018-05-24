@@ -10,7 +10,7 @@ import queryString from 'query-string';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import globalStyles from '../../index.less';
 import request from '../../utils/request';
-import { convertDateTime } from '../../utils/utils';
+import { convertDateTime, generateQueryString } from '../../utils/utils';
 import styles from './styles.less';
 import { orderPayBy, order as orderStatus } from '../../constants/status';
 import SearchOrder from '../../components/Order/SearchOrder';
@@ -22,7 +22,6 @@ class OrderList extends React.Component {
     super(props);
     this.state = {
       ordersInStatus: [],
-      currentMenu: 'all',
       objSearch: {},
     };
     this.selectedOrder = '';
@@ -30,22 +29,32 @@ class OrderList extends React.Component {
   componentDidMount() {
     const { location: { search } } = this.props;
     const objSearch = queryString.parse(search);
-    if (Object.keys(objSearch).length > 0) {
+    if (Object.keys(objSearch).length === 0) {
+      objSearch.orderstatus = 'all';
+    }
+    this.setState({ objSearch });
+    this.getOrderList(objSearch);
+    this.getOrdersInStatus(objSearch);
+  }
+  componentWillReceiveProps(nextProps) {
+    const { location: { search: nextSearch } } = nextProps;
+    const { location: { search } } = this.props;
+    if (search !== nextSearch) {
+      const objSearch = queryString.parse(nextSearch);
+      this.getOrderList(objSearch);
+      this.getOrdersInStatus(objSearch);
       this.setState({ objSearch });
     }
-    this.getOrderList();
-    this.getOrdersInStatus();
   }
   onClickMenu = ({ key }) => {
-    const { currentMenu } = this.state;
-    let options = {};
-    if (key !== 'all' && currentMenu !== key) {
-      options = { orderStatusId: key };
-    }
-    this.getOrderList(options);
-    this.setState({
-      currentMenu: key,
+    const { objSearch } = this.state;
+    objSearch.orderstatus = key;
+    const queryStr = generateQueryString(objSearch);
+    this.props.history.push({
+      pathname: '/order/list',
+      search: queryStr,
     });
+    this.setState({ objSearch });
   }
   onClickDelete = async (record, index) => {
     confirm({
@@ -95,25 +104,20 @@ class OrderList extends React.Component {
     });
   }
   onConfirmCancelOrder = async () => {
+    const { objSearch } = this.state;
     const url = '/order/cancel';
     const result = await request(url, {
       body: { orderId: this.selectedOrder },
       method: 'POST',
     });
     if (result.status === 'success') {
-      this.getOrderList();
-      this.getOrdersInStatus();
+      this.getOrderList(objSearch);
+      this.getOrdersInStatus(objSearch);
     }
   }
-  onSearch = () => {
-    const { location: { search } } = this.props;
-    const objSearch = queryString.parse(search);
-    if (Object.keys(objSearch).length > 0) {
-      this.setState({ objSearch });
-    }
-  }
-  async getOrdersInStatus() {
-    const result = await request('/order/count-order-in-status');
+  async getOrdersInStatus(options) {
+    const url = this.buildUrl('/order/count-order-in-status', options);
+    const result = await request(url);
     this.setState({
       ordersInStatus: result,
     });
@@ -129,8 +133,8 @@ class OrderList extends React.Component {
     let result = url;
     if (options) {
       for (const key in options) {
-        if (url.includes('?')) {
-          result += `&${key}=options[key]`;
+        if (result.includes('?')) {
+          result += `&${key}=${options[key]}`;
         } else {
           result += `?${key}=${options[key]}`;
         }
@@ -162,15 +166,26 @@ class OrderList extends React.Component {
   }
 
   renderSender = ({ client }) => {
-    return client ? client.name : '';
+    return (
+      <div>
+        <p>{client.name}</p>
+        <p>{client.phone}</p>
+      </div>
+    );
   }
 
-  renderReceiverName = ({ receiver }) => {
-    return receiver ? receiver.name : '';
+  renderReceiver = ({ receiver }) => {
+    return (
+      <div>
+        <p>{receiver.name}</p>
+        <p>{receiver.phone}</p>
+      </div>
+    );
   }
 
   renderReceiverAddress = ({ receiver }) => {
-    return receiver ? receiver.address : '';
+    const { district, ward } = receiver;
+    return `${receiver.address}, ${ward.type} ${ward.name}, ${district.type} ${district.name}`;
   }
   renderTotalMoney = ({ goodsMoney, payBy, shipFee }) => {
     let result = 0;
@@ -213,7 +228,7 @@ class OrderList extends React.Component {
   }
 
   render() {
-    const { items, currentMenu, objSearch } = this.state;
+    const { items, objSearch } = this.state;
     const columns = [
       {
         key: 'id',
@@ -230,7 +245,7 @@ class OrderList extends React.Component {
       {
         key: 'ReceiverName',
         title: 'Người nhận',
-        render: this.renderReceiverName,
+        render: this.renderReceiver,
       },
       {
         key: 'ReceiverAddress',
@@ -254,16 +269,15 @@ class OrderList extends React.Component {
         render: this.renderAction,
       },
     ];
-
     return (
       <PageHeaderLayout title="Danh sách đơn hàng">
         <Button onClick={this.onClickAddOrder}>Thêm đơn hàng</Button>
-        <SearchOrder onSearch={this.onSearch} objSearch={objSearch} />
+        <SearchOrder objSearch={objSearch} />
         <div className={globalStyles.tableList}>
           <Menu
             style={{ marginBottom: 20 }}
             onClick={this.onClickMenu}
-            selectedKeys={[currentMenu]}
+            selectedKeys={[objSearch.orderstatus]}
             mode="horizontal"
           >
             <Menu.Item key="all">

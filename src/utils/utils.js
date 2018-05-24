@@ -15,9 +15,21 @@ export function getPlainNode(nodeList, parentPath = '') {
   });
   return arr;
 }
+export function generateQueryString(obj) {
+  const str = [];
+  for (const p in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, p)) {
+      if (obj[p]) {
+        const url = `${encodeURIComponent(p)}=${encodeURIComponent(obj[p])}`;
+        str.push(url);
+      }
+    }
+  }
+  return str.join('&');
+}
 export function convertDateTime(dateTime) {
   const objDateTime = new Date(dateTime);
-  const month = objDateTime.getMonth();
+  const month = objDateTime.getMonth() + 1;
   const date = objDateTime.getDate();
   const hour = objDateTime.getHours();
   const min = objDateTime.getMinutes();

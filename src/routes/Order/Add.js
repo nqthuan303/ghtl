@@ -27,7 +27,7 @@ class AddOrder extends React.Component {
   }
 
   getTempOrderList = async () => {
-    const result = await request('/order/list?status=temp');
+    const result = await request('/order/list?orderstatus=temp');
     const { data } = result;
     const inProcessIds = [];
 
