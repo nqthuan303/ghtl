@@ -142,8 +142,8 @@ class Update extends Component {
   async convertOrderStorage(order) {
     const postData = Object.assign({}, order);
     postData.orderstatus = objOrderStatus.STORAGE.value;
-    const updateOrder = await request(`/order/update/${postData._id}`, { method: 'PUT', body: postData });
-    if (updateOrder.message === 'Success') {
+    const updateOrder = await request(`/order/update/${postData._id}`, { method: 'POST', body: postData });
+    if (updateOrder.status === 'success') {
       delete deliveryOrders[postData._id];
       let index = -1;
       for (let i = 0; i < delivery.orders.length; i += 1) {

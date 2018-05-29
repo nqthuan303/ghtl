@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router';
 import { Table, Divider, Modal } from 'antd';
+import { convertDateTime } from '../../utils/utils';
 
 const { confirm } = Modal;
 
@@ -26,6 +28,14 @@ class TempOrder extends Component {
       },
     });
   }
+  onClickEdit(orderId) {
+    const { history } = this.props;
+    history.push(`/order/save/${orderId}`);
+  }
+
+  renderCreatedAt = (record) => {
+    return convertDateTime(record.createdAt);
+  }
 
   render() {
     const { data } = this.props;
@@ -33,13 +43,12 @@ class TempOrder extends Component {
     const columns = [
       {
         title: 'Mã',
-        width: '6%',
+        width: '70px',
         dataIndex: 'id',
       },
       {
         title: 'Ngày tạo',
-        dataIndex: 'createdAt',
-
+        render: this.renderCreatedAt,
       },
       {
         title: 'Shop',
@@ -54,12 +63,6 @@ class TempOrder extends Component {
         },
       },
       {
-        title: 'Số ĐT',
-        render: () => {
-          return '';
-        },
-      },
-      {
         title: 'Trạng thái',
         dataIndex: 'orderstatus',
 
@@ -70,7 +73,7 @@ class TempOrder extends Component {
           <div>
             <a onClick={() => this.onClickDelete(record._id)}>Xóa</a>
             <Divider type="vertical" />
-            <a>Sửa</a>
+            <a onClick={() => this.onClickEdit(record._id)}>Sửa</a>
           </div>
         ),
       },
@@ -87,4 +90,4 @@ class TempOrder extends Component {
   }
 }
 
-export default TempOrder;
+export default withRouter(TempOrder);

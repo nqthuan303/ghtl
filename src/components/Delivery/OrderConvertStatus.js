@@ -39,8 +39,8 @@ class OrderConvertStatus extends Component {
       const order = this.props.orderConvert;
       if (order.orderstatus !== selectStatus) {
         order.orderstatus = selectStatus;
-        request(`/order/update/${order._id}`, { method: 'PUT', body: order }).then((result) => {
-          if (result.message === 'Success') {
+        request(`/order/update/${order._id}`, { method: 'POST', body: order }).then((result) => {
+          if (result.status === 'success') {
             this.props.onSaveData(order);
           } else {
             notification.error({

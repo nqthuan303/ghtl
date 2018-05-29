@@ -5,9 +5,12 @@ import FormOrder from '../../components/Order/FormOrder';
 import TempOrder from '../../components/Order/TempOrder';
 import request from '../../utils/request';
 
-class AddOrder extends React.Component {
+class SaveOrder extends React.Component {
   constructor(props) {
     super(props);
+    if (props.match.params.id) {
+      this.orderId = props.match.params.id;
+    }
     this.state = {
       tempOrders: [],
     };
@@ -16,16 +19,9 @@ class AddOrder extends React.Component {
   componentDidMount() {
     this.getTempOrderList();
   }
-  onSaveTempOrder = (data) => {
-    const { tempOrders, inProcessIds } = this.state;
-    tempOrders.unshift(data);
-    inProcessIds.unshift(data._id);
-    this.setState({
-      tempOrders,
-      inProcessIds,
-    });
+  onSaveTempOrder = () => {
+    this.getTempOrderList();
   }
-
   getTempOrderList = async () => {
     const result = await request('/order/list?orderstatus=temp');
     const { data } = result;
@@ -89,4 +85,4 @@ class AddOrder extends React.Component {
     );
   }
 }
-export default AddOrder;
+export default SaveOrder;

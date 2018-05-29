@@ -72,7 +72,7 @@ class OrderList extends React.Component {
 
   onClickAddOrder = () => {
     const { history } = this.props;
-    history.push('/order/add');
+    history.push('/order/save');
   }
   async onConfirmDelete(id, index) {
     const result = await request(`/order/delete/${id}`, {
@@ -114,6 +114,10 @@ class OrderList extends React.Component {
       this.getOrderList(objSearch);
       this.getOrdersInStatus(objSearch);
     }
+  }
+  onClickId(orderId) {
+    const { history } = this.props;
+    history.push(`/order/save/${orderId}`);
   }
   async getOrdersInStatus(options) {
     const url = this.buildUrl('/order/count-order-in-status', options);
@@ -159,7 +163,7 @@ class OrderList extends React.Component {
     const dateTime = convertDateTime(createdAt);
     return (
       <div className={styles.colOrderId}>
-        <a className={styles.orderId}>{record.id}</a>
+        <a onClick={() => this.onClickId(record._id)} className={styles.orderId}>{record.id}</a>
         <p className={styles.createdAt}>({dateTime})</p>
       </div>
     );

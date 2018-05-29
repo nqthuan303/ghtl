@@ -25,8 +25,14 @@ export const getNavData = app => [
       {
         name: 'Thêm đơn hàng',
         showOnSideBar: false,
-        path: 'order/add',
-        component: dynamicWrapper(app, ['order'], () => import('../routes/Order/Add')),
+        path: 'order/save',
+        component: dynamicWrapper(app, ['order'], () => import('../routes/Order/Save')),
+      },
+      {
+        name: 'Cập nhật đơn hàng',
+        showOnSideBar: false,
+        path: 'order/save/:id',
+        component: dynamicWrapper(app, ['order'], () => import('../routes/Order/Save')),
       },
       {
         name: 'Chuyến đi lấy',
