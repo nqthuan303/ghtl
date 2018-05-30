@@ -14,6 +14,8 @@ import { convertDateTime, generateQueryString } from '../../utils/utils';
 import styles from './styles.less';
 import { orderPayBy, order as orderStatus } from '../../constants/status';
 import SearchOrder from '../../components/Order/SearchOrder';
+import OrderDetail from '../../components/Order/OrderDetail';
+import FormOrder from '../../components/Order/FormOrder';
 
 const { confirm } = Modal;
 
@@ -23,6 +25,9 @@ class OrderList extends React.Component {
     this.state = {
       ordersInStatus: [],
       objSearch: {},
+      orderDetailModal: false,
+      orderFormModal: false,
+      orderId: '',
     };
     this.selectedOrder = '';
   }
@@ -115,9 +120,16 @@ class OrderList extends React.Component {
       this.getOrdersInStatus(objSearch);
     }
   }
-  onClickId(orderId) {
-    const { history } = this.props;
-    history.push(`/order/save/${orderId}`);
+  onClickId() {
+    this.setState({
+      orderDetailModal: true,
+    });
+  }
+  onClickEditOrder(orderId) {
+    this.setState({
+      orderFormModal: true,
+      orderId,
+    });
   }
   async getOrdersInStatus(options) {
     const url = this.buildUrl('/order/count-order-in-status', options);
@@ -147,6 +159,17 @@ class OrderList extends React.Component {
     return result;
   }
 
+  handleCancel = () => {
+    this.setState({
+      orderDetailModal: false,
+    });
+  }
+
+  closeOrderForm = () => {
+    this.setState({
+      orderFormModal: false,
+    });
+  }
   renderMenu() {
     const { ordersInStatus } = this.state;
     return ordersInStatus.map((item) => {
@@ -163,12 +186,11 @@ class OrderList extends React.Component {
     const dateTime = convertDateTime(createdAt);
     return (
       <div className={styles.colOrderId}>
-        <a onClick={() => this.onClickId(record._id)} className={styles.orderId}>{record.id}</a>
+        <a onClick={() => this.onClickId(record)} className={styles.orderId}>{record.id}</a>
         <p className={styles.createdAt}>({dateTime})</p>
       </div>
     );
   }
-
   renderSender = ({ client }) => {
     return (
       <div>
@@ -201,16 +223,19 @@ class OrderList extends React.Component {
     }
     return result;
   }
+
   renderAction = (text, record, index) => {
     const { orderstatus } = record;
     let result = '-';
-    const { TEMP, PENDING, PICKUP, STORAGE, DELIVERYPREPARE } = orderStatus;
+    const { TEMP, PENDING, PICKUP, STORAGE, DELIVERYPREPARE, DELIVERY } = orderStatus;
     if (orderstatus === TEMP.value) {
       result = (
         <div>
           <a onClick={() => this.onClickDelete(record, index)}>Xóa</a>
           <Divider type="vertical" />
           <a>Duyệt</a>
+          <Divider type="vertical" />
+          <a onClick={() => this.onClickEditOrder(record._id)}>Sửa</a>
         </div>
       );
     }
@@ -221,8 +246,15 @@ class OrderList extends React.Component {
       orderstatus === DELIVERYPREPARE.value
     ) {
       result = (
-        <a onClick={() => this.onClickCancel(record._id)}>Hủy</a>
+        <div>
+          <a onClick={() => this.onClickCancel(record._id)}>Hủy</a>
+          <Divider type="vertical" />
+          <a onClick={() => this.onClickEditOrder(record._id)}>Sửa</a>
+        </div>
       );
+    }
+    if (orderstatus === DELIVERY.value) {
+      result = <a onClick={() => this.onClickEditOrder(record._id)}>Sửa</a>;
     }
     return (
       <div>
@@ -232,7 +264,7 @@ class OrderList extends React.Component {
   }
 
   render() {
-    const { items, objSearch } = this.state;
+    const { items, objSearch, orderDetailModal, orderFormModal, orderId } = this.state;
     const columns = [
       {
         key: 'id',
@@ -295,6 +327,23 @@ class OrderList extends React.Component {
             columns={columns}
             pagination={{ showSizeChanger: true }}
           />
+          <Modal
+            title="Basic Modal"
+            visible={orderDetailModal}
+            footer={null}
+            onCancel={this.handleCancel}
+          >
+            <OrderDetail />
+          </Modal>
+          <Modal
+            width={800}
+            title="Cập nhật đơn hàng"
+            visible={orderFormModal}
+            footer={null}
+            onCancel={this.closeOrderForm}
+          >
+            <FormOrder onSave={this.closeOrderForm} orderId={orderId} />
+          </Modal>
         </div>
       </PageHeaderLayout>
     );

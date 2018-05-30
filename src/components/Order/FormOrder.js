@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Form, Input, Col, Button, Select, Row, notification } from 'antd';
+import { Form, Input, Col, Button, Select, Row, notification, Spin } from 'antd';
 import { withRouter } from 'react-router';
 import globalStyle from '../../index.less';
 import request from '../../utils/request';
@@ -58,6 +58,7 @@ class FormOrder extends React.Component {
       this.orderId = props.match.params.id;
     }
     this.state = {
+      loading: false,
       clients: [],
       districts: [],
       wards: [],
@@ -66,16 +67,23 @@ class FormOrder extends React.Component {
   }
 
   componentDidMount() {
+    const { orderId, form: { validateFields } } = this.props;
     if (this.orderId) {
       this.getOrder(this.orderId);
     }
-    this.props.form.validateFields();
+    if (orderId && orderId !== '') {
+      this.getOrder(orderId);
+    }
+    validateFields();
     this.getClientList();
     this.getDistrictList();
   }
   componentWillReceiveProps(nextProps) {
-    const { match: { params: { id } } } = this.props;
-    const { match: { params: { id: nextId } } } = nextProps;
+    const { match: { params: { id } }, orderId } = this.props;
+    const { match: { params: { id: nextId } }, orderId: nextOrderId } = nextProps;
+    if (orderId !== nextOrderId) {
+      this.getOrder(nextOrderId);
+    }
     if (id !== nextId) {
       this.getOrder(nextId);
     }
@@ -129,6 +137,9 @@ class FormOrder extends React.Component {
     }
   }
   async getOrder(orderId) {
+    const { form: { resetFields } } = this.props;
+    resetFields();
+    this.setState({ loading: true });
     const result = await request(`/order/findOne/${orderId}`);
     if (result.status === 'success') {
       const { data } = result;
@@ -156,6 +167,9 @@ class FormOrder extends React.Component {
       goodsMoney: data.goodsMoney,
       shipFee: data.shipFee,
       payBy: data.payBy,
+    });
+    this.setState({
+      loading: false,
     });
   }
   async getClientList() {
@@ -198,8 +212,15 @@ class FormOrder extends React.Component {
     validateFields(async (err, values) => {
       if (!err) {
         const { onSave } = this.props;
-        const url = this.orderId ? `/order/update/${this.orderId}` : '/order/add';
-        const message = this.orderId ? 'Cập nhật đơn hàng thành công!!!' : 'Thêm đơn hàng thành công!!!';
+        let id = '';
+        if (this.props.orderId && this.props.orderId !== '') {
+          id = this.props.orderId;
+        }
+        if (this.orderId) {
+          id = this.orderId;
+        }
+        const url = id !== '' ? `/order/update/${id}` : '/order/add';
+        const message = id ? 'Cập nhật đơn hàng thành công!!!' : 'Thêm đơn hàng thành công!!!';
         const result = await request(url, {
           method: 'POST',
           body: values,
@@ -272,206 +293,204 @@ class FormOrder extends React.Component {
     const clientError = isFieldTouched('client') && getFieldError('client');
 
     const errors = getFieldsError();
-
+    const { loading } = this.state;
     return (
-      <Form onSubmit={this.handleSubmit} className={globalStyle.appContent}>
-        <Row gutter={12}>
-          <Col span={6}>
-            <FormItem
-              validateStatus={clientError ? 'error' : ''}
-              help={clientError || ''}
-            >
-              {getFieldDecorator('client', {
-                rules: [{ required: true }],
-              })(
-                <Select
-                  onChange={this.onChangeClient}
-                  showSearch
-                  placeholder="Người gửi"
-                  optionFilterProp="children"
-                >
-                  {this.renderClientOption()}
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col span={6}>
-            <FormItem>
-              {getFieldDecorator('senderPhone', {
-                rules: [{ required: false }],
-              })(
-                <Input disabled placeholder="SĐT người gửi" />
-              )}
-            </FormItem>
-          </Col>
-          <Col span={6}>
-            <FormItem>
-              <FormItem>
-                {getFieldDecorator('senderAddress', {
-                  rules: [{ required: false }],
+      <Spin tip="Loading..." spinning={loading}>
+        <Form onSubmit={this.handleSubmit} className={globalStyle.appContent}>
+          <Row gutter={12}>
+            <Col span={6}>
+              <FormItem
+                validateStatus={clientError ? 'error' : ''}
+                help={clientError || ''}
+              >
+                {getFieldDecorator('client', {
+                  rules: [{ required: true }],
                 })(
-                  <Input placeholder="Địa chỉ" disabled />
+                  <Select
+                    onChange={this.onChangeClient}
+                    showSearch
+                    placeholder="Người gửi"
+                    optionFilterProp="children"
+                  >
+                    {this.renderClientOption()}
+                  </Select>
                 )}
               </FormItem>
-            </FormItem>
-          </Col>
-          <Col span={6}>
-            <FormItem>
-              {getFieldDecorator('senderDistrict', {
-                rules: [{ required: false }],
-              })(
-                <Input placeholder="Quận/Huyện" disabled />
-              )}
-            </FormItem>
-          </Col>
-        </Row>
-        <Row gutter={12}>
-          <Col span={12}>
-            <p style={{ fontWeight: 'bold' }}>1. Người nhận</p>
-            <FormItem
-              validateStatus={receiverPhoneError ? 'error' : ''}
-              help={receiverPhoneError || ''}
-              {...formItemLayout}
-              label="Số điện thoại"
-            >
-              {getFieldDecorator('receiver.phone', {
-                rules: [{ required: true }],
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem
-              validateStatus={receiverNameError ? 'error' : ''}
-              help={receiverNameError || ''}
-              {...formItemLayout}
-              label="Họ tên"
-            >
-              {getFieldDecorator('receiver.name', {
-                rules: [{ required: true }],
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem
-              validateStatus={receiverAddressError ? 'error' : ''}
-              help={receiverAddressError || ''}
-              {...formItemLayout}
-              label="Địa chỉ"
-            >
-              {getFieldDecorator('receiver.address', {
-                rules: [{ required: true }],
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem colon={false} {...formItemLayout} label=" ">
-              <Row gutter={12}>
-                <Col span={12}>
-                  <FormItem
-                    validateStatus={receiverDistrictError ? 'error' : ''}
-                    help={receiverDistrictError || ''}
-                  >
-                    {getFieldDecorator('receiver.district', {
-                      rules: [{ required: true }],
-                    })(
-                      <Select
-                        showSearch
-                        onChange={this.onChangeDistrict}
-                        placeholder="Quận/Huyện"
-                        optionFilterProp="children"
-                      >
-                        {this.renderDistrictOption()}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={12}>
-                  <FormItem
-                    validateStatus={receiverWardError ? 'error' : ''}
-                    help={receiverWardError || ''}
-                  >
-                    {getFieldDecorator('receiver.ward', {
-                      rules: [{ required: true }],
-                    })(
-                      <Select
-                        showSearch
-                        placeholder="Phường/Xã"
-                        optionFilterProp="children"
-                      >
-                        {this.renderWardOption()}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-              </Row>
-            </FormItem>
-            <p style={{ fontWeight: 'bold' }}>2. Hàng hóa</p>
-            <FormItem {...formItemLayout} label="Yêu cầu">
-              {getFieldDecorator('require', {
-                rules: [{ required: false }],
-                initialValue: 'notAllowSeeGoods',
-              })(
-                <Select>
-                  <Option value="notAllowSeeGoods">Không được xem hàng</Option>
-                  <Option value="allowSeeGoods">Được xem hàng</Option>
-                </Select>
-              )}
-            </FormItem>
-            <FormItem {...formItemLayout} label="Ghi chú">
-              {getFieldDecorator('note', {
-                rules: [{ required: false }],
-              })(
-                <TextArea rows={4} />
-              )}
-            </FormItem>
-          </Col>
-          <Col span={12}>
-            <p style={{ fontWeight: 'bold' }}>4. Thu tiền</p>
-            <FormItem {...formItemLayout} label="Tiền hàng">
-              {getFieldDecorator('goodsMoney', {
-                rules: [{ required: true }],
-                initialValue: 0,
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem {...formItemLayout} label="Cước phí">
-              {getFieldDecorator('shipFee', {
-                rules: [{ required: true }],
-                initialValue: 0,
-              })(
-                <Input type="hidden" />
-              )}
-              {shipFee}
-            </FormItem>
-            <FormItem {...formItemLayout} label="Trả cước">
-              {getFieldDecorator('payBy', {
-                rules: [{ required: true }],
-                initialValue: orderPayBy.SENDER.value,
-              })(
-                <Select>
-                  <Option value={orderPayBy.SENDER.value}>Người gửi</Option>
-                  <Option value={orderPayBy.RECEIVER.value}>Người nhận</Option>
-                </Select>
-              )}
-            </FormItem>
-            <FormItem {...formItemLayout} label="Thu khách">
-              {totalMoney}
-            </FormItem>
-            <FormItem {...tailFormItemLayout}>
-              <Button
-                disabled={hasErrors(errors)}
-                style={{ marginRight: 5 }}
-                type="primary"
-                htmlType="submit"
+            </Col>
+            <Col span={6}>
+              <FormItem>
+                {getFieldDecorator('senderPhone', {
+                  rules: [{ required: false }],
+                })(
+                  <Input disabled placeholder="SĐT người gửi" />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={6}>
+              <FormItem>
+                <FormItem>
+                  {getFieldDecorator('senderAddress', {
+                    rules: [{ required: false }],
+                  })(
+                    <Input placeholder="Địa chỉ" disabled />
+                  )}
+                </FormItem>
+              </FormItem>
+            </Col>
+            <Col span={6}>
+              <FormItem>
+                {getFieldDecorator('senderDistrict', {
+                  rules: [{ required: false }],
+                })(
+                  <Input placeholder="Quận/Huyện" disabled />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row gutter={12}>
+            <Col span={12}>
+              <p style={{ fontWeight: 'bold' }}>1. Người nhận</p>
+              <FormItem
+                validateStatus={receiverPhoneError ? 'error' : ''}
+                help={receiverPhoneError || ''}
+                {...formItemLayout}
+                label="Số ĐT"
               >
-                Tạo tiếp
-              </Button>
-              {showEndButton ? <Button type="danger" onClick={this.onClickBtnEnd}>Kết thúc</Button> : ''}
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
+                {getFieldDecorator('receiver.phone', {
+                  rules: [{ required: true }],
+                })(
+                  <Input />
+                )}
+              </FormItem>
+              <FormItem
+                validateStatus={receiverNameError ? 'error' : ''}
+                help={receiverNameError || ''}
+                {...formItemLayout}
+                label="Họ tên"
+              >
+                {getFieldDecorator('receiver.name', {
+                  rules: [{ required: true }],
+                })(
+                  <Input />
+                )}
+              </FormItem>
+              <FormItem
+                validateStatus={receiverAddressError ? 'error' : ''}
+                help={receiverAddressError || ''}
+                {...formItemLayout}
+                label="Địa chỉ"
+              >
+                {getFieldDecorator('receiver.address', {
+                  rules: [{ required: true }],
+                })(
+                  <Input />
+                )}
+              </FormItem>
+              <FormItem
+                validateStatus={receiverDistrictError ? 'error' : ''}
+                help={receiverDistrictError || ''}
+                {...formItemLayout}
+                label="Quận"
+              >
+                {getFieldDecorator('receiver.district', {
+                  rules: [{ required: true }],
+                })(
+                  <Select
+                    showSearch
+                    onChange={this.onChangeDistrict}
+                    placeholder="Quận/Huyện"
+                    optionFilterProp="children"
+                  >
+                    {this.renderDistrictOption()}
+                  </Select>
+                )}
+              </FormItem>
+              <FormItem
+                validateStatus={receiverWardError ? 'error' : ''}
+                help={receiverWardError || ''}
+                {...formItemLayout}
+                label="Phường"
+              >
+                {getFieldDecorator('receiver.ward', {
+                  rules: [{ required: true }],
+                })(
+                  <Select
+                    showSearch
+                    placeholder="Phường/Xã"
+                    optionFilterProp="children"
+                  >
+                    {this.renderWardOption()}
+                  </Select>
+                )}
+              </FormItem>
+              <p style={{ fontWeight: 'bold' }}>2. Hàng hóa</p>
+              <FormItem {...formItemLayout} label="Yêu cầu">
+                {getFieldDecorator('require', {
+                  rules: [{ required: false }],
+                  initialValue: 'notAllowSeeGoods',
+                })(
+                  <Select>
+                    <Option value="notAllowSeeGoods">Không được xem hàng</Option>
+                    <Option value="allowSeeGoods">Được xem hàng</Option>
+                  </Select>
+                )}
+              </FormItem>
+              <FormItem {...formItemLayout} label="Ghi chú">
+                {getFieldDecorator('note', {
+                  rules: [{ required: false }],
+                })(
+                  <TextArea rows={4} />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={12}>
+              <p style={{ fontWeight: 'bold' }}>4. Thu tiền</p>
+              <FormItem {...formItemLayout} label="Tiền hàng">
+                {getFieldDecorator('goodsMoney', {
+                  rules: [{ required: true }],
+                  initialValue: 0,
+                })(
+                  <Input />
+                )}
+              </FormItem>
+              <FormItem {...formItemLayout} label="Cước phí">
+                {getFieldDecorator('shipFee', {
+                  rules: [{ required: true }],
+                  initialValue: 0,
+                })(
+                  <Input type="hidden" />
+                )}
+                {shipFee}
+              </FormItem>
+              <FormItem {...formItemLayout} label="Trả cước">
+                {getFieldDecorator('payBy', {
+                  rules: [{ required: true }],
+                  initialValue: orderPayBy.SENDER.value,
+                })(
+                  <Select>
+                    <Option value={orderPayBy.SENDER.value}>Người gửi</Option>
+                    <Option value={orderPayBy.RECEIVER.value}>Người nhận</Option>
+                  </Select>
+                )}
+              </FormItem>
+              <FormItem {...formItemLayout} label="Thu khách">
+                {totalMoney}
+              </FormItem>
+              <FormItem {...tailFormItemLayout}>
+                <Button
+                  disabled={hasErrors(errors)}
+                  style={{ marginRight: 5 }}
+                  type="primary"
+                  htmlType="submit"
+                >
+                  Lưu lại
+                </Button>
+                {showEndButton ? <Button type="danger" onClick={this.onClickBtnEnd}>Kết thúc</Button> : ''}
+              </FormItem>
+            </Col>
+          </Row>
+        </Form>
+      </Spin>
     );
   }
 }
