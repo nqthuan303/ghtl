@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="95a0f511-d8be-4e9e-a1c9-3ff7908dc8ec" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/components/Order/OrderDetail.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/Order/FormOrder.js" afterPath="$PROJECT_DIR$/src/components/Order/FormOrder.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/routes/Order/List.js" afterPath="$PROJECT_DIR$/src/routes/Order/List.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -25,8 +23,8 @@
       <file leaf-file-name="List.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/routes/Order/List.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1200">
-              <caret line="131" column="7" lean-forward="true" selection-start-line="131" selection-start-column="7" selection-end-line="131" selection-end-column="7" />
+            <state relative-caret-position="385">
+              <caret line="138" column="22" lean-forward="false" selection-start-line="138" selection-start-column="22" selection-end-line="138" selection-end-column="22" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
               </folding>
@@ -69,8 +67,8 @@
       <file leaf-file-name="FormOrder.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/Order/FormOrder.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="411" column="29" lean-forward="false" selection-start-line="411" selection-start-column="29" selection-end-line="411" selection-end-column="29" />
+            <state relative-caret-position="306">
+              <caret line="231" column="13" lean-forward="true" selection-start-line="231" selection-start-column="13" selection-end-line="231" selection-end-column="13" />
               <folding>
                 <element signature="e#1#27#0" expanded="true" />
               </folding>
@@ -100,16 +98,9 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>số điện thoại</find>
-      <find>receiver.name</find>
-      <find>withRou</find>
-      <find>order</find>
-      <find>receiver.phone</find>
-      <find>goodsMoney</find>
       <find>getFieldDecorator</find>
       <find>updateOrder</find>
       <find>setfieldsda</find>
-      <find>onsave</find>
       <find>receiverAddressError</find>
       <find>receiver.district</find>
       <find>order/update</find>
@@ -126,10 +117,17 @@
       <find>Số điện thoại</find>
       <find>state</find>
       <find>this.orderId</find>
-      <find>orderId</find>
       <find>!== '</find>
       <find>Tạo tiếp</find>
       <find>Địa chỉ</find>
+      <find>Duyệt</find>
+      <find>onclickeditorder</find>
+      <find>orderId</find>
+      <find>onClickEditOrder</find>
+      <find>selecte</find>
+      <find>selectedOrder</find>
+      <find>onOrderSaved</find>
+      <find>onsave</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -388,12 +386,12 @@
       <workItem from="1527574697051" duration="229000" />
       <workItem from="1527600939212" duration="5596000" />
       <workItem from="1527644994999" duration="154000" />
-      <workItem from="1527688528482" duration="4312000" />
+      <workItem from="1527688528482" duration="6422000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="373744000" />
+    <option name="totallyTimeSpent" value="375854000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1234" height="777" extended-state="6" />
@@ -559,8 +557,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/components/Order/FormOrder.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="411" column="29" lean-forward="false" selection-start-line="411" selection-start-column="29" selection-end-line="411" selection-end-column="29" />
+        <state relative-caret-position="306">
+          <caret line="231" column="13" lean-forward="true" selection-start-line="231" selection-start-column="13" selection-end-line="231" selection-end-column="13" />
           <folding>
             <element signature="e#1#27#0" expanded="true" />
           </folding>
@@ -569,8 +567,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/routes/Order/List.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1200">
-          <caret line="131" column="7" lean-forward="true" selection-start-line="131" selection-start-column="7" selection-end-line="131" selection-end-column="7" />
+        <state relative-caret-position="385">
+          <caret line="138" column="22" lean-forward="false" selection-start-line="138" selection-start-column="22" selection-end-line="138" selection-end-column="22" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>

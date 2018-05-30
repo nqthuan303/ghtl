@@ -28,8 +28,10 @@ class OrderList extends React.Component {
       orderDetailModal: false,
       orderFormModal: false,
       orderId: '',
+      orderShortId: '',
     };
     this.selectedOrder = '';
+    this.selectedIndex = '';
   }
   componentDidMount() {
     const { location: { search } } = this.props;
@@ -125,10 +127,21 @@ class OrderList extends React.Component {
       orderDetailModal: true,
     });
   }
-  onClickEditOrder(orderId) {
+  onClickEditOrder(record, index) {
+    this.selectedIndex = index;
     this.setState({
       orderFormModal: true,
-      orderId,
+      orderId: record._id,
+      orderShortId: record.id,
+    });
+  }
+  onOrderSaved = (data) => {
+    console.log(data);
+    const { items } = this.state;
+    items[this.selectedIndex] = data;
+    this.setState({
+      items,
+      orderFormModal: false,
     });
   }
   async getOrdersInStatus(options) {
@@ -233,9 +246,9 @@ class OrderList extends React.Component {
         <div>
           <a onClick={() => this.onClickDelete(record, index)}>Xóa</a>
           <Divider type="vertical" />
-          <a>Duyệt</a>
+          <a onClick={() => this.onClickEditOrder(record, index)}>Sửa</a>
           <Divider type="vertical" />
-          <a onClick={() => this.onClickEditOrder(record._id)}>Sửa</a>
+          <a>Duyệt</a>
         </div>
       );
     }
@@ -249,12 +262,12 @@ class OrderList extends React.Component {
         <div>
           <a onClick={() => this.onClickCancel(record._id)}>Hủy</a>
           <Divider type="vertical" />
-          <a onClick={() => this.onClickEditOrder(record._id)}>Sửa</a>
+          <a onClick={() => this.onClickEditOrder(record, index)}>Sửa</a>
         </div>
       );
     }
     if (orderstatus === DELIVERY.value) {
-      result = <a onClick={() => this.onClickEditOrder(record._id)}>Sửa</a>;
+      result = <a onClick={() => this.onClickEditOrder(record, index)}>Sửa</a>;
     }
     return (
       <div>
@@ -264,7 +277,12 @@ class OrderList extends React.Component {
   }
 
   render() {
-    const { items, objSearch, orderDetailModal, orderFormModal, orderId } = this.state;
+    const {
+      items, objSearch,
+      orderDetailModal,
+      orderFormModal, orderId,
+      orderShortId,
+    } = this.state;
     const columns = [
       {
         key: 'id',
@@ -337,12 +355,12 @@ class OrderList extends React.Component {
           </Modal>
           <Modal
             width={800}
-            title="Cập nhật đơn hàng"
+            title={`Cập nhật đơn hàng ${orderShortId}`}
             visible={orderFormModal}
             footer={null}
             onCancel={this.closeOrderForm}
           >
-            <FormOrder onSave={this.closeOrderForm} orderId={orderId} />
+            <FormOrder onSave={this.onOrderSaved} orderId={orderId} />
           </Modal>
         </div>
       </PageHeaderLayout>
