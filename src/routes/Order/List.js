@@ -122,9 +122,10 @@ class OrderList extends React.Component {
       this.getOrdersInStatus(objSearch);
     }
   }
-  onClickId() {
+  onClickId(orderId) {
     this.setState({
       orderDetailModal: true,
+      orderId,
     });
   }
   onClickEditOrder(record, index) {
@@ -136,7 +137,6 @@ class OrderList extends React.Component {
     });
   }
   onOrderSaved = (data) => {
-    console.log(data);
     const { items } = this.state;
     items[this.selectedIndex] = data;
     this.setState({
@@ -199,7 +199,7 @@ class OrderList extends React.Component {
     const dateTime = convertDateTime(createdAt);
     return (
       <div className={styles.colOrderId}>
-        <a onClick={() => this.onClickId(record)} className={styles.orderId}>{record.id}</a>
+        <a onClick={() => this.onClickId(record._id)} className={styles.orderId}>{record.id}</a>
         <p className={styles.createdAt}>({dateTime})</p>
       </div>
     );
@@ -349,9 +349,11 @@ class OrderList extends React.Component {
             title="Basic Modal"
             visible={orderDetailModal}
             footer={null}
+            width={1024}
+            header={null}
             onCancel={this.handleCancel}
           >
-            <OrderDetail />
+            <OrderDetail orderId={orderId} />
           </Modal>
           <Modal
             width={800}

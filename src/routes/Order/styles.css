@@ -7,3 +7,38 @@
 .btnSearch {
   margin-right: 10px;
 }
+.orderDetailContainer {
+  width: 100%;
+}
+.clientInfoContainer {
+  width: 100%;
+  margin-bottom: 20px !important;
+}
+.orderInforContainer {
+  display: flex;
+}
+.orderInforBox {
+  width: 30%;
+  float: left;
+  border-right: 1px solid #ddd;
+  padding-left: 10px !important;
+}
+.orderMoneyBox {
+  border-right: 1px solid #ddd;
+  padding-right: 10px !important;
+  text-align: right;
+  width: 20%;
+  float: left;
+}
+.orderPaymentBox {
+  padding-left: 10px !important;
+  display: flex;
+  width: 20%;
+  float: left;
+  align-items: center;
+  justify-content: center;
+}
+.orderStatus {
+  position: absolute;
+  right: 32px;
+}
